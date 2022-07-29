@@ -19,8 +19,8 @@ defmodule Tetrex.Shape.Test do
     merged = Tetrex.Shape.merge(blue_l, red_t)
 
     expected = %Tetrex.Shape{
-      cols: 2,
-      rows: 2,
+      cols: 3,
+      rows: 3,
       squares: %{
         {0, 0} => :blue,
         {0, 1} => :red,
@@ -37,8 +37,8 @@ defmodule Tetrex.Shape.Test do
 
   test "move/2 offsets all the coordinates in a Shape" do
     shape = %Tetrex.Shape{
-      cols: 1,
-      rows: 1,
+      cols: 2,
+      rows: 2,
       squares: %{
         {0, 0} => :blue,
         {0, 1} => :red,
@@ -50,8 +50,8 @@ defmodule Tetrex.Shape.Test do
     moved = Tetrex.Shape.move(shape, {-2, 1})
 
     expected = %Tetrex.Shape{
-      cols: 1,
-      rows: 1,
+      cols: 2,
+      rows: 2,
       squares: %{
         {-2, 1} => :blue,
         {-2, 2} => :red,

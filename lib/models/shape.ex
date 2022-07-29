@@ -15,23 +15,27 @@ defmodule Tetrex.Shape do
   ...> ])
   %Tetrex.Shape{
       squares: %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue},
-      rows: 2,
-      cols: 1
+      rows: 3,
+      cols: 2
     }
   """
   @spec new([[atom() | nil]]) :: __MODULE__.t()
   def new(squares_2d) do
-    for {row, row_num} <- Stream.with_index(squares_2d),
-        {square, col_num} when square != nil <- Stream.with_index(row),
-        reduce: %__MODULE__{squares: %{}, rows: 0, cols: 0} do
-      %__MODULE__{squares: squares, rows: rows} ->
-        %__MODULE__{
-          squares: Map.put(squares, {row_num, col_num}, square),
-          rows: max(rows, row_num),
-          # Latest col_num is always the max so no need to check
-          cols: col_num
-        }
-    end
+    shape =
+      for {row, row_num} <- Stream.with_index(squares_2d),
+          {square, col_num} when square != nil <- Stream.with_index(row),
+          reduce: %__MODULE__{squares: %{}, rows: 0, cols: 0} do
+        %__MODULE__{squares: squares, rows: rows} ->
+          %__MODULE__{
+            squares: Map.put(squares, {row_num, col_num}, square),
+            rows: max(rows, row_num),
+            # Latest col_num is always the max so no need to check
+            cols: col_num
+          }
+      end
+
+    # Need to add 1 to rows and cols to represent how many, rather than max indexes
+    %__MODULE__{squares: shape.squares, rows: shape.rows + 1, cols: shape.cols + 1}
   end
 
   @spec move(__MODULE__.t(), {integer(), integer()}) :: __MODULE__.t()
