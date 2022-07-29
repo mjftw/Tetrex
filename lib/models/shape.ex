@@ -11,7 +11,7 @@ defmodule Tetrex.Shape do
   To leave a square empty, `nil` can be used.
 
   E.g.
-
+  ```
   iex> Tetrex.Shape.new([
   ...>   [:blue, nil],
   ...>   [:blue, nil],
@@ -22,6 +22,7 @@ defmodule Tetrex.Shape do
       rows: 3,
       cols: 2
     }
+  ```
   """
   @spec new([[atom() | nil]]) :: __MODULE__.t()
   def new(squares_2d) do
@@ -29,12 +30,11 @@ defmodule Tetrex.Shape do
       for {row, row_num} <- Stream.with_index(squares_2d),
           {square, col_num} when square != nil <- Stream.with_index(row),
           reduce: %__MODULE__{squares: %{}, rows: 0, cols: 0} do
-        %__MODULE__{squares: squares, rows: rows} ->
+        %__MODULE__{squares: squares, rows: rows, cols: cols} ->
           %__MODULE__{
             squares: Map.put(squares, {row_num, col_num}, square),
             rows: max(rows, row_num),
-            # Latest col_num is always the max so no need to check
-            cols: col_num
+            cols: max(cols, col_num)
           }
       end
 
@@ -53,6 +53,21 @@ defmodule Tetrex.Shape do
   end
 
   @doc """
+  Rotate the shape around the origin
+  """
+  @spec rotate(__MODULE__.t(), angle()) :: __MODULE__.t()
+  def rotate(shape, angle) do
+    squares =
+      shape.squares
+      |> rotate_squares(angle)
+      |> Map.new()
+
+    {rows, cols} = rotate_dimensions({shape.rows, shape.cols}, angle)
+
+    %__MODULE__{squares: squares, rows: rows, cols: cols}
+  end
+
+  @doc """
   Combine two Shapes. In the case of overlaps values from the second shape overwrite the first.
   """
   @spec merge(__MODULE__.t(), __MODULE__.t()) :: __MODULE__.t()
@@ -67,4 +82,18 @@ defmodule Tetrex.Shape do
   defp move_squares(squares, {x_offset, y_offset}) do
     Stream.map(squares, fn {{col, row}, value} -> {{col + x_offset, row + y_offset}, value} end)
   end
+
+  defp rotate_squares(squares, angle) do
+    Stream.map(squares, fn {coordinate, value} ->
+      {rotate_coordinate(coordinate, angle), value}
+    end)
+  end
+
+  defp rotate_coordinate({x, y}, :clockwise90), do: {y, -x}
+  defp rotate_coordinate({x, y}, :clockwise180), do: {-x, -y}
+  defp rotate_coordinate({x, y}, :clockwise270), do: {-y, x}
+
+  defp rotate_dimensions({rows, cols}, :clockwise90), do: {cols, rows}
+  defp rotate_dimensions({rows, cols}, :clockwise180), do: {rows, cols}
+  defp rotate_dimensions({rows, cols}, :clockwise270), do: {cols, rows}
 end
