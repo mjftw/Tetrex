@@ -2,6 +2,10 @@ defmodule Tetrex.Shape do
   @enforce_keys [:squares, :rows, :cols]
   defstruct squares: %{}, rows: 0, cols: 0
 
+  @type angle() :: :clockwise90 | :clockwise180 | :clockwise270
+  @type coordinate() :: coordinate()
+  @type placed_values() :: %{coordinate() => any()}
+
   @doc """
   Create a new Shape from a 2d list of values.
   To leave a square empty, `nil` can be used.
@@ -38,11 +42,11 @@ defmodule Tetrex.Shape do
     %__MODULE__{squares: shape.squares, rows: shape.rows + 1, cols: shape.cols + 1}
   end
 
-  @spec move(__MODULE__.t(), {integer(), integer()}) :: __MODULE__.t()
-  def move(shape, {offset_rows, offset_cols}) do
+  @spec move(__MODULE__.t(), coordinate()) :: __MODULE__.t()
+  def move(shape, offset) do
     squares =
       shape.squares
-      |> Enum.map(fn {{row, col}, value} -> {{row + offset_rows, col + offset_cols}, value} end)
+      |> move_squares(offset)
       |> Map.new()
 
     %__MODULE__{squares: squares, rows: shape.rows, cols: shape.cols}
@@ -58,5 +62,9 @@ defmodule Tetrex.Shape do
       rows: max(shape1.rows, shape2.rows),
       cols: max(shape1.cols, shape2.cols)
     }
+  end
+
+  defp move_squares(squares, {x_offset, y_offset}) do
+    Stream.map(squares, fn {{col, row}, value} -> {{col + x_offset, row + y_offset}, value} end)
   end
 end
