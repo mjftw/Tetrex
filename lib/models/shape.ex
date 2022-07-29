@@ -2,6 +2,23 @@ defmodule Tetrex.Shape do
   @enforce_keys [:squares, :rows, :cols]
   defstruct squares: %{}, rows: 0, cols: 0
 
+  @doc """
+  Create a new Shape from a 2d list of values.
+  To leave a square empty, `nil` can be used.
+
+  E.g.
+
+  iex> Tetrex.Shape.new([
+  ...>   [:blue, nil],
+  ...>   [:blue, nil],
+  ...>   [:blue, :blue],
+  ...> ])
+  %Tetrex.Shape{
+      squares: %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue},
+      rows: 2,
+      cols: 1
+    }
+  """
   @spec new([[atom() | nil]]) :: Shape.t()
   def new(squares_2d) do
     for {row, row_num} <- Stream.with_index(squares_2d),
