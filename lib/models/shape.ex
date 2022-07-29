@@ -56,15 +56,33 @@ defmodule Tetrex.Shape do
   Rotate the shape around the origin
   """
   @spec rotate(__MODULE__.t(), angle()) :: __MODULE__.t()
-  def rotate(shape, angle) do
-    squares =
-      shape.squares
+  def rotate(%__MODULE__{squares: squares, rows: rows, cols: cols}, angle) do
+    new_squares =
+      squares
       |> rotate_squares(angle)
       |> Map.new()
 
-    {rows, cols} = rotate_dimensions({shape.rows, shape.cols}, angle)
+    {new_rows, new_cols} = rotate_dimensions({rows, cols}, angle)
 
-    %__MODULE__{squares: squares, rows: rows, cols: cols}
+    %__MODULE__{squares: new_squares, rows: new_rows, cols: new_cols}
+  end
+
+  @doc """
+  Rotate the shape around a specific origin of rotation
+  """
+  @spec rotate(__MODULE__.t(), angle(), coordinate()) :: __MODULE__.t()
+  def rotate(%__MODULE__{squares: squares, rows: rows, cols: cols}, angle, {origin_x, origin_y}) do
+    # Rotating around a point is the same as moving to the origin, rotating, and moving back
+    new_squares =
+      squares
+      |> move_squares({-origin_x, -origin_y})
+      |> rotate_squares(angle)
+      |> move_squares({origin_x, origin_y})
+      |> Map.new()
+
+    {new_rows, new_cols} = rotate_dimensions({rows, cols}, angle)
+
+    %__MODULE__{squares: new_squares, rows: new_rows, cols: new_cols}
   end
 
   @doc """

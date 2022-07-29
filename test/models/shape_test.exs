@@ -95,7 +95,7 @@ defmodule Tetrex.Shape.Test do
     assert moved == expected
   end
 
-  test "rotate/2 can rotate a Shape around the origin 90 degrees" do
+  test "rotate/2 can rotate a Shape 90 degrees around the origin" do
     blue_l =
       Tetrex.Shape.new([
         [:blue],
@@ -114,7 +114,7 @@ defmodule Tetrex.Shape.Test do
     assert rotated == expected
   end
 
-  test "rotate/2 can rotate a Shape around the origin 180 degrees" do
+  test "rotate/2 can rotate a Shape 180 degrees around the origin" do
     blue_l =
       Tetrex.Shape.new([
         [:blue],
@@ -133,7 +133,7 @@ defmodule Tetrex.Shape.Test do
     assert rotated == expected
   end
 
-  test "rotate/2 can rotate a Shape around the origin 270 degrees" do
+  test "rotate/2 can rotate a Shape 270 degrees around the origin" do
     blue_l =
       Tetrex.Shape.new([
         [:blue],
@@ -145,6 +145,63 @@ defmodule Tetrex.Shape.Test do
 
     expected = %Tetrex.Shape{
       squares: %{{-1, 2} => :blue, {0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue},
+      rows: 2,
+      cols: 3
+    }
+
+    assert rotated == expected
+  end
+
+  test "rotate/3 can rotate a Shape 90 degrees around a given origin" do
+    blue_l =
+      Tetrex.Shape.new([
+        [:blue],
+        [:blue],
+        [:blue, :blue]
+      ])
+
+    rotated = Tetrex.Shape.rotate(blue_l, :clockwise90, {3, 1})
+
+    expected = %Tetrex.Shape{
+      squares: %{{2, 2} => :blue, {2, 3} => :blue, {2, 4} => :blue, {3, 2} => :blue},
+      rows: 2,
+      cols: 3
+    }
+
+    assert rotated == expected
+  end
+
+  test "rotate/3 can rotate a Shape 180 degrees around a given origin" do
+    blue_l =
+      Tetrex.Shape.new([
+        [:blue],
+        [:blue],
+        [:blue, :blue]
+      ])
+
+    rotated = Tetrex.Shape.rotate(blue_l, :clockwise180, {3, 1})
+
+    expected = %Tetrex.Shape{
+      squares: %{{4, 1} => :blue, {4, 2} => :blue, {5, 2} => :blue, {6, 2} => :blue},
+      rows: 3,
+      cols: 2
+    }
+
+    assert rotated == expected
+  end
+
+  test "rotate/3 can rotate a Shape 270 degrees around a given origin" do
+    blue_l =
+      Tetrex.Shape.new([
+        [:blue],
+        [:blue],
+        [:blue, :blue]
+      ])
+
+    rotated = Tetrex.Shape.rotate(blue_l, :clockwise270, {3, 1})
+
+    expected = %Tetrex.Shape{
+      squares: %{{3, 0} => :blue, {4, -2} => :blue, {4, -1} => :blue, {4, 0} => :blue},
       rows: 2,
       cols: 3
     }
