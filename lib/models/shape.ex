@@ -16,4 +16,16 @@ defmodule Tetrex.Shape do
         }
     end
   end
+
+  @doc """
+  Combine two Shapes. In the case of overlaps values from the second shape overwrite the first.
+  """
+  @spec merge(Shape.t(), Shape.t()) :: Shape.t()
+  def merge(shape1, shape2) do
+    %__MODULE__{
+      squares: Map.merge(shape1.squares, shape2.squares),
+      rows: max(shape1.rows, shape2.rows),
+      cols: max(shape1.cols, shape2.cols)
+    }
+  end
 end
