@@ -27,6 +27,17 @@ defmodule Tetrex.SparseGrid do
   @type sparse_grid() :: %{coordinate() => any()}
 
   @doc """
+  Create a new empty SparseGrid
+  E.g.
+  ```
+  iex> Tetrex.SparseGrid.new()
+  %{}
+  ```
+  """
+  @spec new() :: sparse_grid()
+  def new(), do: %{}
+
+  @doc """
   Create a new SparseGrid from a 2d list of values.
   To leave a grid empty, `nil` can be used.
 
