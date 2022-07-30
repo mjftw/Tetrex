@@ -21,9 +21,9 @@ defmodule Tetrex.SparseGrid do
   """
 
   @type angle() :: :clockwise90 | :clockwise180 | :clockwise270
-  @type coordinate_x :: integer()
-  @type coordinate_y :: integer()
-  @type coordinate() :: {coordinate_y(), coordinate_x()}
+  @type x :: integer()
+  @type y :: integer()
+  @type coordinate() :: {y(), x()}
   @type sparse_grid() :: %{coordinate() => any()}
 
   @doc """
@@ -48,7 +48,7 @@ defmodule Tetrex.SparseGrid do
         do: {{row_num, col_num}, value}
   end
 
-  @spec move(sparse_grid(), coordinate()) :: sparse_grid()
+  @spec move(sparse_grid(), {y(), x()}) :: sparse_grid()
   def move(grid, {offset_y, offset_x}) do
     grid
     |> move_grid({offset_y, offset_x})
@@ -56,7 +56,7 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
-  Rotate the shape around the origin
+  Rotate the grid around the origin
   """
   @spec rotate(sparse_grid(), angle()) :: sparse_grid()
   def rotate(grid, angle) do
@@ -66,7 +66,7 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
-  Rotate the shape around a specific point of rotation
+  Rotate the grid around a specific point of rotation
   """
   @spec rotate(sparse_grid(), angle(), coordinate()) :: sparse_grid()
   def rotate(grid, angle, {rotate_at_y, rotate_at_x}) do
@@ -111,6 +111,16 @@ defmodule Tetrex.SparseGrid do
         }
       end
     )
+  end
+
+  @doc """
+  Find the width and height of the grid, returned as `{height, width}`.
+  """
+  @spec size(sparse_grid()) :: {y(), x()}
+  def size(grid) do
+    case __MODULE__.corners(grid) do
+      %{topright: {tr_y, tr_x}, bottomleft: {bl_y, bl_x}} -> {bl_y - tr_y, tr_x - bl_x}
+    end
   end
 
   @doc """

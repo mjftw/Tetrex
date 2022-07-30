@@ -185,4 +185,18 @@ defmodule Tetrex.SparseGrid.Test do
 
     assert corners == expected
   end
+
+  test "size/1 can find the height and width of a grid" do
+    grid = %{
+      {-5, 2} => 1,
+      {-11, 10} => 1,
+      {2, 6} => 1,
+      {13, -3} => 1,
+      {5, 5} => 1
+    }
+
+    {height, width} = Tetrex.SparseGrid.size(grid)
+
+    assert {height, width} == {24, 13}
+  end
 end
