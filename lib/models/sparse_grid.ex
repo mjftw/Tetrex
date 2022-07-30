@@ -135,6 +135,14 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
+  Detect whether two grids have values at the same coordinates
+  """
+  @spec overlaps?(sparse_grid(), sparse_grid()) :: boolean()
+  def overlaps?(grid1, grid2) do
+    !MapSet.disjoint?(MapSet.new(Map.keys(grid1)), MapSet.new(Map.keys(grid2)))
+  end
+
+  @doc """
   Combine two SparseGrids. In the case of overlaps vales from the second grid overwrite the first.
   """
   @spec merge(sparse_grid(), sparse_grid()) :: sparse_grid()

@@ -1,10 +1,11 @@
-defmodule Tetrex.SparseGrid.Test do
+defmodule SparseGrid.Test do
   use ExUnit.Case
-  doctest Tetrex.SparseGrid
+  alias Tetrex.SparseGrid
+  doctest SparseGrid
 
   test "new/1 can create a grid from 2d list of tuples" do
     grid =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue, :blue, :blue],
         [:blue, nil, nil]
       ])
@@ -16,7 +17,7 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "new/1 can create a grid from irregular 2d list of tuples" do
     grid =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue, :blue, :blue],
         [:blue]
       ])
@@ -28,19 +29,19 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "merge/2 can combine grids with no offset" do
     blue_l =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue, nil],
         [:blue, nil],
         [:blue, :blue]
       ])
 
     red_t =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [nil, :red, nil],
         [:red, :red, :red]
       ])
 
-    merged = Tetrex.SparseGrid.merge(blue_l, red_t)
+    merged = SparseGrid.merge(blue_l, red_t)
 
     expected = %{
       {0, 0} => :blue,
@@ -63,7 +64,7 @@ defmodule Tetrex.SparseGrid.Test do
       {1, 1} => :green
     }
 
-    moved = Tetrex.SparseGrid.move(grid, {-2, 1})
+    moved = SparseGrid.move(grid, {-2, 1})
 
     expected = %{
       {-2, 1} => :blue,
@@ -77,13 +78,13 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "rotate/2 can rotate a SparseGrid 90 degrees around the origin" do
     blue_l =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue],
         [:blue],
         [:blue, :blue]
       ])
 
-    rotated = Tetrex.SparseGrid.rotate(blue_l, :clockwise90)
+    rotated = SparseGrid.rotate(blue_l, :clockwise90)
 
     expected = %{{0, -2} => :blue, {0, -1} => :blue, {0, 0} => :blue, {1, -2} => :blue}
 
@@ -92,13 +93,13 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "rotate/2 can rotate a SparseGrid 180 degrees around the origin" do
     blue_l =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue],
         [:blue],
         [:blue, :blue]
       ])
 
-    rotated = Tetrex.SparseGrid.rotate(blue_l, :clockwise180)
+    rotated = SparseGrid.rotate(blue_l, :clockwise180)
 
     expected = %{{-2, -1} => :blue, {-2, 0} => :blue, {-1, 0} => :blue, {0, 0} => :blue}
 
@@ -107,13 +108,13 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "rotate/2 can rotate a SparseGrid 270 degrees around the origin" do
     blue_l =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue],
         [:blue],
         [:blue, :blue]
       ])
 
-    rotated = Tetrex.SparseGrid.rotate(blue_l, :clockwise270)
+    rotated = SparseGrid.rotate(blue_l, :clockwise270)
 
     expected = %{{-1, 2} => :blue, {0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue}
 
@@ -122,13 +123,13 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "rotate/3 can rotate a SparseGrid 90 degrees around a given origin" do
     blue_l =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue],
         [:blue],
         [:blue, :blue]
       ])
 
-    rotated = Tetrex.SparseGrid.rotate(blue_l, :clockwise90, {3, 1})
+    rotated = SparseGrid.rotate(blue_l, :clockwise90, {3, 1})
 
     expected = %{{2, 2} => :blue, {2, 3} => :blue, {2, 4} => :blue, {3, 2} => :blue}
 
@@ -137,13 +138,13 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "rotate/3 can rotate a SparseGrid 180 degrees around a given origin" do
     blue_l =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue],
         [:blue],
         [:blue, :blue]
       ])
 
-    rotated = Tetrex.SparseGrid.rotate(blue_l, :clockwise180, {3, 1})
+    rotated = SparseGrid.rotate(blue_l, :clockwise180, {3, 1})
 
     expected = %{{4, 1} => :blue, {4, 2} => :blue, {5, 2} => :blue, {6, 2} => :blue}
 
@@ -152,13 +153,13 @@ defmodule Tetrex.SparseGrid.Test do
 
   test "rotate/3 can rotate a SparseGrid 270 degrees around a given origin" do
     blue_l =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [:blue],
         [:blue],
         [:blue, :blue]
       ])
 
-    rotated = Tetrex.SparseGrid.rotate(blue_l, :clockwise270, {3, 1})
+    rotated = SparseGrid.rotate(blue_l, :clockwise270, {3, 1})
 
     expected = %{{3, 0} => :blue, {4, -2} => :blue, {4, -1} => :blue, {4, 0} => :blue}
 
@@ -174,7 +175,7 @@ defmodule Tetrex.SparseGrid.Test do
       {5, 5} => 1
     }
 
-    corners = Tetrex.SparseGrid.corners(grid)
+    corners = SparseGrid.corners(grid)
 
     expected = %{
       topleft: {-11, -3},
@@ -195,8 +196,42 @@ defmodule Tetrex.SparseGrid.Test do
       {5, 5} => 1
     }
 
-    {height, width} = Tetrex.SparseGrid.size(grid)
+    {height, width} = SparseGrid.size(grid)
 
     assert {height, width} == {24, 13}
+  end
+
+  test "overlaps/2 should return false if when no coordinates in common" do
+    grid1 =
+      SparseGrid.new([
+        [:blue],
+        [:blue],
+        [:blue, :blue]
+      ])
+
+    grid2 =
+      SparseGrid.new([
+        [nil, nil, :red],
+        [nil, nil, :red]
+      ])
+
+    assert SparseGrid.overlaps?(grid1, grid2) == false
+  end
+
+  test "overlaps/2 should return true if when coordinates in common" do
+    grid1 =
+      SparseGrid.new([
+        [:blue],
+        [:blue],
+        [:blue, :blue]
+      ])
+
+    grid2 =
+      SparseGrid.new([
+        [:green, nil, :red],
+        [nil, nil, :red]
+      ])
+
+    assert SparseGrid.overlaps?(grid1, grid2) == true
   end
 end

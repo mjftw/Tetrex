@@ -55,7 +55,10 @@ Required actions:
 * Draw new Tetromino at random
 * Add a blocking line to the bottom of the Playfield
 * Clear a line from the bottom of the Playfield
-
+* Place next Tetromino on the Playfield to become the current one
+* Move current Tetromino down, left and right
+  * Cannot move current through the walls
+  * Need collision detection
 
 ## Sockets layer
 
