@@ -2,7 +2,7 @@ defmodule Tetrex.Board do
   alias Tetrex.SparseGrid
   alias Tetrex.Tetromino
 
-  @tile_bag_size 99999
+  @tile_bag_size 9999
 
   @enforce_keys [
     :playfield,
@@ -22,7 +22,7 @@ defmodule Tetrex.Board do
   ]
 
   @spec new(non_neg_integer(), non_neg_integer(), integer()) :: __MODULE__.t()
-  def new(width, height, random_seed) do
+  def new(height, width, random_seed) do
     [current_tile | upcoming_tiles] = Tetromino.draw_randoms(@tile_bag_size, random_seed)
 
     %__MODULE__{
