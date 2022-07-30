@@ -13,15 +13,17 @@ defmodule Tetrex.Board.Test do
       playfield_height: 20,
       playfield_width: 10,
       current_tile: :t,
+      next_tile: :s,
       hold_tile: nil
     }
 
-    expected_upcoming = [:s, :t, :l, :z, :o, :t, :o, :l, :l, :o]
+    expected_upcoming = [:t, :l, :z, :o, :t, :o, :l, :l, :o, :z]
 
     assert board.playfield == expected.playfield
     assert board.playfield_height == expected.playfield_height
     assert board.playfield_width == expected.playfield_width
     assert board.current_tile == expected.current_tile
+    assert board.next_tile == expected.next_tile
     assert board.hold_tile == expected.hold_tile
     assert upcoming == expected_upcoming
   end
