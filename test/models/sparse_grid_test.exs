@@ -27,6 +27,21 @@ defmodule SparseGrid.Test do
     assert grid == expected
   end
 
+  test "fill/3 creates a grid filled with a given value" do
+    grid = SparseGrid.fill(:a, {2, 1}, {4, 2})
+
+    expected =
+      SparseGrid.new([
+        [],
+        [],
+        [nil, :a, :a],
+        [nil, :a, :a],
+        [nil, :a, :a]
+      ])
+
+    assert grid == expected
+  end
+
   test "merge/2 can combine grids with no offset" do
     blue_l =
       SparseGrid.new([

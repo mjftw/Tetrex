@@ -69,6 +69,18 @@ defmodule Tetrex.SparseGrid do
         do: {{row_num, col_num}, value}
   end
 
+  @doc """
+  Create a rectangle grid filled with a given value.
+  The top_left and bottom_right coordinates border the fill area, inclusive of the coordinates.
+  """
+  @spec fill(any(), {y(), x()}, {y(), x()}) :: sparse_grid()
+  def fill(value, {top_left_y, top_left_x}, {bottom_right_y, bottom_right_x}) do
+    for y <- top_left_y..bottom_right_y,
+        x <- top_left_x..bottom_right_x,
+        into: %{},
+        do: {{y, x}, value}
+  end
+
   @spec move(sparse_grid(), {y(), x()}) :: sparse_grid()
   def move(grid, {offset_y, offset_x}) do
     grid
