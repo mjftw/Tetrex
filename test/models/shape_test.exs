@@ -9,11 +9,7 @@ defmodule Tetrex.Shape.Test do
         [:blue, nil, nil]
       ])
 
-    expected = %Tetrex.Shape{
-      squares: %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue},
-      rows: 2,
-      cols: 3
-    }
+    expected = %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue}
 
     assert shape == expected
   end
@@ -25,11 +21,7 @@ defmodule Tetrex.Shape.Test do
         [:blue]
       ])
 
-    expected = %Tetrex.Shape{
-      squares: %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue},
-      rows: 2,
-      cols: 3
-    }
+    expected = %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue}
 
     assert shape == expected
   end
@@ -50,46 +42,34 @@ defmodule Tetrex.Shape.Test do
 
     merged = Tetrex.Shape.merge(blue_l, red_t)
 
-    expected = %Tetrex.Shape{
-      cols: 3,
-      rows: 3,
-      squares: %{
-        {0, 0} => :blue,
-        {0, 1} => :red,
-        {1, 0} => :red,
-        {1, 1} => :red,
-        {1, 2} => :red,
-        {2, 0} => :blue,
-        {2, 1} => :blue
-      }
+    expected = %{
+      {0, 0} => :blue,
+      {0, 1} => :red,
+      {1, 0} => :red,
+      {1, 1} => :red,
+      {1, 2} => :red,
+      {2, 0} => :blue,
+      {2, 1} => :blue
     }
 
     assert merged == expected
   end
 
   test "move/2 offsets all the coordinates in a Shape" do
-    shape = %Tetrex.Shape{
-      cols: 2,
-      rows: 2,
-      squares: %{
-        {0, 0} => :blue,
-        {0, 1} => :red,
-        {1, 0} => :red,
-        {1, 1} => :green
-      }
+    shape = %{
+      {0, 0} => :blue,
+      {0, 1} => :red,
+      {1, 0} => :red,
+      {1, 1} => :green
     }
 
     moved = Tetrex.Shape.move(shape, {-2, 1})
 
-    expected = %Tetrex.Shape{
-      cols: 2,
-      rows: 2,
-      squares: %{
-        {-2, 1} => :blue,
-        {-2, 2} => :red,
-        {-1, 1} => :red,
-        {-1, 2} => :green
-      }
+    expected = %{
+      {-2, 1} => :blue,
+      {-2, 2} => :red,
+      {-1, 1} => :red,
+      {-1, 2} => :green
     }
 
     assert moved == expected
@@ -105,11 +85,7 @@ defmodule Tetrex.Shape.Test do
 
     rotated = Tetrex.Shape.rotate(blue_l, :clockwise90)
 
-    expected = %Tetrex.Shape{
-      squares: %{{0, -2} => :blue, {0, -1} => :blue, {0, 0} => :blue, {1, -2} => :blue},
-      rows: 2,
-      cols: 3
-    }
+    expected = %{{0, -2} => :blue, {0, -1} => :blue, {0, 0} => :blue, {1, -2} => :blue}
 
     assert rotated == expected
   end
@@ -124,11 +100,7 @@ defmodule Tetrex.Shape.Test do
 
     rotated = Tetrex.Shape.rotate(blue_l, :clockwise180)
 
-    expected = %Tetrex.Shape{
-      squares: %{{-2, -1} => :blue, {-2, 0} => :blue, {-1, 0} => :blue, {0, 0} => :blue},
-      rows: 3,
-      cols: 2
-    }
+    expected = %{{-2, -1} => :blue, {-2, 0} => :blue, {-1, 0} => :blue, {0, 0} => :blue}
 
     assert rotated == expected
   end
@@ -143,11 +115,7 @@ defmodule Tetrex.Shape.Test do
 
     rotated = Tetrex.Shape.rotate(blue_l, :clockwise270)
 
-    expected = %Tetrex.Shape{
-      squares: %{{-1, 2} => :blue, {0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue},
-      rows: 2,
-      cols: 3
-    }
+    expected = %{{-1, 2} => :blue, {0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue}
 
     assert rotated == expected
   end
@@ -162,11 +130,7 @@ defmodule Tetrex.Shape.Test do
 
     rotated = Tetrex.Shape.rotate(blue_l, :clockwise90, {3, 1})
 
-    expected = %Tetrex.Shape{
-      squares: %{{2, 2} => :blue, {2, 3} => :blue, {2, 4} => :blue, {3, 2} => :blue},
-      rows: 2,
-      cols: 3
-    }
+    expected = %{{2, 2} => :blue, {2, 3} => :blue, {2, 4} => :blue, {3, 2} => :blue}
 
     assert rotated == expected
   end
@@ -181,11 +145,7 @@ defmodule Tetrex.Shape.Test do
 
     rotated = Tetrex.Shape.rotate(blue_l, :clockwise180, {3, 1})
 
-    expected = %Tetrex.Shape{
-      squares: %{{4, 1} => :blue, {4, 2} => :blue, {5, 2} => :blue, {6, 2} => :blue},
-      rows: 3,
-      cols: 2
-    }
+    expected = %{{4, 1} => :blue, {4, 2} => :blue, {5, 2} => :blue, {6, 2} => :blue}
 
     assert rotated == expected
   end
@@ -200,11 +160,7 @@ defmodule Tetrex.Shape.Test do
 
     rotated = Tetrex.Shape.rotate(blue_l, :clockwise270, {3, 1})
 
-    expected = %Tetrex.Shape{
-      squares: %{{3, 0} => :blue, {4, -2} => :blue, {4, -1} => :blue, {4, 0} => :blue},
-      rows: 2,
-      cols: 3
-    }
+    expected = %{{3, 0} => :blue, {4, -2} => :blue, {4, -1} => :blue, {4, 0} => :blue}
 
     assert rotated == expected
   end

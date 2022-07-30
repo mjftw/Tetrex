@@ -1,7 +1,4 @@
 defmodule Tetrex.Shape do
-  @enforce_keys [:squares, :rows, :cols]
-  defstruct squares: %{}, rows: 0, cols: 0
-
   @type angle() :: :clockwise90 | :clockwise180 | :clockwise270
   @type coordinate() :: coordinate()
   @type placed_values() :: %{coordinate() => any()}
@@ -17,84 +14,53 @@ defmodule Tetrex.Shape do
   ...>   [:blue, nil],
   ...>   [:blue, :blue],
   ...> ])
-  %Tetrex.Shape{
-      squares: %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue},
-      rows: 3,
-      cols: 2
-    }
+  %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue}
   ```
   """
-  @spec new([[atom() | nil]]) :: __MODULE__.t()
+  @spec new([[any() | nil]]) :: placed_values()
   def new(squares_2d) do
-    shape =
-      for {row, row_num} <- Stream.with_index(squares_2d),
-          {square, col_num} when square != nil <- Stream.with_index(row),
-          reduce: %__MODULE__{squares: %{}, rows: 0, cols: 0} do
-        %__MODULE__{squares: squares, rows: rows, cols: cols} ->
-          %__MODULE__{
-            squares: Map.put(squares, {row_num, col_num}, square),
-            rows: max(rows, row_num),
-            cols: max(cols, col_num)
-          }
-      end
-
-    # Need to add 1 to rows and cols to represent how many, rather than max indexes
-    %__MODULE__{squares: shape.squares, rows: shape.rows + 1, cols: shape.cols + 1}
+    for {row, row_num} <- Stream.with_index(squares_2d),
+        {square, col_num} when square != nil <- Stream.with_index(row),
+        into: %{},
+        do: {{row_num, col_num}, square}
   end
 
-  @spec move(__MODULE__.t(), coordinate()) :: __MODULE__.t()
-  def move(shape, offset) do
-    squares =
-      shape.squares
-      |> move_squares(offset)
-      |> Map.new()
-
-    %__MODULE__{squares: squares, rows: shape.rows, cols: shape.cols}
+  @spec move(placed_values(), coordinate()) :: placed_values()
+  def move(squares, offset) do
+    squares
+    |> move_squares(offset)
+    |> Map.new()
   end
 
   @doc """
   Rotate the shape around the origin
   """
-  @spec rotate(__MODULE__.t(), angle()) :: __MODULE__.t()
-  def rotate(%__MODULE__{squares: squares, rows: rows, cols: cols}, angle) do
-    new_squares =
-      squares
-      |> rotate_squares(angle)
-      |> Map.new()
-
-    {new_rows, new_cols} = rotate_dimensions({rows, cols}, angle)
-
-    %__MODULE__{squares: new_squares, rows: new_rows, cols: new_cols}
+  @spec rotate(placed_values(), angle()) :: placed_values()
+  def rotate(squares, angle) do
+    squares
+    |> rotate_squares(angle)
+    |> Map.new()
   end
 
   @doc """
-  Rotate the shape around a specific origin of rotation
+  Rotate the shape around a specific point of rotation
   """
-  @spec rotate(__MODULE__.t(), angle(), coordinate()) :: __MODULE__.t()
-  def rotate(%__MODULE__{squares: squares, rows: rows, cols: cols}, angle, {origin_x, origin_y}) do
+  @spec rotate(placed_values(), angle(), coordinate()) :: placed_values()
+  def rotate(squares, angle, {rotate_at_x, rotate_at_y}) do
     # Rotating around a point is the same as moving to the origin, rotating, and moving back
-    new_squares =
-      squares
-      |> move_squares({-origin_x, -origin_y})
-      |> rotate_squares(angle)
-      |> move_squares({origin_x, origin_y})
-      |> Map.new()
-
-    {new_rows, new_cols} = rotate_dimensions({rows, cols}, angle)
-
-    %__MODULE__{squares: new_squares, rows: new_rows, cols: new_cols}
+    squares
+    |> move_squares({-rotate_at_x, -rotate_at_y})
+    |> rotate_squares(angle)
+    |> move_squares({rotate_at_x, rotate_at_y})
+    |> Map.new()
   end
 
   @doc """
   Combine two Shapes. In the case of overlaps values from the second shape overwrite the first.
   """
-  @spec merge(__MODULE__.t(), __MODULE__.t()) :: __MODULE__.t()
-  def merge(shape1, shape2) do
-    %__MODULE__{
-      squares: Map.merge(shape1.squares, shape2.squares),
-      rows: max(shape1.rows, shape2.rows),
-      cols: max(shape1.cols, shape2.cols)
-    }
+  @spec merge(placed_values(), placed_values()) :: placed_values()
+  def merge(squares1, squares2) do
+    Map.merge(squares1, squares2)
   end
 
   defp move_squares(squares, {x_offset, y_offset}) do
@@ -110,8 +76,4 @@ defmodule Tetrex.Shape do
   defp rotate_coordinate({x, y}, :clockwise90), do: {y, -x}
   defp rotate_coordinate({x, y}, :clockwise180), do: {-x, -y}
   defp rotate_coordinate({x, y}, :clockwise270), do: {-y, x}
-
-  defp rotate_dimensions({rows, cols}, :clockwise90), do: {cols, rows}
-  defp rotate_dimensions({rows, cols}, :clockwise180), do: {rows, cols}
-  defp rotate_dimensions({rows, cols}, :clockwise270), do: {cols, rows}
 end
