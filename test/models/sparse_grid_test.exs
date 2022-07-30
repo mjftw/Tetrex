@@ -234,4 +234,274 @@ defmodule SparseGrid.Test do
 
     assert SparseGrid.overlaps?(grid1, grid2) == true
   end
+
+  test "align/3 should move a grid to align with another using :top_left alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :top_left)
+
+    expected =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :top_centre alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :top_centre)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, :aa, :bb],
+        [nil, nil, :cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :top_right alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :top_right)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, nil, nil, :aa, :bb],
+        [nil, nil, nil, nil, :cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :centre_left alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :centre_left)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil],
+        [nil, nil],
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :centre alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :centre)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, nil, nil],
+        [nil, nil, nil, nil],
+        [nil, nil, :aa, :bb],
+        [nil, nil, :cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :centre_right alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :centre_right)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, :aa, :bb],
+        [nil, nil, nil, nil, :cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :bottom_left alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :bottom_left)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil],
+        [nil, nil],
+        [nil, nil],
+        [nil, nil],
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :bottom_centre alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :bottom_centre)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, nil, nil],
+        [nil, nil, nil, nil],
+        [nil, nil, nil, nil],
+        [nil, nil, nil, nil],
+        [nil, nil, :aa, :bb],
+        [nil, nil, :cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
+
+  test "align/3 should move a grid to align with another using :bottom_right alignment" do
+    to_move =
+      SparseGrid.new([
+        [:aa, :bb],
+        [:cc, :dd]
+      ])
+
+    cross =
+      SparseGrid.new([
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [:xx, :xx, :xx, :xx, :xx, :xx],
+        [nil, nil, :xx, :xx, nil, nil],
+        [nil, nil, :xx, :xx, nil, nil]
+      ])
+
+    aligned = SparseGrid.align(to_move, cross, :bottom_right)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, nil, nil],
+        [nil, nil, nil, nil, :aa, :bb],
+        [nil, nil, nil, nil, :cc, :dd]
+      ])
+
+    assert aligned == expected
+  end
 end

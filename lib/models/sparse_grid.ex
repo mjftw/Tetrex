@@ -20,11 +20,21 @@ defmodule Tetrex.SparseGrid do
   ```
   """
 
-  @type angle() :: :clockwise90 | :clockwise180 | :clockwise270
+  @type angle :: :clockwise90 | :clockwise180 | :clockwise270
+  @type alignment ::
+          :top_left
+          | :top_centre
+          | :top_right
+          | :centre_left
+          | :centre
+          | :centre_right
+          | :bottom_left
+          | :bottom_centre
+          | :bottom_right
   @type x :: integer()
   @type y :: integer()
-  @type coordinate() :: {y(), x()}
-  @type sparse_grid() :: %{coordinate() => any()}
+  @type coordinate :: {y(), x()}
+  @type sparse_grid :: %{coordinate() => any()}
 
   @doc """
   Create a new empty SparseGrid
@@ -148,6 +158,41 @@ defmodule Tetrex.SparseGrid do
   @spec merge(sparse_grid(), sparse_grid()) :: sparse_grid()
   def merge(grid1, grid2) do
     Map.merge(grid1, grid2)
+  end
+
+  @doc """
+  Move a grid so that it aligns with another grid.
+  """
+  @spec align(sparse_grid(), sparse_grid(), alignment()) :: sparse_grid()
+  def align(grid_to_move, align_with_grid, alignment) do
+    {move_from_y, move_from_x} = alignment_coordinate(grid_to_move, alignment)
+    {move_to_y, move_to_x} = alignment_coordinate(align_with_grid, alignment)
+
+    move(grid_to_move, {move_to_y - move_from_y, move_to_x - move_from_x})
+  end
+
+  defp alignment_coordinate(grid, alignment) do
+    %{
+      topleft: {tl_y, tl_x},
+      topright: {tr_y, tr_x},
+      bottomleft: {bl_y, bl_x},
+      bottomright: {br_y, br_x}
+    } = corners(grid)
+
+    mid_x = div(tr_x - tl_x, 2)
+    mid_y = div(bl_y - tl_y, 2)
+
+    case alignment do
+      :top_left -> {tl_y, tl_x}
+      :top_centre -> {tl_y, mid_x}
+      :top_right -> {tr_y, tr_x}
+      :centre_left -> {mid_y, tl_x}
+      :centre -> {mid_y, mid_x}
+      :centre_right -> {mid_y, tr_x}
+      :bottom_left -> {bl_y, bl_x}
+      :bottom_centre -> {bl_y, mid_x}
+      :bottom_right -> {br_y, br_x}
+    end
   end
 
   defp move_grid(grid, {y_offset, x_offset}) do
