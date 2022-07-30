@@ -2,6 +2,9 @@ defmodule Tetrex.SparseGrid do
   @moduledoc """
   Data structure for holding a 2d grid of grid.
   Not every coordinate must have a grid, in this sense it is a sparse grid.
+  Grid coordinates are written {col, row} or {y, x} with the origin (0, 0) is in the top left,
+  as they would be for matrix notation.
+  Coordinates can have negative values.
 
   E.g.
   ```
@@ -71,6 +74,41 @@ defmodule Tetrex.SparseGrid do
     |> rotate_grid(angle)
     |> move_grid({rotate_at_x, rotate_at_y})
     |> Map.new()
+  end
+
+  @doc """
+  Find the 4 corner coordinates bounding the grid
+  """
+  @spec corners(sparse_grid()) :: %{
+          topleft: coordinate(),
+          topright: coordinate(),
+          bottomleft: coordinate(),
+          bottomright: coordinate()
+        }
+  def corners(grid) do
+    Enum.reduce(
+      grid,
+      %{
+        topleft: {0, 0},
+        topright: {0, 0},
+        bottomleft: {0, 0},
+        bottomright: {0, 0}
+      },
+      fn {{y, x}, _},
+         %{
+           topleft: {tl_y, tl_x},
+           topright: {tr_y, tr_x},
+           bottomleft: {bl_y, bl_x},
+           bottomright: {br_y, br_x}
+         } ->
+        %{
+          topleft: {min(tl_y, y), min(tl_x, x)},
+          topright: {min(tr_y, y), max(tr_x, x)},
+          bottomleft: {max(bl_y, y), min(bl_x, x)},
+          bottomright: {max(br_y, y), max(br_x, x)}
+        }
+      end
+    )
   end
 
   @doc """

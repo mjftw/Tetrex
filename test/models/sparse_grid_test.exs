@@ -164,4 +164,25 @@ defmodule Tetrex.SparseGrid.Test do
 
     assert rotated == expected
   end
+
+  test "corners/1 can find the corner coordinates of a grid" do
+    grid = %{
+      {-5, 2} => 1,
+      {-11, 10} => 1,
+      {2, 6} => 1,
+      {13, -3} => 1,
+      {5, 5} => 1
+    }
+
+    corners = Tetrex.SparseGrid.corners(grid)
+
+    expected = %{
+      topleft: {-11, -3},
+      topright: {-11, 10},
+      bottomleft: {13, -3},
+      bottomright: {13, 10}
+    }
+
+    assert corners == expected
+  end
 end
