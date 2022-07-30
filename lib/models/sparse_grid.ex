@@ -47,9 +47,9 @@ defmodule Tetrex.SparseGrid do
   end
 
   @spec move(sparse_grid(), coordinate()) :: sparse_grid()
-  def move(grid, offset) do
+  def move(grid, {offset_y, offset_x}) do
     grid
-    |> move_grid(offset)
+    |> move_grid({offset_y, offset_x})
     |> Map.new()
   end
 
@@ -67,12 +67,12 @@ defmodule Tetrex.SparseGrid do
   Rotate the shape around a specific point of rotation
   """
   @spec rotate(sparse_grid(), angle(), coordinate()) :: sparse_grid()
-  def rotate(grid, angle, {rotate_at_x, rotate_at_y}) do
+  def rotate(grid, angle, {rotate_at_y, rotate_at_x}) do
     # Rotating around a point is the same as moving to the origin, rotating, and moving back
     grid
-    |> move_grid({-rotate_at_x, -rotate_at_y})
+    |> move_grid({-rotate_at_y, -rotate_at_x})
     |> rotate_grid(angle)
-    |> move_grid({rotate_at_x, rotate_at_y})
+    |> move_grid({rotate_at_y, rotate_at_x})
     |> Map.new()
   end
 
@@ -119,8 +119,8 @@ defmodule Tetrex.SparseGrid do
     Map.merge(grid1, grid2)
   end
 
-  defp move_grid(grid, {x_offset, y_offset}) do
-    Stream.map(grid, fn {{col, row}, grid} -> {{col + x_offset, row + y_offset}, grid} end)
+  defp move_grid(grid, {y_offset, x_offset}) do
+    Stream.map(grid, fn {{y, x}, grid} -> {{y + y_offset, x + x_offset}, grid} end)
   end
 
   defp rotate_grid(grid, angle) do
@@ -129,7 +129,7 @@ defmodule Tetrex.SparseGrid do
     end)
   end
 
-  defp rotate_coordinate({x, y}, :clockwise90), do: {y, -x}
-  defp rotate_coordinate({x, y}, :clockwise180), do: {-x, -y}
-  defp rotate_coordinate({x, y}, :clockwise270), do: {-y, x}
+  defp rotate_coordinate({y, x}, :clockwise90), do: {x, -y}
+  defp rotate_coordinate({y, x}, :clockwise180), do: {-y, -x}
+  defp rotate_coordinate({y, x}, :clockwise270), do: {-x, y}
 end
