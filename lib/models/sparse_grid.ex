@@ -21,7 +21,9 @@ defmodule Tetrex.SparseGrid do
   """
 
   @type angle() :: :clockwise90 | :clockwise180 | :clockwise270
-  @type coordinate() :: coordinate()
+  @type coordinate_x :: integer()
+  @type coordinate_y :: integer()
+  @type coordinate() :: {coordinate_y(), coordinate_x()}
   @type sparse_grid() :: %{coordinate() => any()}
 
   @doc """
