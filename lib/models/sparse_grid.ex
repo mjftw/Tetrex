@@ -1,4 +1,22 @@
 defmodule Tetrex.SparseGrid do
+  @moduledoc """
+  Data structure for holding a 2d grid of values.
+  Not every coordinate must have a value, in this sense it is a sparse grid.
+
+  E.g.
+  ```
+      0   1   2   3   4
+  0 |   | a |   |   |   |
+    |---|---|---|---|---|
+  1 |   |   | b |   |   |
+    |---|---|---|---|---|
+  2 |   |   | c | d |   |
+    |---|---|---|---|---|
+  3 |   |   |   | e |   |
+
+  ```
+  """
+
   @type angle() :: :clockwise90 | :clockwise180 | :clockwise270
   @type coordinate() :: coordinate()
   @type sparse_grid() :: %{coordinate() => any()}
