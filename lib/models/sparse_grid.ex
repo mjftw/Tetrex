@@ -195,9 +195,7 @@ defmodule Tetrex.SparseGrid do
     %{
       topleft: grid_tl,
       bottomright: grid_br
-    } =
-      corners(grid)
-      |> IO.inspect()
+    } = corners(grid)
 
     {move_from_y, move_from_x} = alignment_coordinate(grid_tl, grid_br, alignment)
     {move_to_y, move_to_x} = alignment_coordinate(top_left, bottom_right, alignment)

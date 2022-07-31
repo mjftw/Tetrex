@@ -27,4 +27,36 @@ defmodule Tetrex.Board.Test do
     assert board.hold_tile == expected.hold_tile
     assert upcoming == expected_upcoming
   end
+
+  test "place_next_tile/1 should change the current tile when no overlap would occur" do
+    board = %{
+      Board.new(5, 5, 0)
+      | next_tile: :t,
+        upcoming_tiles: [:i, :o, :s]
+    }
+
+    expected = %{
+      board
+      | current_tile: :t,
+        next_tile: :i,
+        upcoming_tiles: [:o, :s]
+    }
+
+    assert Board.place_next_tile(board) == {:ok, expected}
+  end
+
+  test "place_next_tile/1 should error when an overlap would occur" do
+    full_playfield =
+      Tetrex.SparseGrid.new([
+        [:x, :x, :x, :x, :x],
+        [:x, :x, :x, :x, :x],
+        [:x, :x, :x, :x, :x],
+        [:x, :x, :x, :x, :x],
+        [:x, :x, :x, :x, :x]
+      ])
+
+    board = %{Board.new(5, 5, 0) | playfield: full_playfield}
+
+    assert Board.place_next_tile(board) == {:error, :collision}
+  end
 end
