@@ -1,7 +1,7 @@
 defmodule Tetrex.SparseGrid do
   @moduledoc """
   Data structure for holding a 2d grid of grid.
-  Not every coordinate must have a grid, in this sense it is a sparse grid.
+  Not every coordinate must have a value, in this sense the grid is sparse.
   Grid coordinates are written {col, row} or {y, x} with the origin (0, 0) is in the top left,
   as they would be for matrix notation.
   Coordinates can have negative values.
@@ -195,7 +195,9 @@ defmodule Tetrex.SparseGrid do
     %{
       topleft: grid_tl,
       bottomright: grid_br
-    } = corners(grid)
+    } =
+      corners(grid)
+      |> IO.inspect()
 
     {move_from_y, move_from_x} = alignment_coordinate(grid_tl, grid_br, alignment)
     {move_to_y, move_to_x} = alignment_coordinate(top_left, bottom_right, alignment)
