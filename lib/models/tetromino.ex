@@ -77,7 +77,7 @@ defmodule Tetrex.Tetromino do
   @doc """
   Draw a list of random Tetrominos.
   """
-  @spec draw_randoms(non_neg_integer(), integer()) :: [{name(), SparseGrid.sparse_grid()}]
+  @spec draw_randoms(non_neg_integer(), integer()) :: [name()]
   def draw_randoms(number, random_seed) do
     :rand.seed(:exsss, random_seed)
 
