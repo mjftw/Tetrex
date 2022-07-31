@@ -1,5 +1,6 @@
 defmodule Tetrex.Board do
   alias Tetrex.SparseGrid
+  alias Tetrex.LazySparseGrid
   alias Tetrex.Tetromino
 
   @type placement_error :: :collision
@@ -11,33 +12,35 @@ defmodule Tetrex.Board do
     :playfield_height,
     :playfield_width,
     :current_tile,
-    :next_tile,
-    :hold_tile,
-    :upcoming_tiles
+    :next_tile_name,
+    :hold_tile_name,
+    :upcoming_tile_names
   ]
   defstruct [
     :playfield,
     :playfield_height,
     :playfield_width,
     :current_tile,
-    :next_tile,
-    :hold_tile,
-    :upcoming_tiles
+    :next_tile_name,
+    :hold_tile_name,
+    :upcoming_tile_names
   ]
 
   @spec new(non_neg_integer(), non_neg_integer(), integer()) :: __MODULE__.t()
   def new(height, width, random_seed) do
-    [current_tile | [next_tile | upcoming_tiles]] =
+    [current_tile_name | [next_tile_name | upcoming_tile_names]] =
       Tetromino.draw_randoms(@tile_bag_size, random_seed)
+
+    current_tile = %LazySparseGrid{sparse_grid: Tetromino.tetromino!(current_tile_name)}
 
     %__MODULE__{
       playfield: SparseGrid.new(),
       playfield_height: height,
       playfield_width: width,
       current_tile: current_tile,
-      next_tile: next_tile,
-      hold_tile: nil,
-      upcoming_tiles: upcoming_tiles
+      next_tile_name: next_tile_name,
+      hold_tile_name: nil,
+      upcoming_tile_names: upcoming_tile_names
     }
   end
 
@@ -49,7 +52,7 @@ defmodule Tetrex.Board do
   def place_next_tile(board) do
     candidate_placement =
       SparseGrid.align(
-        Tetromino.tetromino!(board.next_tile),
+        Tetromino.tetromino!(board.next_tile_name),
         {0, 0},
         {board.playfield_height, board.playfield_width},
         :top_centre
@@ -58,14 +61,14 @@ defmodule Tetrex.Board do
     if SparseGrid.overlaps?(candidate_placement, board.playfield) do
       {:error, :collision}
     else
-      [next_tile | upcoming_tiles] = board.upcoming_tiles
+      [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
 
       {:ok,
        %{
          board
-         | current_tile: board.next_tile,
-           next_tile: next_tile,
-           upcoming_tiles: upcoming_tiles
+         | current_tile: board.next_tile_name,
+           next_tile_name: next_tile_name,
+           upcoming_tile_names: upcoming_tile_names
        }}
     end
   end
