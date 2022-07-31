@@ -177,32 +177,44 @@ defmodule Tetrex.SparseGrid do
   """
   @spec align(sparse_grid(), sparse_grid(), alignment()) :: sparse_grid()
   def align(grid_to_move, align_with_grid, alignment) do
-    {move_from_y, move_from_x} = alignment_coordinate(grid_to_move, alignment)
-    {move_to_y, move_to_x} = alignment_coordinate(align_with_grid, alignment)
+    %{
+      topleft: move_to_tl,
+      bottomright: move_to_br
+    } = corners(align_with_grid)
 
-    move(grid_to_move, {move_to_y - move_from_y, move_to_x - move_from_x})
+    align(grid_to_move, move_to_tl, move_to_br, alignment)
   end
 
-  defp alignment_coordinate(grid, alignment) do
+  @doc """
+  Move a grid to align it with a given bounding box,
+  denoted by a top_left and bottom_right coordinate.
+  """
+  @spec align(sparse_grid(), {y(), x()}, {y(), x()}, alignment()) :: sparse_grid()
+  def align(grid, top_left, bottom_right, alignment) do
     %{
-      topleft: {tl_y, tl_x},
-      topright: {tr_y, tr_x},
-      bottomleft: {bl_y, bl_x},
-      bottomright: {br_y, br_x}
+      topleft: grid_tl,
+      bottomright: grid_br
     } = corners(grid)
 
-    mid_x = div(tr_x - tl_x, 2)
-    mid_y = div(bl_y - tl_y, 2)
+    {move_from_y, move_from_x} = alignment_coordinate(grid_tl, grid_br, alignment)
+    {move_to_y, move_to_x} = alignment_coordinate(top_left, bottom_right, alignment)
+
+    move(grid, {move_to_y - move_from_y, move_to_x - move_from_x})
+  end
+
+  defp alignment_coordinate({tl_y, tl_x}, {br_y, br_x}, alignment) do
+    mid_x = div(br_x - tl_x, 2)
+    mid_y = div(br_y - tl_y, 2)
 
     case alignment do
       :top_left -> {tl_y, tl_x}
       :top_centre -> {tl_y, mid_x}
-      :top_right -> {tr_y, tr_x}
+      :top_right -> {tl_y, br_x}
       :centre_left -> {mid_y, tl_x}
       :centre -> {mid_y, mid_x}
-      :centre_right -> {mid_y, tr_x}
-      :bottom_left -> {bl_y, bl_x}
-      :bottom_centre -> {bl_y, mid_x}
+      :centre_right -> {mid_y, br_x}
+      :bottom_left -> {br_y, tl_x}
+      :bottom_centre -> {br_y, mid_x}
       :bottom_right -> {br_y, br_x}
     end
   end
