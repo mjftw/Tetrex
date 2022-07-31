@@ -227,7 +227,7 @@ defmodule SparseGrid.Test do
     assert {height, width} == {24, 13}
   end
 
-  test "overlaps/2 should return false if when no coordinates in common" do
+  test "overlaps?/2 should return false if when no coordinates in common" do
     grid1 =
       SparseGrid.new([
         [:blue],
@@ -244,7 +244,7 @@ defmodule SparseGrid.Test do
     assert SparseGrid.overlaps?(grid1, grid2) == false
   end
 
-  test "overlaps/2 should return true if when coordinates in common" do
+  test "overlaps?/2 should return true if when coordinates in common" do
     grid1 =
       SparseGrid.new([
         [:blue],
@@ -259,6 +259,20 @@ defmodule SparseGrid.Test do
       ])
 
     assert SparseGrid.overlaps?(grid1, grid2) == true
+  end
+
+  test "within_bounds?/3 should return true if grid fits withing bounding box" do
+    grid =
+      SparseGrid.new([
+        [:a, :a],
+        [:a],
+        [:a]
+      ])
+
+    assert SparseGrid.within_bounds?(grid, {-1, -1}, {3, 3}) == true
+  end
+
+  test "within_bounds?/3 should return false if grid falls outside bounding box" do
   end
 
   test "align/3 should move a grid to align with another using :top_left alignment" do

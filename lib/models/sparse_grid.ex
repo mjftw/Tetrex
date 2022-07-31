@@ -168,6 +168,22 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
+  Detect whether a grid is withing a bounding box, denoted by top_left and bottom_right coordinates.
+  """
+  @spec within_bounds?(sparse_grid(), {y(), x()}, {y(), x()}) :: boolean()
+  def within_bounds?(grid, {box_tl_y, box_tl_x}, {box_br_y, box_br_x}) do
+    %{
+      topleft: {tl_y, tl_x},
+      bottomright: {br_y, br_x}
+    } = corners(grid)
+
+    tl_y >= box_tl_y &&
+      tl_x >= box_tl_x &&
+      br_x <= box_br_x &&
+      br_y <= box_br_y
+  end
+
+  @doc """
   Combine two SparseGrids. In the case of overlaps vales from the second grid overwrite the first.
   """
   @spec merge(sparse_grid(), sparse_grid()) :: sparse_grid()
