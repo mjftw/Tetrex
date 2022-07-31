@@ -106,6 +106,17 @@ defmodule SparseGrid.Test do
     assert rotated == expected
   end
 
+  test "rotate/2 with :zero angle leaves grid untouched" do
+    blue_l =
+      SparseGrid.new([
+        [:blue],
+        [:blue],
+        [:blue, :blue]
+      ])
+
+    assert SparseGrid.rotate(blue_l, :zero) == blue_l
+  end
+
   test "rotate/2 can rotate a SparseGrid 180 degrees around the origin" do
     blue_l =
       SparseGrid.new([

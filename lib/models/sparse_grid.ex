@@ -21,7 +21,7 @@ defmodule Tetrex.SparseGrid do
   ```
   """
 
-  @type angle :: :clockwise90 | :clockwise180 | :clockwise270
+  @type(angle :: :zero, :clockwise90 | :clockwise180 | :clockwise270)
   @type alignment ::
           :top_left
           | :top_centre
@@ -90,9 +90,11 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
-  Rotate the grid around the origin
+  Rotate the grid around the origin.
   """
   @spec rotate(sparse_grid(), angle()) :: sparse_grid()
+  def rotate(grid, :zero), do: grid
+
   def rotate(grid, angle) do
     grid
     |> rotate_grid(angle)
@@ -230,6 +232,7 @@ defmodule Tetrex.SparseGrid do
     end)
   end
 
+  defp rotate_coordinate({y, x}, :zero), do: {y, x}
   defp rotate_coordinate({y, x}, :clockwise90), do: {x, -y}
   defp rotate_coordinate({y, x}, :clockwise180), do: {-y, -x}
   defp rotate_coordinate({y, x}, :clockwise270), do: {-x, y}
