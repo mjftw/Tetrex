@@ -3,7 +3,7 @@ defmodule Tetrex.Board do
   alias Tetrex.LazySparseGrid
   alias Tetrex.Tetromino
 
-  @type placement_error :: :collision
+  @type placement_error :: :collision | :out_of_bounds
 
   @tile_bag_size 9999
 
@@ -11,35 +11,33 @@ defmodule Tetrex.Board do
     :playfield,
     :playfield_height,
     :playfield_width,
-    :current_tile,
-    :next_tile_name,
-    :hold_tile_name,
+    :active_tile,
+    :next_tile,
+    :hold_tile,
     :upcoming_tile_names
   ]
   defstruct [
     :playfield,
     :playfield_height,
     :playfield_width,
-    :current_tile,
-    :next_tile_name,
-    :hold_tile_name,
+    :active_tile,
+    :next_tile,
+    :hold_tile,
     :upcoming_tile_names
   ]
 
   @spec new(non_neg_integer(), non_neg_integer(), integer()) :: __MODULE__.t()
   def new(height, width, random_seed) do
-    [current_tile_name | [next_tile_name | upcoming_tile_names]] =
+    [active_tile_name | [next_tile_name | upcoming_tile_names]] =
       Tetromino.draw_randoms(@tile_bag_size, random_seed)
-
-    current_tile = %LazySparseGrid{sparse_grid: Tetromino.tetromino!(current_tile_name)}
 
     %__MODULE__{
       playfield: SparseGrid.new(),
       playfield_height: height,
       playfield_width: width,
-      current_tile: current_tile,
-      next_tile_name: next_tile_name,
-      hold_tile_name: nil,
+      active_tile: Tetromino.tetromino!(active_tile_name),
+      next_tile: Tetromino.tetromino!(next_tile_name),
+      hold_tile: nil,
       upcoming_tile_names: upcoming_tile_names
     }
   end
@@ -52,7 +50,7 @@ defmodule Tetrex.Board do
   def place_next_tile(board) do
     candidate_placement =
       SparseGrid.align(
-        Tetromino.tetromino!(board.next_tile_name),
+        board.next_tile,
         {0, 0},
         {board.playfield_height, board.playfield_width},
         :top_centre
@@ -66,8 +64,8 @@ defmodule Tetrex.Board do
       {:ok,
        %{
          board
-         | current_tile: board.next_tile_name,
-           next_tile_name: next_tile_name,
+         | active_tile: board.next_tile,
+           next_tile: Tetromino.tetromino!(next_tile_name),
            upcoming_tile_names: upcoming_tile_names
        }}
     end

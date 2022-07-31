@@ -12,14 +12,9 @@ defmodule Tetrex.Board.Test do
       playfield: Tetrex.SparseGrid.new(),
       playfield_height: 20,
       playfield_width: 10,
-      current_tile: %Tetrex.LazySparseGrid{
-        rotation: :zero,
-        rotation_origin: {0, 0},
-        sparse_grid: %{{0, 1} => :purple, {1, 0} => :purple, {1, 1} => :purple, {1, 2} => :purple},
-        translation: {0, 0}
-      },
-      next_tile_name: :s,
-      hold_tile_name: nil
+      active_tile: Tetrex.Tetromino.tetromino!(:t),
+      next_tile: Tetrex.Tetromino.tetromino!(:s),
+      hold_tile: nil
     }
 
     expected_upcoming = [:t, :l, :z, :o, :t, :o, :l, :l, :o, :z]
@@ -27,23 +22,23 @@ defmodule Tetrex.Board.Test do
     assert board.playfield == expected.playfield
     assert board.playfield_height == expected.playfield_height
     assert board.playfield_width == expected.playfield_width
-    assert board.current_tile == expected.current_tile
-    assert board.next_tile_name == expected.next_tile_name
-    assert board.hold_tile_name == expected.hold_tile_name
+    assert board.active_tile == expected.active_tile
+    assert board.next_tile == expected.next_tile
+    assert board.hold_tile == expected.hold_tile
     assert upcoming == expected_upcoming
   end
 
   test "place_next_tile/1 should change the current tile when no overlap would occur" do
     board = %{
       Board.new(5, 5, 0)
-      | next_tile_name: :t,
+      | next_tile: Tetrex.Tetromino.tetromino!(:t),
         upcoming_tile_names: [:i, :o, :s]
     }
 
     expected = %{
       board
-      | current_tile: :t,
-        next_tile_name: :i,
+      | active_tile: Tetrex.Tetromino.tetromino!(:t),
+        next_tile: Tetrex.Tetromino.tetromino!(:i),
         upcoming_tile_names: [:o, :s]
     }
 
