@@ -5,6 +5,7 @@ defmodule Tetrex.SparseGrid do
   Grid coordinates are written {col, row} or {y, x} with the origin (0, 0) is in the top left,
   as they would be for matrix notation.
   Coordinates can have negative values.
+  The grid is dynamically sized, meaning that each value written can change its dimensions.
 
   E.g.
   ```
