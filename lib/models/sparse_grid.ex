@@ -84,11 +84,11 @@ defmodule Tetrex.SparseGrid do
   """
   @spec fill(any(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
   def fill(value, {top_left_y, top_left_x}, {bottom_right_y, bottom_right_x}) do
-    values_map =for y <- top_left_y..bottom_right_y,
-        x <- top_left_x..bottom_right_x,
-        into: %{},
-        do:
-          {{y, x}, value}
+    values_map =
+      for y <- top_left_y..bottom_right_y,
+          x <- top_left_x..bottom_right_x,
+          into: %{},
+          do: {{y, x}, value}
 
     new(values_map)
   end
@@ -268,3 +268,86 @@ defmodule Tetrex.SparseGrid do
   defp rotate_coordinate({y, x}, :clockwise180), do: {-y, -x}
   defp rotate_coordinate({y, x}, :clockwise270), do: {-x, y}
 end
+
+# Need SparseGrid to be a struct before I can do this
+defimpl Inspect, for: Tetrex.SparseGrid do
+  def inspect(grid, opts) do
+    str_grid =
+      Enum.map(grid.values, fn {coord, value} -> {coord, to_string(value)} end)
+      |> Map.new()
+
+    max_str_width =
+      Enum.reduce(str_grid, 0, fn {_, value_str}, max_str_width ->
+        value_str
+        |> String.length()
+        |> max(max_str_width)
+      end)
+
+    filler = String.duplicate(" ", max_str_width)
+
+    %{
+      topleft: {tl_y, tl_x},
+      bottomright: {br_y, br_x}
+    } = Tetrex.SparseGrid.corners(grid)
+
+    cols =
+      Enum.map(tl_y..br_y, fn y ->
+        row_str =
+          Enum.map(tl_x..br_x, fn x ->
+            value_str = Map.get(str_grid, {y, x}, filler)
+            value_str_len = String.length(value_str)
+
+            padded_value_str =
+              cond do
+                value_str_len < max_str_width ->
+                  pad_len = max_str_width - value_str_len
+
+                  String.duplicate(" ", div(pad_len, 2)) <>
+                    value_str <> String.duplicate(" ", div(pad_len, 2) + rem(pad_len, 2))
+
+                true ->
+                  value_str
+              end
+
+            " " <> padded_value_str <> " "
+          end)
+          |> Enum.join("│")
+
+        "│" <> row_str <> "│"
+      end)
+
+    row_divider =
+      String.duplicate("─", max_str_width + 2)
+      |> List.duplicate(br_x - tl_x + 1)
+      |> Enum.join("┼")
+
+    row_divider_capped = "├" <> row_divider <> "┤"
+
+    row_top =
+      String.duplicate("─", max_str_width + 2)
+      |> List.duplicate(br_x - tl_x + 1)
+      |> Enum.join("┬")
+
+    row_top_capped = "┌" <> row_top <> "┐"
+
+    row_bottom =
+      String.duplicate("─", max_str_width + 2)
+      |> List.duplicate(br_x - tl_x + 1)
+      |> Enum.join("┴")
+
+    row_bottom_capped = "└" <> row_bottom <> "┘"
+
+    grid_str =
+      cols
+      |> Enum.intersperse(row_divider_capped)
+      |> Enum.join("\n")
+
+    row_top_capped <> "\n" <> grid_str <> "\n" <> row_bottom_capped
+  end
+end
+
+# ┌───┬───┐
+# │ 1 │ 2 │
+# ├───┼───┤
+# │ 3 │ 4 │
+# └───┴───┘
