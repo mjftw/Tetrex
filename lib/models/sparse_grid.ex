@@ -276,78 +276,133 @@ defimpl Inspect, for: Tetrex.SparseGrid do
       Enum.map(grid.values, fn {coord, value} -> {coord, to_string(value)} end)
       |> Map.new()
 
-    max_str_width =
+    max_value_str_width =
       Enum.reduce(str_grid, 0, fn {_, value_str}, max_str_width ->
         value_str
         |> String.length()
         |> max(max_str_width)
       end)
 
-    filler = String.duplicate(" ", max_str_width)
-
     %{
       topleft: {tl_y, tl_x},
       bottomright: {br_y, br_x}
     } = Tetrex.SparseGrid.corners(grid)
 
-    cols =
+    col_indices =
+      tl_x..br_x
+      |> Enum.map(&to_string/1)
+
+    row_indices =
+      tl_y..br_y
+      |> Enum.map(&to_string/1)
+
+    max_col_index_str_len =
+      Enum.reduce(col_indices, 0, fn col_index_str, max_str_width ->
+        col_index_str
+        |> String.length()
+        |> max(max_str_width)
+      end)
+
+    max_row_index_str_len =
+      Enum.reduce(row_indices, 0, fn row_index_str, max_str_width ->
+        row_index_str
+        |> String.length()
+        |> max(max_str_width)
+      end)
+
+    row_left_padding = String.duplicate(" ", max_row_index_str_len)
+
+    cell_width = max(max_col_index_str_len, max_value_str_width)
+
+    value_filler = String.duplicate(" ", cell_width)
+
+    pad_central = fn str, len ->
+      str_len = String.length(str)
+
+      cond do
+        str_len < len ->
+          pad_len = len - str_len
+
+          String.duplicate(" ", div(pad_len, 2)) <>
+            str <> String.duplicate(" ", div(pad_len, 2) + rem(pad_len, 2))
+
+        true ->
+          str
+      end
+    end
+
+    pad_right = fn str, len ->
+      str_len = String.length(str)
+
+      cond do
+        str_len < len ->
+          pad_len = len - str_len
+
+          String.duplicate(" ", pad_len) <> str
+
+        true ->
+          str
+      end
+    end
+
+    col_indices_row_str =
+      col_indices
+      |> Enum.map(&(" " <> pad_central.(&1, cell_width) <> " "))
+      |> Enum.join(" ")
+
+    col_indices_row_str_capped =
+      row_left_padding <> " " <> pad_right.("x", max_row_index_str_len) <> col_indices_row_str
+
+    cols_strs =
       Enum.map(tl_y..br_y, fn y ->
+        row_index_str =
+          y
+          |> to_string()
+          |> pad_right.(max_row_index_str_len)
+
         row_str =
           Enum.map(tl_x..br_x, fn x ->
-            value_str = Map.get(str_grid, {y, x}, filler)
-            value_str_len = String.length(value_str)
-
             padded_value_str =
-              cond do
-                value_str_len < max_str_width ->
-                  pad_len = max_str_width - value_str_len
-
-                  String.duplicate(" ", div(pad_len, 2)) <>
-                    value_str <> String.duplicate(" ", div(pad_len, 2) + rem(pad_len, 2))
-
-                true ->
-                  value_str
-              end
+              str_grid
+              |> Map.get({y, x}, value_filler)
+              |> pad_central.(cell_width)
 
             " " <> padded_value_str <> " "
           end)
           |> Enum.join("│")
 
-        "│" <> row_str <> "│"
+        row_index_str <> " │" <> row_str <> "│"
       end)
 
     row_divider =
-      String.duplicate("─", max_str_width + 2)
+      String.duplicate("─", cell_width + 2)
       |> List.duplicate(br_x - tl_x + 1)
       |> Enum.join("┼")
 
-    row_divider_capped = "├" <> row_divider <> "┤"
+    row_divider_capped = row_left_padding <> " ┼" <> row_divider <> "┤"
 
     row_top =
-      String.duplicate("─", max_str_width + 2)
+      String.duplicate("─", cell_width + 2)
       |> List.duplicate(br_x - tl_x + 1)
-      |> Enum.join("┬")
+      |> Enum.join("┼")
 
-    row_top_capped = "┌" <> row_top <> "┐"
+    row_top_capped = String.slice(row_left_padding, 1..-1) <> "y" <> " ┼" <> row_top <> "┤"
 
     row_bottom =
-      String.duplicate("─", max_str_width + 2)
+      String.duplicate("─", cell_width + 2)
       |> List.duplicate(br_x - tl_x + 1)
       |> Enum.join("┴")
 
-    row_bottom_capped = "└" <> row_bottom <> "┘"
+    row_bottom_capped = row_left_padding <> " ┴" <> row_bottom <> "┘"
 
     grid_str =
-      cols
+      cols_strs
       |> Enum.intersperse(row_divider_capped)
       |> Enum.join("\n")
 
-    row_top_capped <> "\n" <> grid_str <> "\n" <> row_bottom_capped
+    Enum.join(
+      [col_indices_row_str_capped, row_top_capped, grid_str, row_bottom_capped],
+      "\n"
+    )
   end
 end
-
-# ┌───┬───┐
-# │ 1 │ 2 │
-# ├───┼───┤
-# │ 3 │ 4 │
-# └───┴───┘

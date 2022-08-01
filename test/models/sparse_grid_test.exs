@@ -213,13 +213,12 @@ defmodule SparseGrid.Test do
 
     corners = SparseGrid.corners(grid)
 
-    expected =
-      %{
-        topleft: {-11, -3},
-        topright: {-11, 10},
-        bottomleft: {13, -3},
-        bottomright: {13, 10}
-      }
+    expected = %{
+      topleft: {-11, -3},
+      topright: {-11, 10},
+      bottomleft: {13, -3},
+      bottomright: {13, 10}
+    }
 
     assert corners == expected
   end
@@ -285,7 +284,7 @@ defmodule SparseGrid.Test do
   end
 
   test "within_bounds?/3 should return false if grid falls outside bounding box" do
-    #TODO
+    # TODO
   end
 
   test "align/3 should move a grid to align with another using :top_left alignment" do
@@ -754,5 +753,34 @@ defmodule SparseGrid.Test do
       ])
 
     assert aligned == expected
+  end
+
+  test "Inspect implementation should pretty print a grid" do
+    grid =
+      Tetrex.SparseGrid.new([
+        [nil, nil, 1],
+        [nil, :foo],
+        [nil, 5, 3.14159],
+        ["hello"]
+      ])
+
+    expected = """
+      x    0         1         2
+    y ┼─────────┼─────────┼─────────┤
+    0 │         │         │    1    │
+      ┼─────────┼─────────┼─────────┤
+    1 │         │   foo   │         │
+      ┼─────────┼─────────┼─────────┤
+    2 │         │    5    │ 3.14159 │
+      ┼─────────┼─────────┼─────────┤
+    3 │  hello  │         │         │
+      ┴─────────┴─────────┴─────────┘
+    """
+
+    result = inspect(grid)
+    # Required for check as editor auto-strips trailing spaces in expected string above
+    result_to_match = String.replace(result, ~r/ +\n/, "\n")
+
+    assert result_to_match <> "\n" == expected
   end
 end
