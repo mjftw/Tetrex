@@ -21,6 +21,9 @@ defmodule Tetrex.SparseGrid do
   ```
   """
 
+  @enforce_keys [:values]
+  defstruct [:values]
+
   @type(angle :: :zero, :clockwise90 | :clockwise180 | :clockwise270)
   @type alignment ::
           :top_left
@@ -42,11 +45,13 @@ defmodule Tetrex.SparseGrid do
   E.g.
   ```
   iex> Tetrex.SparseGrid.new()
-  %{}
+  %Tetrex.SparseGrid{values: %{}}
   ```
   """
-  @spec new() :: sparse_grid()
-  def new(), do: %{}
+  @spec new() :: __MODULE__.t()
+  def new(), do: %__MODULE__{values: %{}}
+
+  def new(grid_values) when is_map(grid_values), do: %__MODULE__{values: grid_values}
 
   @doc """
   Create a new SparseGrid from a 2d list of values.
@@ -59,71 +64,80 @@ defmodule Tetrex.SparseGrid do
   ...>   [:blue, nil],
   ...>   [:blue, :blue],
   ...> ])
-  %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue}
+  %Tetrex.SparseGrid{values: %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue}}
   ```
   """
-  @spec new([[any() | nil]]) :: sparse_grid()
+  @spec new([[any() | nil]]) :: __MODULE__.t()
   def new(values_2d) do
-    for {row, row_num} <- Stream.with_index(values_2d),
-        {value, col_num} when value != nil <- Stream.with_index(row),
-        into: %{},
-        do: {{row_num, col_num}, value}
+    values_map =
+      for {row, row_num} <- Stream.with_index(values_2d),
+          {value, col_num} when value != nil <- Stream.with_index(row),
+          into: %{},
+          do: {{row_num, col_num}, value}
+
+    new(values_map)
   end
 
   @doc """
   Create a rectangle grid filled with a given value.
   The top_left and bottom_right coordinates border the fill area, inclusive of the coordinates.
   """
-  @spec fill(any(), {y(), x()}, {y(), x()}) :: sparse_grid()
+  @spec fill(any(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
   def fill(value, {top_left_y, top_left_x}, {bottom_right_y, bottom_right_x}) do
-    for y <- top_left_y..bottom_right_y,
+    values_map =for y <- top_left_y..bottom_right_y,
         x <- top_left_x..bottom_right_x,
         into: %{},
-        do: {{y, x}, value}
+        do:
+          {{y, x}, value}
+
+    new(values_map)
   end
 
-  @spec move(sparse_grid(), {y(), x()}) :: sparse_grid()
-  def move(grid, {offset_y, offset_x}) do
+  @spec move(__MODULE__.t(), {y(), x()}) :: __MODULE__.t()
+  def move(%__MODULE__{values: grid}, {offset_y, offset_x}) do
     grid
     |> move_grid({offset_y, offset_x})
     |> Map.new()
+    |> new()
   end
 
   @doc """
   Rotate the grid around the origin.
   """
-  @spec rotate(sparse_grid(), angle()) :: sparse_grid()
+  @spec rotate(__MODULE__.t(), angle()) :: __MODULE__.t()
   def rotate(grid, :zero), do: grid
 
-  def rotate(grid, angle) do
+  def rotate(%__MODULE__{values: grid}, angle) do
     grid
     |> rotate_grid(angle)
     |> Map.new()
+    |> new()
   end
 
   @doc """
   Rotate the grid around a specific point of rotation
   """
-  @spec rotate(sparse_grid(), angle(), coordinate()) :: sparse_grid()
-  def rotate(grid, angle, {rotate_at_y, rotate_at_x}) do
+  @spec rotate(__MODULE__.t(), angle(), coordinate()) :: __MODULE__.t()
+  def rotate(%__MODULE__{values: grid}, angle, {rotate_at_y, rotate_at_x}) do
     # Rotating around a point is the same as moving to the origin, rotating, and moving back
     grid
     |> move_grid({-rotate_at_y, -rotate_at_x})
     |> rotate_grid(angle)
     |> move_grid({rotate_at_y, rotate_at_x})
     |> Map.new()
+    |> new()
   end
 
   @doc """
   Find the 4 corner coordinates bounding the grid
   """
-  @spec corners(sparse_grid()) :: %{
+  @spec corners(__MODULE__.t()) :: %{
           topleft: coordinate(),
           topright: coordinate(),
           bottomleft: coordinate(),
           bottomright: coordinate()
         }
-  def corners(grid) do
+  def corners(%__MODULE__{values: grid}) do
     Enum.reduce(
       grid,
       %{
@@ -152,9 +166,9 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Find the width and height of the grid, returned as `{height, width}`.
   """
-  @spec size(sparse_grid()) :: {y(), x()}
+  @spec size(__MODULE__.t()) :: {y(), x()}
   def size(grid) do
-    case __MODULE__.corners(grid) do
+    case corners(grid) do
       %{topright: {tr_y, tr_x}, bottomleft: {bl_y, bl_x}} -> {bl_y - tr_y, tr_x - bl_x}
     end
   end
@@ -162,15 +176,15 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Detect whether two grids have values at the same coordinates
   """
-  @spec overlaps?(sparse_grid(), sparse_grid()) :: boolean()
-  def overlaps?(grid1, grid2) do
+  @spec overlaps?(__MODULE__.t(), __MODULE__.t()) :: boolean()
+  def overlaps?(%__MODULE__{values: grid1}, %__MODULE__{values: grid2}) do
     !MapSet.disjoint?(MapSet.new(Map.keys(grid1)), MapSet.new(Map.keys(grid2)))
   end
 
   @doc """
   Detect whether a grid is withing a bounding box, denoted by top_left and bottom_right coordinates.
   """
-  @spec within_bounds?(sparse_grid(), {y(), x()}, {y(), x()}) :: boolean()
+  @spec within_bounds?(__MODULE__.t(), {y(), x()}, {y(), x()}) :: boolean()
   def within_bounds?(grid, {box_tl_y, box_tl_x}, {box_br_y, box_br_x}) do
     %{
       topleft: {tl_y, tl_x},
@@ -186,15 +200,16 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Combine two SparseGrids. In the case of overlaps vales from the second grid overwrite the first.
   """
-  @spec merge(sparse_grid(), sparse_grid()) :: sparse_grid()
-  def merge(grid1, grid2) do
+  @spec merge(__MODULE__.t(), __MODULE__.t()) :: __MODULE__.t()
+  def merge(%__MODULE__{values: grid1}, %__MODULE__{values: grid2}) do
     Map.merge(grid1, grid2)
+    |> new()
   end
 
   @doc """
   Move a grid so that it aligns with another grid.
   """
-  @spec align(sparse_grid(), sparse_grid(), alignment()) :: sparse_grid()
+  @spec align(__MODULE__.t(), __MODULE__.t(), alignment()) :: __MODULE__.t()
   def align(grid_to_move, align_with_grid, alignment) do
     %{
       topleft: move_to_tl,
@@ -208,7 +223,7 @@ defmodule Tetrex.SparseGrid do
   Move a grid to align it with a given bounding box,
   denoted by a top_left and bottom_right coordinate.
   """
-  @spec align(sparse_grid(), {y(), x()}, {y(), x()}, alignment()) :: sparse_grid()
+  @spec align(__MODULE__.t(), {y(), x()}, {y(), x()}, alignment()) :: __MODULE__.t()
   def align(grid, top_left, bottom_right, alignment) do
     %{
       topleft: grid_tl,

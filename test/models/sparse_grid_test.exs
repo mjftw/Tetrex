@@ -10,7 +10,9 @@ defmodule SparseGrid.Test do
         [:blue, nil, nil]
       ])
 
-    expected = %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue}
+    expected = %SparseGrid{
+      values: %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue}
+    }
 
     assert grid == expected
   end
@@ -22,7 +24,9 @@ defmodule SparseGrid.Test do
         [:blue]
       ])
 
-    expected = %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue}
+    expected = %SparseGrid{
+      values: %{{0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue, {1, 0} => :blue}
+    }
 
     assert grid == expected
   end
@@ -58,35 +62,34 @@ defmodule SparseGrid.Test do
 
     merged = SparseGrid.merge(blue_l, red_t)
 
-    expected = %{
-      {0, 0} => :blue,
-      {0, 1} => :red,
-      {1, 0} => :red,
-      {1, 1} => :red,
-      {1, 2} => :red,
-      {2, 0} => :blue,
-      {2, 1} => :blue
-    }
+    expected =
+      SparseGrid.new([
+        [:blue, :red, nil],
+        [:red, :red, :red],
+        [:blue, :blue, nil]
+      ])
 
     assert merged == expected
   end
 
   test "move/2 offsets all the coordinates in a SparseGrid" do
-    grid = %{
-      {0, 0} => :blue,
-      {0, 1} => :red,
-      {1, 0} => :red,
-      {1, 1} => :green
-    }
+    grid =
+      SparseGrid.new(%{
+        {0, 0} => :blue,
+        {0, 1} => :red,
+        {1, 0} => :red,
+        {1, 1} => :green
+      })
 
     moved = SparseGrid.move(grid, {-2, 1})
 
-    expected = %{
-      {-2, 1} => :blue,
-      {-2, 2} => :red,
-      {-1, 1} => :red,
-      {-1, 2} => :green
-    }
+    expected =
+      SparseGrid.new(%{
+        {-2, 1} => :blue,
+        {-2, 2} => :red,
+        {-1, 1} => :red,
+        {-1, 2} => :green
+      })
 
     assert moved == expected
   end
@@ -101,7 +104,8 @@ defmodule SparseGrid.Test do
 
     rotated = SparseGrid.rotate(blue_l, :clockwise90)
 
-    expected = %{{0, -2} => :blue, {0, -1} => :blue, {0, 0} => :blue, {1, -2} => :blue}
+    expected =
+      SparseGrid.new(%{{0, -2} => :blue, {0, -1} => :blue, {0, 0} => :blue, {1, -2} => :blue})
 
     assert rotated == expected
   end
@@ -127,7 +131,8 @@ defmodule SparseGrid.Test do
 
     rotated = SparseGrid.rotate(blue_l, :clockwise180)
 
-    expected = %{{-2, -1} => :blue, {-2, 0} => :blue, {-1, 0} => :blue, {0, 0} => :blue}
+    expected =
+      SparseGrid.new(%{{-2, -1} => :blue, {-2, 0} => :blue, {-1, 0} => :blue, {0, 0} => :blue})
 
     assert rotated == expected
   end
@@ -142,7 +147,8 @@ defmodule SparseGrid.Test do
 
     rotated = SparseGrid.rotate(blue_l, :clockwise270)
 
-    expected = %{{-1, 2} => :blue, {0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue}
+    expected =
+      SparseGrid.new(%{{-1, 2} => :blue, {0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue})
 
     assert rotated == expected
   end
@@ -157,7 +163,8 @@ defmodule SparseGrid.Test do
 
     rotated = SparseGrid.rotate(blue_l, :clockwise90, {3, 1})
 
-    expected = %{{2, 2} => :blue, {2, 3} => :blue, {2, 4} => :blue, {3, 2} => :blue}
+    expected =
+      SparseGrid.new(%{{2, 2} => :blue, {2, 3} => :blue, {2, 4} => :blue, {3, 2} => :blue})
 
     assert rotated == expected
   end
@@ -172,7 +179,8 @@ defmodule SparseGrid.Test do
 
     rotated = SparseGrid.rotate(blue_l, :clockwise180, {3, 1})
 
-    expected = %{{4, 1} => :blue, {4, 2} => :blue, {5, 2} => :blue, {6, 2} => :blue}
+    expected =
+      SparseGrid.new(%{{4, 1} => :blue, {4, 2} => :blue, {5, 2} => :blue, {6, 2} => :blue})
 
     assert rotated == expected
   end
@@ -187,40 +195,44 @@ defmodule SparseGrid.Test do
 
     rotated = SparseGrid.rotate(blue_l, :clockwise270, {3, 1})
 
-    expected = %{{3, 0} => :blue, {4, -2} => :blue, {4, -1} => :blue, {4, 0} => :blue}
+    expected =
+      SparseGrid.new(%{{3, 0} => :blue, {4, -2} => :blue, {4, -1} => :blue, {4, 0} => :blue})
 
     assert rotated == expected
   end
 
   test "corners/1 can find the corner coordinates of a grid" do
-    grid = %{
-      {-5, 2} => 1,
-      {-11, 10} => 1,
-      {2, 6} => 1,
-      {13, -3} => 1,
-      {5, 5} => 1
-    }
+    grid =
+      SparseGrid.new(%{
+        {-5, 2} => 1,
+        {-11, 10} => 1,
+        {2, 6} => 1,
+        {13, -3} => 1,
+        {5, 5} => 1
+      })
 
     corners = SparseGrid.corners(grid)
 
-    expected = %{
-      topleft: {-11, -3},
-      topright: {-11, 10},
-      bottomleft: {13, -3},
-      bottomright: {13, 10}
-    }
+    expected =
+      %{
+        topleft: {-11, -3},
+        topright: {-11, 10},
+        bottomleft: {13, -3},
+        bottomright: {13, 10}
+      }
 
     assert corners == expected
   end
 
   test "size/1 can find the height and width of a grid" do
-    grid = %{
-      {-5, 2} => 1,
-      {-11, 10} => 1,
-      {2, 6} => 1,
-      {13, -3} => 1,
-      {5, 5} => 1
-    }
+    grid =
+      SparseGrid.new(%{
+        {-5, 2} => 1,
+        {-11, 10} => 1,
+        {2, 6} => 1,
+        {13, -3} => 1,
+        {5, 5} => 1
+      })
 
     {height, width} = SparseGrid.size(grid)
 
@@ -273,6 +285,7 @@ defmodule SparseGrid.Test do
   end
 
   test "within_bounds?/3 should return false if grid falls outside bounding box" do
+    #TODO
   end
 
   test "align/3 should move a grid to align with another using :top_left alignment" do
