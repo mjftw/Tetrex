@@ -70,4 +70,31 @@ defmodule Tetrex.Board do
        }}
     end
   end
+
+  @doc """
+  Apply a transform function to the active tile, checking that doing so would
+  cause it to collide with the playfield or be outside the playfield.
+  """
+  @spec move_active_if_legal(
+          __MODULE__.t(),
+          (SparseGrid.sparse_grid() -> SparseGrid.sparse_grid())
+        ) :: {:ok, __MODULE__.t()} | {:error, placement_error()}
+  def move_active_if_legal(board, transform_fn) do
+    candidate_placement = transform_fn.(board.active_tile)
+
+    collides = SparseGrid.overlaps?(candidate_placement, board.playfield)
+
+    on_playfield =
+      SparseGrid.within_bounds?(
+        candidate_placement,
+        {0, 0},
+        {board.playfield_height, board.playfield_width}
+      )
+
+    case {collides, on_playfield} do
+      {true, _} -> {:error, :collision}
+      {_, false} -> {:error, :out_of_bounds}
+      {false, true} -> {:ok, %{board | active_tile: candidate_placement}}
+    end
+  end
 end

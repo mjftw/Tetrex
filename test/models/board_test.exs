@@ -59,4 +59,41 @@ defmodule Tetrex.Board.Test do
 
     assert Board.place_next_tile(board) == {:error, :collision}
   end
+
+  test "move_active_if_legal/2 applies the transform function when legal" do
+    board = Board.new(20, 10, 0)
+
+    transform = &Tetrex.SparseGrid.move(&1, {1, 0})
+
+    {:ok, moved} = Board.move_active_if_legal(board, transform)
+
+    assert moved.active_tile == transform.(board.active_tile)
+  end
+
+  test "move_active_if_legal/2 gives out_of_bounds error when moving off playfield" do
+    board = %{Board.new(20, 10, 0) | active_tile: Tetrex.SparseGrid.new([[:a]])}
+
+    transform = &Tetrex.SparseGrid.move(&1, {-1, 0})
+
+    assert Board.move_active_if_legal(board, transform) == {:error, :out_of_bounds}
+  end
+
+  test "move_active_if_legal/2 gives collision error when over a filled space in the playfield" do
+    board = %{
+      Board.new(5, 1, 0)
+      | active_tile: Tetrex.SparseGrid.new([[:a]]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [:b],
+            [:b],
+            [:b],
+            [:b]
+          ])
+    }
+
+    transform = &Tetrex.SparseGrid.move(&1, {1, 0})
+
+    assert Board.move_active_if_legal(board, transform) == {:error, :collision}
+  end
 end
