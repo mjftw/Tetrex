@@ -56,18 +56,20 @@ defmodule Tetrex.Board do
         :top_centre
       )
 
-    if SparseGrid.overlaps?(candidate_placement, board.playfield) do
-      {:error, :collision}
-    else
-      [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
+    cond do
+      SparseGrid.overlaps?(candidate_placement, board.playfield) ->
+        {:error, :collision}
 
-      {:ok,
-       %{
-         board
-         | active_tile: board.next_tile,
-           next_tile: Tetromino.tetromino!(next_tile_name),
-           upcoming_tile_names: upcoming_tile_names
-       }}
+      true ->
+        [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
+
+        {:ok,
+         %{
+           board
+           | active_tile: board.next_tile,
+             next_tile: Tetromino.tetromino!(next_tile_name),
+             upcoming_tile_names: upcoming_tile_names
+         }}
     end
   end
 
@@ -82,7 +84,7 @@ defmodule Tetrex.Board do
   def move_active_if_legal(board, transform_fn) do
     candidate_placement = transform_fn.(board.active_tile)
 
-    collides = SparseGrid.overlaps?(candidate_placement, board.playfield)
+    collides_with_playfield = SparseGrid.overlaps?(candidate_placement, board.playfield)
 
     on_playfield =
       SparseGrid.within_bounds?(
@@ -91,10 +93,10 @@ defmodule Tetrex.Board do
         {board.playfield_height, board.playfield_width}
       )
 
-    case {collides, on_playfield} do
-      {true, _} -> {:error, :collision}
-      {_, false} -> {:error, :out_of_bounds}
-      {false, true} -> {:ok, %{board | active_tile: candidate_placement}}
+    cond do
+      collides_with_playfield -> {:error, :collision}
+      !on_playfield -> {:error, :out_of_bounds}
+      true -> {:ok, %{board | active_tile: candidate_placement}}
     end
   end
 end
