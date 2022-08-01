@@ -43,21 +43,16 @@ defmodule Tetrex.Board do
   end
 
   @doc """
-  Attempt to place the next tile on the board.
-  An error is returned if the tile could no be placed due to the board already being full.
+  Attempt to place the active_tile on the playfield.
+  An error is returned if the tile could not be placed due to the playfield already being full at
+  that location.
   """
-  @spec place_next_tile(__MODULE__.t()) :: {:ok, __MODULE__.t()} | {:error, placement_error()}
-  def place_next_tile(board) do
-    candidate_placement =
-      SparseGrid.align(
-        board.next_tile,
-        {0, 0},
-        {board.playfield_height, board.playfield_width},
-        :top_centre
-      )
+  @spec merge_active_draw_next(__MODULE__.t()) ::
+          {:ok, __MODULE__.t()} | {:error, placement_error()}
 
+  def merge_active_draw_next(board) do
     cond do
-      SparseGrid.overlaps?(candidate_placement, board.playfield) ->
+      !active_tile_fits_on_playfield?(board) ->
         {:error, :collision}
 
       true ->
@@ -66,10 +61,27 @@ defmodule Tetrex.Board do
         {:ok,
          %{
            board
-           | active_tile: board.next_tile,
-             next_tile: Tetromino.tetromino!(next_tile_name),
-             upcoming_tile_names: upcoming_tile_names
+           | next_tile: Tetromino.tetromino!(next_tile_name),
+             upcoming_tile_names: upcoming_tile_names,
+             active_tile: board.next_tile,
+             playfield: SparseGrid.merge(board.playfield, board.active_tile)
          }}
+    end
+  end
+
+  @doc """
+  Move the active tile down on the playfield.
+  If doing so would cause it to collide with tiles on the playfield or it's at the bottom then fix
+  the active_tile to the playfield and draw a new one.
+  """
+  @spec move_active_down(__MODULE__.t()) :: {:ok, __MODULE__.t()} | {:error, :playfield_full}
+  def move_active_down(board) do
+    case move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
+      {:ok, new_board} ->
+        {:ok, new_board}
+
+      {:error, error} when error == :collision or error == :out_of_bounds ->
+        merge_active_draw_next(board)
     end
   end
 
@@ -98,5 +110,17 @@ defmodule Tetrex.Board do
       !on_playfield -> {:error, :out_of_bounds}
       true -> {:ok, %{board | active_tile: candidate_placement}}
     end
+  end
+
+  defp active_tile_fits_on_playfield?(board) do
+    candidate_placement =
+      SparseGrid.align(
+        board.active_tile,
+        {0, 0},
+        {board.playfield_height, board.playfield_width},
+        :top_centre
+      )
+
+    !SparseGrid.overlaps?(candidate_placement, board.playfield)
   end
 end
