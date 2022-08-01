@@ -350,8 +350,7 @@ defimpl Inspect, for: Tetrex.SparseGrid do
       |> Enum.map(&(" " <> pad_central.(&1, cell_width) <> " "))
       |> Enum.join(" ")
 
-    col_indices_row_str_capped =
-      row_left_padding <> " " <> pad_right.("x", max_row_index_str_len) <> col_indices_row_str
+    col_indices_row_str_capped = row_left_padding <> " " <> "x" <> col_indices_row_str
 
     cols_strs =
       Enum.map(tl_y..br_y, fn y ->

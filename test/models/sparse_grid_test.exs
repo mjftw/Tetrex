@@ -757,7 +757,7 @@ defmodule SparseGrid.Test do
 
   test "Inspect implementation should pretty print a grid" do
     grid =
-      Tetrex.SparseGrid.new([
+      SparseGrid.new([
         [nil, nil, 1],
         [nil, :foo],
         [nil, 5, 3.14159],
@@ -775,6 +775,36 @@ defmodule SparseGrid.Test do
       ┼─────────┼─────────┼─────────┤
     3 │  hello  │         │         │
       ┴─────────┴─────────┴─────────┘
+    """
+
+    result = inspect(grid)
+    # Required for check as editor auto-strips trailing spaces in expected string above
+    result_to_match = String.replace(result, ~r/ +\n/, "\n")
+
+    assert result_to_match <> "\n" == expected
+  end
+
+  test "Inspect implementation should pretty print a grid, with negative axis" do
+    grid =
+      SparseGrid.new([
+        [nil, nil, 1],
+        [nil, :foo],
+        [nil, 5, 3.14159],
+        ["hello"]
+      ])
+      |> SparseGrid.move({-2, -1})
+
+    expected = """
+       x   -1         0         1
+     y ┼─────────┼─────────┼─────────┤
+    -2 │         │         │    1    │
+       ┼─────────┼─────────┼─────────┤
+    -1 │         │   foo   │         │
+       ┼─────────┼─────────┼─────────┤
+     0 │         │    5    │ 3.14159 │
+       ┼─────────┼─────────┼─────────┤
+     1 │  hello  │         │         │
+       ┴─────────┴─────────┴─────────┘
     """
 
     result = inspect(grid)
