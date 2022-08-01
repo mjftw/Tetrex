@@ -154,4 +154,80 @@ defmodule Tetrex.Board.Test do
 
     assert moved.playfield == expected
   end
+
+  test "move_active_left/1 should move the active tile left by one if legal" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
+    }
+
+    moved = Board.move_active_left(board)
+
+    expected = Tetrex.SparseGrid.new([[:a]])
+
+    assert moved.active_tile == expected
+  end
+
+  test "move_active_left/1 should not move the active tile left blocked" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
+        playfield: Tetrex.SparseGrid.new([[:b, nil, nil]])
+    }
+
+    not_moved = Board.move_active_left(board)
+
+    assert not_moved.active_tile == board.active_tile
+  end
+
+  test "move_active_left/1 should not move the active tile left on edge of playfield" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[:a, nil, nil]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
+    }
+
+    not_moved = Board.move_active_left(board)
+
+    assert not_moved.active_tile == board.active_tile
+  end
+
+  test "move_active_right/1 should move the active tile right by one if legal" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
+    }
+
+    moved = Board.move_active_right(board)
+
+    expected = Tetrex.SparseGrid.new([[nil, nil, :a]])
+
+    assert moved.active_tile == expected
+  end
+
+  test "move_active_right/1 should not move the active tile right blocked" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, :b]])
+    }
+
+    not_moved = Board.move_active_right(board)
+
+    assert not_moved.active_tile == board.active_tile
+  end
+
+  test "move_active_right/1 should not move the active tile right on edge of playfield" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, nil, :a]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
+    }
+
+    not_moved = Board.move_active_right(board)
+
+    assert not_moved.active_tile == board.active_tile
+  end
 end
