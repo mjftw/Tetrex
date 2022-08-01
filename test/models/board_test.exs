@@ -230,4 +230,100 @@ defmodule Tetrex.Board.Test do
 
     assert not_moved.active_tile == board.active_tile
   end
+
+  test "hold_active/1 should hold the active_tile when no hold_tile" do
+    board = %{
+      Board.new(3, 3, 0)
+      | hold_tile: nil,
+        active_tile: Tetrex.SparseGrid.new([[:a]])
+    }
+
+    new_board = Board.hold_active(board)
+
+    assert new_board.hold_tile == board.active_tile
+  end
+
+  test "hold_active/1 should draw a new tile when no hold_tile" do
+    board = %{
+      Board.new(3, 3, 0)
+      | hold_tile: nil,
+        active_tile: Tetrex.SparseGrid.new([[:a]]),
+        next_tile: Tetrex.Tetromino.tetromino!(:t),
+        upcoming_tile_names: [:i, :o, :s]
+    }
+
+    result =
+      board
+      |> Board.hold_active()
+      |> Map.take([:active_tile, :next_tile, :upcoming_tile_names])
+
+    expected = %{
+      active_tile: board.next_tile,
+      next_tile: Tetrex.Tetromino.tetromino!(:i),
+      upcoming_tile_names: [:o, :s]
+    }
+
+    assert result == expected
+  end
+
+  test "hold_active/1 should swap active and hold tiles a new tile when no hold_tile" do
+    board = %{
+      Board.new(10, 10, 0)
+      | hold_tile:
+          Tetrex.SparseGrid.new([
+            [:h],
+            [:h],
+            [:h, :h]
+          ]),
+        active_tile:
+          Tetrex.SparseGrid.new([
+            [:a, :a, :a, :a]
+          ]),
+        next_tile: Tetrex.Tetromino.tetromino!(:t),
+        upcoming_tile_names: [:i, :o, :s]
+    }
+
+    result =
+      board
+      |> Board.hold_active()
+      |> Map.take([:active_tile, :hold_tile, :next_tile])
+
+    expected = %{
+      # Hold tile aligned with top centre of where active_tile was
+      active_tile:
+        Tetrex.SparseGrid.new([
+          [nil, :h],
+          [nil, :h],
+          [nil, :h, :h]
+        ]),
+      hold_tile: board.active_tile,
+      next_tile: board.next_tile
+    }
+
+    assert result == expected
+  end
+
+  test "hold_active/1 should not swap active and hold tiles if hold tile doesn't fit where active was" do
+    board = %{
+      Board.new(3, 3, 0)
+      | hold_tile:
+          Tetrex.SparseGrid.new([
+            [:h, :h, :h]
+          ]),
+        active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [nil, :a, nil],
+            [nil, nil, nil]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [:p, :p, :p],
+            [:p, nil, :p],
+            [:p, :p, :p]
+          ])
+    }
+
+    assert Board.hold_active(board) == board
+  end
 end

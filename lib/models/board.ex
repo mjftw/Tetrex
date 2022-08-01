@@ -56,17 +56,24 @@ defmodule Tetrex.Board do
         {:error, :collision}
 
       true ->
-        [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
-
         {:ok,
          %{
-           board
-           | next_tile: Tetromino.tetromino!(next_tile_name),
-             upcoming_tile_names: upcoming_tile_names,
-             active_tile: board.next_tile,
-             playfield: SparseGrid.merge(board.playfield, board.active_tile)
+           draw_next_tile(board)
+           | playfield: SparseGrid.merge(board.playfield, board.active_tile)
          }}
     end
+  end
+
+  @spec draw_next_tile(__MODULE__.t()) :: __MODULE__.t()
+  defp draw_next_tile(board) do
+    [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
+
+    %{
+      board
+      | next_tile: Tetromino.tetromino!(next_tile_name),
+        upcoming_tile_names: upcoming_tile_names,
+        active_tile: board.next_tile
+    }
   end
 
   @doc """
@@ -80,7 +87,7 @@ defmodule Tetrex.Board do
       {:ok, new_board} ->
         {:ok, new_board}
 
-      {:error, error} when error == :collision or error == :out_of_bounds ->
+      {:error, error} when error in [:collision, :out_of_bounds] ->
         merge_active_draw_next(board)
     end
   end
@@ -98,6 +105,40 @@ defmodule Tetrex.Board do
   """
   @spec move_active_right(__MODULE__.t()) :: __MODULE__.t()
   def move_active_right(board), do: move_active_sideways(board, 1)
+
+  @doc """
+  Move the active tile into the hold slot.
+  If the hold slot was empty a new tile is drawn.
+  If hold slot was full, swap the hold and active tiles
+  If swapping the hold and active tiles is not possible due to a collision, do not swap.
+  """
+  @spec hold_active(__MODULE__.t()) :: __MODULE__.t()
+  def hold_active(board) do
+    # Compute lazily as not needed in all branches
+    active_at_origin = fn -> SparseGrid.align(board.active_tile, {0, 0}, {0, 0}, :top_left) end
+
+    case board.hold_tile do
+      nil ->
+        # No hold tile, put active in hold slot and draw new active
+        %{board | hold_tile: active_at_origin.()}
+        |> draw_next_tile()
+
+      _ ->
+        # Swap the active and hold tiles
+        case move_active_if_legal(
+               board,
+               fn _ -> SparseGrid.align(board.hold_tile, board.active_tile, :top_centre) end
+             ) do
+          {:ok, new_board} ->
+            # hold tile fits on board
+            %{new_board | hold_tile: active_at_origin.()}
+
+          {:error, error} when error in [:collision, :out_of_bounds] ->
+            # hold tile does not fit on board
+            board
+        end
+    end
+  end
 
   @doc """
   Apply a transform function to the active tile, checking that doing so would
