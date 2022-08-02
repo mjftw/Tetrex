@@ -414,4 +414,88 @@ defmodule Tetrex.Board.Test do
 
     assert not_rotated == board
   end
+
+  test "preview/1 should return flattened view of board when active tile fits" do
+    board = %{
+      Board.new(3, 3, 0)
+      | hold_tile:
+          Tetrex.SparseGrid.new([
+            [:h]
+          ]),
+        next_tile:
+          Tetrex.SparseGrid.new([
+            [:n]
+          ]),
+        active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, :a, nil],
+            [nil, :a, nil],
+            [nil, nil, nil]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [:p, nil, :p],
+            [:p, :p, :p]
+          ])
+    }
+
+    previewed = Board.preview(board)
+
+    expected = %{
+      hold_tile: board.hold_tile,
+      next_tile: board.next_tile,
+      playfield:
+        Tetrex.SparseGrid.new([
+          [nil, :a, nil],
+          [:p, :a, :p],
+          [:p, :p, :p]
+        ]),
+      active_tile_fits: true
+    }
+
+    assert previewed == expected
+  end
+
+  test "preview/1 should return flattened view with active tile clipped to fit when overlaps" do
+    board = %{
+      Board.new(3, 3, 0)
+      | hold_tile:
+          Tetrex.SparseGrid.new([
+            [:h]
+          ]),
+        next_tile:
+          Tetrex.SparseGrid.new([
+            [:n]
+          ]),
+        active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, :a, :b],
+            [nil, :c, nil],
+            [nil, :d, nil]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [:p, nil, :p],
+            [:p, :p, :p]
+          ])
+    }
+
+    previewed = Board.preview(board)
+
+    expected = %{
+      hold_tile: board.hold_tile,
+      next_tile: board.next_tile,
+      playfield:
+        Tetrex.SparseGrid.new([
+          [nil, :c, nil],
+          [:p, :d, :p],
+          [:p, :p, :p]
+        ]),
+      active_tile_fits: false
+    }
+
+    assert previewed == expected
+  end
 end

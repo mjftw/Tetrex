@@ -51,11 +51,19 @@ defmodule Tetrex.Board do
           {:ok, __MODULE__.t()} | {:error, placement_error()}
 
   def merge_active_draw_next(board) do
-    cond do
-      !active_tile_fits_on_playfield?(board) ->
+    candidate_placement =
+      SparseGrid.align(
+        board.active_tile,
+        :top_centre,
+        {0, 0},
+        {board.playfield_height, board.playfield_width}
+      )
+
+    case SparseGrid.overlaps?(candidate_placement, board.playfield) do
+      true ->
         {:error, :collision}
 
-      true ->
+      false ->
         {:ok,
          %{
            draw_next_tile(board)
@@ -90,6 +98,8 @@ defmodule Tetrex.Board do
       {:error, error} when error in [:collision, :out_of_bounds] ->
         merge_active_draw_next(board)
     end
+
+    # TODO: Need to add the logic for clearing the bottom row of playfield if filled
   end
 
   @doc """
@@ -190,16 +200,61 @@ defmodule Tetrex.Board do
     end
   end
 
-  defp active_tile_fits_on_playfield?(board) do
-    candidate_placement =
-      SparseGrid.align(
-        board.active_tile,
-        :top_centre,
-        {0, 0},
-        {board.playfield_height, board.playfield_width}
-      )
+  @doc """
+  Build the flattened version of the playfield ready for viewing.
+  """
+  @spec preview(__MODULE__.t()) :: %{
+          playfield: SparseGrid.t(),
+          next_tile: SparseGrid.t(),
+          hold_tile: SparseGrid.t(),
+          active_tile_fits: boolean()
+        }
+  def preview(board) do
+    # Check whether active tile collides with playfield
+    # If yes:
+    #   Keep cutting the top of the active tile off, moving it up 1, and seeing if it then fits.
+    #   Repeat until some part of the active tile fits or can't fit at all.
+    #   Merge this with the playfield and return as %{playfield: <merged>} to give the "game over"
+    #    placement preview.
+    #   Set %{error: :playfield_full}.
+    # If no:
+    #   Merge the active tile with the playfield and return as %{playfield: <merged>}.
+    case SparseGrid.overlaps?(board.active_tile, board.playfield) do
+      false ->
+        %{
+          playfield: SparseGrid.merge(board.playfield, board.active_tile),
+          next_tile: board.next_tile,
+          hold_tile: board.hold_tile,
+          active_tile_fits: true
+        }
 
-    !SparseGrid.overlaps?(candidate_placement, board.playfield)
+      true ->
+        new_board = move_active_up_until_fits(board)
+
+        %{
+          playfield: SparseGrid.merge(new_board.playfield, new_board.active_tile),
+          next_tile: new_board.next_tile,
+          hold_tile: new_board.hold_tile,
+          active_tile_fits: false
+        }
+    end
+  end
+
+  defp move_active_up_until_fits(board) do
+    case SparseGrid.overlaps?(board.active_tile, board.playfield) do
+      false ->
+        board
+
+      true ->
+        %{
+          board
+          | active_tile:
+              board.active_tile
+              |> SparseGrid.move({-1, 0})
+              |> SparseGrid.mask({0, 0}, {board.playfield_height - 1, board.playfield_width - 1})
+        }
+        |> move_active_up_until_fits()
+    end
   end
 
   defp move_active_sideways(board, x_translation) do
