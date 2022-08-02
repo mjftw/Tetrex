@@ -244,6 +244,18 @@ defmodule Tetrex.SparseGrid do
     move(grid, {move_to_y - move_from_y, move_to_x - move_from_x})
   end
 
+  @doc """
+  Delete all entries from the grid that are within the bounding box (inclusive of edge coordinates).
+  The bounding box is denoted by the coordinates of the top_left and bottom_right points.
+  """
+  @spec clear(__MODULE__.t(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
+  def clear(%__MODULE__{values: grid}, top_left, bottom_right) do
+    grid
+    |> Enum.filter(fn {coord, _} -> !coordinate_in_bounds(coord, top_left, bottom_right) end)
+    |> Map.new()
+    |> new()
+  end
+
   defp alignment_coordinate({tl_y, tl_x}, {br_y, br_x}, alignment) do
     mid_x = tl_x + div(br_x - tl_x, 2)
     mid_y = tl_y + div(br_y - tl_y, 2)
@@ -259,6 +271,12 @@ defmodule Tetrex.SparseGrid do
       :bottom_centre -> {br_y, mid_x}
       :bottom_right -> {br_y, br_x}
     end
+  end
+
+  @spec coordinate_in_bounds(coordinate(), {y(), x()}, {y(), x()}) :: boolean()
+  defp coordinate_in_bounds({y, x}, {box_tl_y, box_tl_x}, {box_br_y, box_br_x}) do
+    box_tl_y <= y && y <= box_br_y &&
+      box_tl_x <= x && x <= box_br_x
   end
 
   defp move_grid(grid, {y_offset, x_offset}) do
@@ -279,7 +297,7 @@ end
 
 # Need SparseGrid to be a struct before I can do this
 defimpl Inspect, for: Tetrex.SparseGrid do
-  def inspect(grid, opts) do
+  def inspect(grid, _opts) do
     str_grid =
       Enum.map(grid.values, fn {coord, value} -> {coord, to_string(value)} end)
       |> Map.new()

@@ -794,6 +794,32 @@ defmodule SparseGrid.Test do
     assert aligned == expected
   end
 
+  test "clear/3 should delete cell values that are contained within the bounding box" do
+    grid =
+      SparseGrid.new([
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a]
+      ])
+
+    cleared = SparseGrid.clear(grid, {1, 1}, {4, 2})
+
+    expected =
+      SparseGrid.new([
+        [:a, :a, :a, :a, :a],
+        [:a, nil, nil, :a, :a],
+        [:a, nil, nil, :a, :a],
+        [:a, nil, nil, :a, :a],
+        [:a, nil, nil, :a, :a],
+        [:a, :a, :a, :a, :a]
+      ])
+
+    assert cleared == expected
+  end
+
   test "Inspect implementation should pretty print a grid" do
     grid =
       SparseGrid.new([
