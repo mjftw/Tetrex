@@ -326,4 +326,92 @@ defmodule Tetrex.Board.Test do
 
     assert Board.hold_active(board) == board
   end
+
+  test "rotate_active/1 should rotate the active tile 90 degrees when no collision" do
+    board = %{
+      Board.new(3, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [nil, :a, :a],
+            [nil, nil, nil]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [nil, nil, nil],
+            [nil, nil, nil]
+          ])
+    }
+
+    rotated = Board.rotate_active(board)
+
+    assert rotated.active_tile == Tetrex.SparseGrid.rotate(board.active_tile, :clockwise90)
+  end
+
+  test "rotate_active/1 should rotate the active tile 180 degrees when collision at 90" do
+    board = %{
+      Board.new(3, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [nil, :a, :a],
+            [nil, nil, nil]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [nil, nil, nil],
+            [nil, :b, nil]
+          ])
+    }
+
+    rotated = Board.rotate_active(board)
+
+    assert rotated.active_tile == Tetrex.SparseGrid.rotate(board.active_tile, :clockwise180)
+  end
+
+  test "rotate_active/1 should rotate the active tile 270 degrees when collision at 90 & 180" do
+    board = %{
+      Board.new(3, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [nil, :a, :a],
+            [nil, nil, nil]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [:b, nil, nil],
+            [nil, :b, nil]
+          ])
+    }
+
+    rotated = Board.rotate_active(board)
+
+    assert rotated.active_tile == Tetrex.SparseGrid.rotate(board.active_tile, :clockwise270)
+  end
+
+  test "rotate_active/1 should not rotate the active tile when collision at 90, 180, & 270" do
+    board = %{
+      Board.new(3, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, nil, nil],
+            [nil, :a, :a],
+            [nil, nil, nil]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [nil, :b, nil],
+            [:b, nil, nil],
+            [nil, :b, nil]
+          ])
+    }
+
+    not_rotated = Board.rotate_active(board)
+
+    assert not_rotated == board
+  end
 end

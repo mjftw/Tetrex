@@ -141,6 +141,29 @@ defmodule Tetrex.Board do
   end
 
   @doc """
+  Attempt to rotate the active tile clockwise, first 90 degrees clockwise, then 180, then 270.
+  If a rotation would cause a collision the next is tried.
+  If no rotation is possible then the board is returned unchanged.
+  """
+  @spec rotate_active(__MODULE__.t()) :: __MODULE__.t()
+  def rotate_active(board) do
+    # Keep attempting to rotate until it works, or every rotation has been tried and failed
+    result =
+      with {:error, _} <-
+             move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise90)),
+           {:error, _} <-
+             move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise180)),
+           {:error, _} <-
+             move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise270)),
+           do: :could_not_rotate
+
+    case result do
+      {:ok, new_board} -> new_board
+      :could_not_rotate -> board
+    end
+  end
+
+  @doc """
   Apply a transform function to the active tile, checking that doing so would
   cause it to collide with the playfield or be outside the playfield.
   """
