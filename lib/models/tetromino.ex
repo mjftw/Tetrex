@@ -59,8 +59,8 @@ defmodule Tetrex.Tetromino do
   Fetch the tetromino with the given name.
   An exception is raised if no tetromino with matching name exists.
   """
-  @spec tetromino!(name()) :: SparseGrid.sparse_grid()
-  def tetromino!(name), do: Map.fetch!(@tetrominos, name)
+  @spec fetch!(name()) :: SparseGrid.sparse_grid()
+  def fetch!(name), do: Map.fetch!(@tetrominos, name)
 
   # Would prefer to draw tiles from an infinite lazy stream rather than computing eagerly.
   # When playing Tetris Battles we want both players to draw the same sequence of tiles to make the

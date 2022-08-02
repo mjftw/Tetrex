@@ -35,8 +35,8 @@ defmodule Tetrex.Board do
       playfield: SparseGrid.new(),
       playfield_height: height,
       playfield_width: width,
-      active_tile: Tetromino.tetromino!(active_tile_name),
-      next_tile: Tetromino.tetromino!(next_tile_name),
+      active_tile: Tetromino.fetch!(active_tile_name),
+      next_tile: Tetromino.fetch!(next_tile_name),
       hold_tile: nil,
       upcoming_tile_names: upcoming_tile_names
     }
@@ -78,7 +78,7 @@ defmodule Tetrex.Board do
 
     %{
       board
-      | next_tile: Tetromino.tetromino!(next_tile_name),
+      | next_tile: Tetromino.fetch!(next_tile_name),
         upcoming_tile_names: upcoming_tile_names,
         active_tile: board.next_tile
     }

@@ -12,8 +12,8 @@ defmodule Tetrex.Board.Test do
       playfield: Tetrex.SparseGrid.new(),
       playfield_height: 20,
       playfield_width: 10,
-      active_tile: Tetrex.Tetromino.tetromino!(:t),
-      next_tile: Tetrex.Tetromino.tetromino!(:s),
+      active_tile: Tetrex.Tetromino.fetch!(:t),
+      next_tile: Tetrex.Tetromino.fetch!(:s),
       hold_tile: nil
     }
 
@@ -31,14 +31,14 @@ defmodule Tetrex.Board.Test do
   test "merge_active_draw_next/1 should change the current tile when no overlap would occur" do
     board = %{
       Board.new(3, 3, 0)
-      | next_tile: Tetrex.Tetromino.tetromino!(:t),
+      | next_tile: Tetrex.Tetromino.fetch!(:t),
         upcoming_tile_names: [:i, :o, :s]
     }
 
     expected = %{
       board
       | active_tile: board.next_tile,
-        next_tile: Tetrex.Tetromino.tetromino!(:i),
+        next_tile: Tetrex.Tetromino.fetch!(:i),
         playfield: board.active_tile,
         upcoming_tile_names: [:o, :s]
     }
@@ -248,7 +248,7 @@ defmodule Tetrex.Board.Test do
       Board.new(3, 3, 0)
       | hold_tile: nil,
         active_tile: Tetrex.SparseGrid.new([[:a]]),
-        next_tile: Tetrex.Tetromino.tetromino!(:t),
+        next_tile: Tetrex.Tetromino.fetch!(:t),
         upcoming_tile_names: [:i, :o, :s]
     }
 
@@ -259,7 +259,7 @@ defmodule Tetrex.Board.Test do
 
     expected = %{
       active_tile: board.next_tile,
-      next_tile: Tetrex.Tetromino.tetromino!(:i),
+      next_tile: Tetrex.Tetromino.fetch!(:i),
       upcoming_tile_names: [:o, :s]
     }
 
@@ -279,7 +279,7 @@ defmodule Tetrex.Board.Test do
           Tetrex.SparseGrid.new([
             [:a, :a, :a, :a]
           ]),
-        next_tile: Tetrex.Tetromino.tetromino!(:t),
+        next_tile: Tetrex.Tetromino.fetch!(:t),
         upcoming_tile_names: [:i, :o, :s]
     }
 
