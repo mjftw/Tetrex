@@ -820,6 +820,32 @@ defmodule SparseGrid.Test do
     assert cleared == expected
   end
 
+  test "mask/3 should delete cell values that are not contained within the bounding box" do
+    grid =
+      SparseGrid.new([
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a],
+        [:a, :a, :a, :a, :a]
+      ])
+
+    cleared = SparseGrid.mask(grid, {1, 1}, {4, 2})
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, nil, nil, nil],
+        [nil, :a, :a, nil, nil],
+        [nil, :a, :a, nil, nil],
+        [nil, :a, :a, nil, nil],
+        [nil, :a, :a, nil, nil],
+        [nil, nil, nil, nil, nil]
+      ])
+
+    assert cleared == expected
+  end
+
   test "Inspect implementation should pretty print a grid" do
     grid =
       SparseGrid.new([

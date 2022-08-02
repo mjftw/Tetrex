@@ -256,6 +256,18 @@ defmodule Tetrex.SparseGrid do
     |> new()
   end
 
+  @doc """
+  Delete all entries from the grid that are outside the bounding box (inclusive of edge coordinates).
+  The bounding box is denoted by the coordinates of the top_left and bottom_right points.
+  """
+  @spec mask(__MODULE__.t(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
+  def mask(%__MODULE__{values: grid}, top_left, bottom_right) do
+    grid
+    |> Enum.filter(fn {coord, _} -> coordinate_in_bounds(coord, top_left, bottom_right) end)
+    |> Map.new()
+    |> new()
+  end
+
   defp alignment_coordinate({tl_y, tl_x}, {br_y, br_x}, alignment) do
     mid_x = tl_x + div(br_x - tl_x, 2)
     mid_y = tl_y + div(br_y - tl_y, 2)
