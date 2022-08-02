@@ -140,25 +140,29 @@ defmodule Tetrex.SparseGrid do
   def corners(%__MODULE__{values: grid}) do
     Enum.reduce(
       grid,
-      %{
-        topleft: {0, 0},
-        topright: {0, 0},
-        bottomleft: {0, 0},
-        bottomright: {0, 0}
-      },
-      fn {{y, x}, _},
-         %{
-           topleft: {tl_y, tl_x},
-           topright: {tr_y, tr_x},
-           bottomleft: {bl_y, bl_x},
-           bottomright: {br_y, br_x}
-         } ->
+      nil,
+      fn
+        {{y, x}, _}, nil ->
+          %{
+            topleft: {y, x},
+            topright: {y, x},
+            bottomleft: {y, x},
+            bottomright: {y, x}
+          }
+
+        {{y, x}, _},
         %{
-          topleft: {min(tl_y, y), min(tl_x, x)},
-          topright: {min(tr_y, y), max(tr_x, x)},
-          bottomleft: {max(bl_y, y), min(bl_x, x)},
-          bottomright: {max(br_y, y), max(br_x, x)}
-        }
+          topleft: {tl_y, tl_x},
+          topright: {tr_y, tr_x},
+          bottomleft: {bl_y, bl_x},
+          bottomright: {br_y, br_x}
+        } ->
+          %{
+            topleft: {min(tl_y, y), min(tl_x, x)},
+            topright: {min(tr_y, y), max(tr_x, x)},
+            bottomleft: {max(bl_y, y), min(bl_x, x)},
+            bottomright: {max(br_y, y), max(br_x, x)}
+          }
       end
     )
   end
@@ -206,6 +210,7 @@ defmodule Tetrex.SparseGrid do
     |> new()
   end
 
+  # TODO: Would be better for alignment() to be second argument
   @doc """
   Move a grid so that it aligns with another grid.
   """

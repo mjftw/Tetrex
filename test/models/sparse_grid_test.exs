@@ -223,6 +223,27 @@ defmodule SparseGrid.Test do
     assert corners == expected
   end
 
+  test "corners/1 can find the corner coordinates of a moved grid" do
+    grid =
+      SparseGrid.new([
+        [:a],
+        [:a],
+        [:a, :a]
+      ])
+      |> SparseGrid.move({10, 10})
+
+    corners = SparseGrid.corners(grid)
+
+    expected = %{
+      topleft: {10, 10},
+      topright: {10, 11},
+      bottomleft: {12, 10},
+      bottomright: {12, 11}
+    }
+
+    assert corners == expected
+  end
+
   test "size/1 can find the height and width of a grid" do
     grid =
       SparseGrid.new(%{
@@ -805,6 +826,33 @@ defmodule SparseGrid.Test do
        ┼─────────┼─────────┼─────────┤
      1 │  hello  │         │         │
        ┴─────────┴─────────┴─────────┘
+    """
+
+    result = inspect(grid)
+    # Required for check as editor auto-strips trailing spaces in expected string above
+    result_to_match = String.replace(result, ~r/ +\n/, "\n")
+
+    assert result_to_match <> "\n" == expected
+  end
+
+  test "Inspect implementation should pretty print a grid, with extreme coordinates" do
+    grid =
+      SparseGrid.new([
+        [:a],
+        [:a],
+        [:a, :a]
+      ])
+      |> SparseGrid.move({-10000, 10000})
+
+    expected = """
+           x 10000   10001
+         y ┼───────┼───────┤
+    -10000 │   a   │       │
+           ┼───────┼───────┤
+     -9999 │   a   │       │
+           ┼───────┼───────┤
+     -9998 │   a   │   a   │
+           ┴───────┴───────┘
     """
 
     result = inspect(grid)
