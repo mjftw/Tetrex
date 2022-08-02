@@ -201,7 +201,8 @@ defmodule Tetrex.Board do
   end
 
   @doc """
-  Build the flattened version of the playfield ready for viewing.
+  Build the flattened preview of the Board.
+  This preview contains everything needed for a front end to display the Board.
   """
   @spec preview(__MODULE__.t()) :: %{
           playfield: SparseGrid.t(),
@@ -210,15 +211,6 @@ defmodule Tetrex.Board do
           active_tile_fits: boolean()
         }
   def preview(board) do
-    # Check whether active tile collides with playfield
-    # If yes:
-    #   Keep cutting the top of the active tile off, moving it up 1, and seeing if it then fits.
-    #   Repeat until some part of the active tile fits or can't fit at all.
-    #   Merge this with the playfield and return as %{playfield: <merged>} to give the "game over"
-    #    placement preview.
-    #   Set %{error: :playfield_full}.
-    # If no:
-    #   Merge the active tile with the playfield and return as %{playfield: <merged>}.
     case SparseGrid.overlaps?(board.active_tile, board.playfield) do
       false ->
         %{
