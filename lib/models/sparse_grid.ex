@@ -214,26 +214,25 @@ defmodule Tetrex.SparseGrid do
     |> new()
   end
 
-  # TODO: Would be better for alignment() to be second argument
   @doc """
   Move a grid so that it aligns with another grid.
   """
-  @spec align(__MODULE__.t(), __MODULE__.t(), alignment()) :: __MODULE__.t()
-  def align(grid_to_move, align_with_grid, alignment) do
+  @spec align(__MODULE__.t(), alignment(), __MODULE__.t()) :: __MODULE__.t()
+  def align(grid_to_move, alignment, align_with_grid) do
     %{
       topleft: move_to_tl,
       bottomright: move_to_br
     } = corners(align_with_grid)
 
-    align(grid_to_move, move_to_tl, move_to_br, alignment)
+    align(grid_to_move, alignment, move_to_tl, move_to_br)
   end
 
   @doc """
   Move a grid to align it with a given bounding box,
   denoted by a top_left and bottom_right coordinate.
   """
-  @spec align(__MODULE__.t(), {y(), x()}, {y(), x()}, alignment()) :: __MODULE__.t()
-  def align(grid, top_left, bottom_right, alignment) do
+  @spec align(__MODULE__.t(), alignment(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
+  def align(grid, alignment, top_left, bottom_right) do
     %{
       topleft: grid_tl,
       bottomright: grid_br

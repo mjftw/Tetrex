@@ -343,7 +343,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :top_left)
+    aligned = SparseGrid.align(to_move, :top_left, cross)
 
     expected =
       SparseGrid.new([
@@ -371,7 +371,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :top_centre)
+    aligned = SparseGrid.align(to_move, :top_centre, cross)
 
     expected =
       SparseGrid.new([
@@ -399,7 +399,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :top_right)
+    aligned = SparseGrid.align(to_move, :top_right, cross)
 
     expected =
       SparseGrid.new([
@@ -427,7 +427,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :centre_left)
+    aligned = SparseGrid.align(to_move, :centre_left, cross)
 
     expected =
       SparseGrid.new([
@@ -457,7 +457,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :centre)
+    aligned = SparseGrid.align(to_move, :centre, cross)
 
     expected =
       SparseGrid.new([
@@ -487,7 +487,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :centre_right)
+    aligned = SparseGrid.align(to_move, :centre_right, cross)
 
     expected =
       SparseGrid.new([
@@ -517,7 +517,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :bottom_left)
+    aligned = SparseGrid.align(to_move, :bottom_left, cross)
 
     expected =
       SparseGrid.new([
@@ -549,7 +549,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :bottom_centre)
+    aligned = SparseGrid.align(to_move, :bottom_centre, cross)
 
     expected =
       SparseGrid.new([
@@ -581,7 +581,7 @@ defmodule SparseGrid.Test do
         [nil, nil, :xx, :xx, nil, nil]
       ])
 
-    aligned = SparseGrid.align(to_move, cross, :bottom_right)
+    aligned = SparseGrid.align(to_move, :bottom_right, cross)
 
     expected =
       SparseGrid.new([
@@ -605,7 +605,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :top_left)
+    aligned = SparseGrid.align(to_move, :top_left, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -625,7 +625,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :top_centre)
+    aligned = SparseGrid.align(to_move, :top_centre, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -645,7 +645,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :top_right)
+    aligned = SparseGrid.align(to_move, :top_right, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -665,7 +665,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :centre_left)
+    aligned = SparseGrid.align(to_move, :centre_left, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -687,7 +687,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :centre)
+    aligned = SparseGrid.align(to_move, :centre, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -709,7 +709,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :centre_right)
+    aligned = SparseGrid.align(to_move, :centre_right, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -731,7 +731,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :bottom_left)
+    aligned = SparseGrid.align(to_move, :bottom_left, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -755,7 +755,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :bottom_centre)
+    aligned = SparseGrid.align(to_move, :bottom_centre, top_left, bottom_right)
 
     expected =
       SparseGrid.new([
@@ -779,7 +779,7 @@ defmodule SparseGrid.Test do
 
     {top_left, bottom_right} = {{0, 0}, {5, 5}}
 
-    aligned = SparseGrid.align(to_move, top_left, bottom_right, :bottom_right)
+    aligned = SparseGrid.align(to_move, :bottom_right, top_left, bottom_right)
 
     expected =
       SparseGrid.new([

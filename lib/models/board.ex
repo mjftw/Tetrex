@@ -115,7 +115,7 @@ defmodule Tetrex.Board do
   @spec hold_active(__MODULE__.t()) :: __MODULE__.t()
   def hold_active(board) do
     # Compute lazily as not needed in all branches
-    active_at_origin = fn -> SparseGrid.align(board.active_tile, {0, 0}, {0, 0}, :top_left) end
+    active_at_origin = fn -> SparseGrid.align(board.active_tile, :top_left, {0, 0}, {0, 0}) end
 
     case board.hold_tile do
       nil ->
@@ -127,7 +127,7 @@ defmodule Tetrex.Board do
         # Swap the active and hold tiles
         case move_active_if_legal(
                board,
-               fn _ -> SparseGrid.align(board.hold_tile, board.active_tile, :top_centre) end
+               fn _ -> SparseGrid.align(board.hold_tile, :top_centre, board.active_tile) end
              ) do
           {:ok, new_board} ->
             # hold tile fits on board
@@ -171,9 +171,9 @@ defmodule Tetrex.Board do
     candidate_placement =
       SparseGrid.align(
         board.active_tile,
+        :top_centre,
         {0, 0},
-        {board.playfield_height, board.playfield_width},
-        :top_centre
+        {board.playfield_height, board.playfield_width}
       )
 
     !SparseGrid.overlaps?(candidate_placement, board.playfield)
