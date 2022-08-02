@@ -104,14 +104,18 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Rotate the grid around the origin.
   """
-  @spec rotate(__MODULE__.t(), angle()) :: __MODULE__.t()
   def rotate(grid, :zero), do: grid
 
-  def rotate(%__MODULE__{values: grid}, angle) do
-    grid
-    |> rotate_grid(angle)
-    |> Map.new()
-    |> new()
+  @spec rotate(__MODULE__.t(), angle()) :: __MODULE__.t()
+  def rotate(grid, angle) do
+    %{
+      topleft: topleft,
+      bottomright: bottomright
+    } = corners(grid)
+
+    centre = alignment_coordinate(topleft, bottomright, :centre)
+
+    rotate(grid, angle, centre)
   end
 
   @doc """
@@ -242,8 +246,8 @@ defmodule Tetrex.SparseGrid do
   end
 
   defp alignment_coordinate({tl_y, tl_x}, {br_y, br_x}, alignment) do
-    mid_x = div(br_x - tl_x, 2)
-    mid_y = div(br_y - tl_y, 2)
+    mid_x = tl_x + div(br_x - tl_x, 2)
+    mid_y = tl_y + div(br_y - tl_y, 2)
 
     case alignment do
       :top_left -> {tl_y, tl_x}

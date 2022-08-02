@@ -94,22 +94,6 @@ defmodule SparseGrid.Test do
     assert moved == expected
   end
 
-  test "rotate/2 can rotate a SparseGrid 90 degrees around the origin" do
-    blue_l =
-      SparseGrid.new([
-        [:blue],
-        [:blue],
-        [:blue, :blue]
-      ])
-
-    rotated = SparseGrid.rotate(blue_l, :clockwise90)
-
-    expected =
-      SparseGrid.new(%{{0, -2} => :blue, {0, -1} => :blue, {0, 0} => :blue, {1, -2} => :blue})
-
-    assert rotated == expected
-  end
-
   test "rotate/2 with :zero angle leaves grid untouched" do
     blue_l =
       SparseGrid.new([
@@ -121,34 +105,68 @@ defmodule SparseGrid.Test do
     assert SparseGrid.rotate(blue_l, :zero) == blue_l
   end
 
-  test "rotate/2 can rotate a SparseGrid 180 degrees around the origin" do
-    blue_l =
+  test "rotate/2 can rotate a SparseGrid 90 degrees around its centre" do
+    grid =
       SparseGrid.new([
-        [:blue],
-        [:blue],
-        [:blue, :blue]
+        [nil, nil, nil, nil, nil],
+        [nil, nil, nil, :c, :c],
+        [nil, nil, :c],
+        [nil, nil, nil, :c, :c]
       ])
 
-    rotated = SparseGrid.rotate(blue_l, :clockwise180)
+    rotated = SparseGrid.rotate(grid, :clockwise90)
 
     expected =
-      SparseGrid.new(%{{-2, -1} => :blue, {-2, 0} => :blue, {-1, 0} => :blue, {0, 0} => :blue})
+      SparseGrid.new([
+        [nil, nil, nil, nil, nil],
+        [nil, nil, nil, :c, nil],
+        [nil, nil, :c, nil, :c],
+        [nil, nil, :c, nil, :c]
+      ])
 
     assert rotated == expected
   end
 
-  test "rotate/2 can rotate a SparseGrid 270 degrees around the origin" do
-    blue_l =
+  test "rotate/2 can rotate a SparseGrid 180 degrees around its centre" do
+    grid =
       SparseGrid.new([
-        [:blue],
-        [:blue],
-        [:blue, :blue]
+        [nil, nil, nil, nil, nil],
+        [nil, nil, nil, :c, :c],
+        [nil, nil, :c],
+        [nil, nil, nil, :c, :c]
       ])
 
-    rotated = SparseGrid.rotate(blue_l, :clockwise270)
+    rotated = SparseGrid.rotate(grid, :clockwise180)
 
     expected =
-      SparseGrid.new(%{{-1, 2} => :blue, {0, 0} => :blue, {0, 1} => :blue, {0, 2} => :blue})
+      SparseGrid.new([
+        [nil, nil, nil, nil, nil],
+        [nil, nil, :c, :c],
+        [nil, nil, nil, nil, :c],
+        [nil, nil, :c, :c]
+      ])
+
+    assert rotated == expected
+  end
+
+  test "rotate/2 can rotate a SparseGrid 270 degrees around its centre" do
+    grid =
+      SparseGrid.new([
+        [nil, nil, nil, nil, nil],
+        [nil, nil, nil, :c, :c],
+        [nil, nil, :c],
+        [nil, nil, nil, :c, :c]
+      ])
+
+    rotated = SparseGrid.rotate(grid, :clockwise270)
+
+    expected =
+      SparseGrid.new([
+        [nil, nil, nil, nil, nil],
+        [nil, nil, :c, nil, :c],
+        [nil, nil, :c, nil, :c],
+        [nil, nil, nil, :c, nil]
+      ])
 
     assert rotated == expected
   end
