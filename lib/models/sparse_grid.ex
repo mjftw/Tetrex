@@ -295,7 +295,6 @@ defmodule Tetrex.SparseGrid do
   defp rotate_coordinate({y, x}, :clockwise270), do: {-x, y}
 end
 
-# Need SparseGrid to be a struct before I can do this
 defimpl Inspect, for: Tetrex.SparseGrid do
   def inspect(grid, _opts) do
     str_grid =
