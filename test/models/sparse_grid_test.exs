@@ -846,6 +846,51 @@ defmodule SparseGrid.Test do
     assert cleared == expected
   end
 
+  test "sparse?/1 should return false if all cells are filled" do
+    grid =
+      SparseGrid.new([
+        [],
+        [:a, :a, :a],
+        [:a, :a, :a],
+        [:a, :a, :a]
+      ])
+
+    assert !SparseGrid.sparse?(grid)
+  end
+
+  test "sparse?/1 should return true if any cells are empty" do
+    grid =
+      SparseGrid.new([
+        [:a, :a, :a],
+        [:a, :a],
+        [:a, :a, :a]
+      ])
+
+    assert SparseGrid.sparse?(grid)
+  end
+
+  test "filled?/3 should return true if all cells in the bounding box are filled" do
+    grid =
+      SparseGrid.new([
+        [nil, nil, nil],
+        [nil, :a, :a],
+        [nil, :a, :a]
+      ])
+
+    assert SparseGrid.filled?(grid, {1, 1}, {2, 2})
+  end
+
+  test "filled?/3 should return false if any cells in the bounding box are empty" do
+    grid =
+      SparseGrid.new([
+        [nil, nil, nil],
+        [nil, :a, :a],
+        [nil, :a, nil]
+      ])
+
+    assert !SparseGrid.filled?(grid, {0, 1}, {2, 2})
+  end
+
   test "Inspect implementation should pretty print a grid" do
     grid =
       SparseGrid.new([

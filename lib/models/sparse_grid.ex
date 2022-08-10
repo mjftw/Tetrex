@@ -268,6 +268,54 @@ defmodule Tetrex.SparseGrid do
     |> new()
   end
 
+  @doc """
+  Check whether all grid cells in a given bounding box have a value.
+  """
+  @spec filled?(__MODULE__, {y(), x()}, {y(), x()}) :: boolean()
+  def filled?(grid, top_left, bottom_right) do
+    grid
+    |> mask(top_left, bottom_right)
+    |> sparse?()
+    |> Kernel.not()
+  end
+
+  @doc """
+  Check whether a grid is sparse - containing at least one empty cell within its bounds.
+  """
+  @spec sparse?(__MODULE__) :: boolean()
+  def sparse?(grid) do
+    %{
+      topleft: {min_y, min_x},
+      bottomright: {max_y, max_x}
+    } = corners(grid)
+
+    get_next_index = fn {y, x} ->
+      cond do
+        y >= max_y && x >= max_x -> :stop
+        x < max_x -> {:continue, {y, x + 1}}
+        y < max_y -> {:continue, {y + 1, min_x}}
+      end
+    end
+
+    grid.values
+
+    !all_true(&Map.has_key?(grid.values, &1), {min_y, min_x}, get_next_index)
+  end
+
+  @opaque t :: any()
+  @spec all_true((t() -> boolean()), t(), (t() -> {:continue, t()} | :stop)) :: boolean()
+  defp all_true(continue_if, current_index, get_next_index) do
+    if continue_if.(current_index) do
+      case get_next_index.(current_index) do
+        {:continue, next_index} -> all_true(continue_if, next_index, get_next_index)
+        :stop -> true
+      end
+    else
+      false
+    end
+  end
+
+  @spec alignment_coordinate(coordinate(), coordinate(), alignment()) :: coordinate()
   defp alignment_coordinate({tl_y, tl_x}, {br_y, br_x}, alignment) do
     mid_x = tl_x + div(br_x - tl_x, 2)
     mid_y = tl_y + div(br_y - tl_y, 2)
