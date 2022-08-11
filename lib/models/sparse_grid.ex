@@ -299,20 +299,11 @@ defmodule Tetrex.SparseGrid do
 
     grid.values
 
-    !all_true(&Map.has_key?(grid.values, &1), {min_y, min_x}, get_next_index)
-  end
-
-  @opaque t :: any()
-  @spec all_true((t() -> boolean()), t(), (t() -> {:continue, t()} | :stop)) :: boolean()
-  defp all_true(continue_if, current_index, get_next_index) do
-    if continue_if.(current_index) do
-      case get_next_index.(current_index) do
-        {:continue, next_index} -> all_true(continue_if, next_index, get_next_index)
-        :stop -> true
-      end
-    else
-      false
-    end
+    !Tetrex.IterUtils.all(
+      &Map.has_key?(grid.values, &1),
+      {min_y, min_x},
+      get_next_index
+    )
   end
 
   @spec alignment_coordinate(coordinate(), coordinate(), alignment()) :: coordinate()
