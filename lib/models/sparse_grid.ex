@@ -285,37 +285,24 @@ defmodule Tetrex.SparseGrid do
   """
   @spec filled?(__MODULE__, {y(), x()}, {y(), x()}) :: boolean()
   def filled?(grid, top_left, bottom_right) do
-    grid
-    |> mask(top_left, bottom_right)
-    |> sparse?()
-    |> Kernel.not()
-  end
+    {min_y, min_x} = top_left
+    {max_y, max_x} = bottom_right
 
-  @doc """
-  Check whether a grid is sparse - containing at least one empty cell within its bounds.
-  """
-  @spec sparse?(__MODULE__) :: boolean()
-  def sparse?(grid) do
-    %{
-      topleft: {min_y, min_x},
-      bottomright: {max_y, max_x}
-    } = corners(grid)
-
-    get_next_index = fn {y, x} ->
-      cond do
-        y >= max_y && x >= max_x -> :stop
-        x < max_x -> {:continue, {y, x + 1}}
-        y < max_y -> {:continue, {y + 1, min_x}}
-      end
-    end
-
-    grid.values
-
-    !Tetrex.IterUtils.all(
+    Tetrex.IterUtils.all(
       &Map.has_key?(grid.values, &1),
       {min_y, min_x},
-      get_next_index
+      &next_coordinate_generator(&1, min_x, {max_y, max_x})
     )
+  end
+
+  @spec next_coordinate_generator(coordinate(), {y(), x()}, {y(), x()}) ::
+          {:continue, coordinate()} | :stop
+  defp next_coordinate_generator({y, x}, min_x, {max_y, max_x}) do
+    cond do
+      y >= max_y && x >= max_x -> :stop
+      x < max_x -> {:continue, {y, x + 1}}
+      y < max_y -> {:continue, {y + 1, min_x}}
+    end
   end
 
   @spec alignment_coordinate(coordinate(), coordinate(), alignment()) :: coordinate()
