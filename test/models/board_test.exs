@@ -104,7 +104,33 @@ defmodule Tetrex.Board.Test do
     assert moved.active_tile == expected
   end
 
-  test "move_active_down/1 should draw a new tile when move legal" do
+  test "move_active_down/1 should draw a new tile if block below" do
+    board = %{
+      Board.new(4, 1, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [:a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [:b],
+            [:b]
+          ]),
+        upcoming_tile_names: [:i, :o, :s]
+    }
+
+    {:ok, moved} = Board.move_active_down(board)
+
+    expected = %{
+      active_tile: board.next_tile,
+      next_tile: Tetrex.Tetromino.fetch!(:i),
+      upcoming_tile_names: [:o, :s]
+    }
+
+    assert Map.take(moved, [:active_tile, :next_tile, :upcoming_tile_names]) == expected
   end
 
   test "move_active_down/1 should fix the active tile to the playfield if block below" do
