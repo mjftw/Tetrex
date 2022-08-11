@@ -48,7 +48,7 @@ defmodule Tetrex.SparseGrid do
   %Tetrex.SparseGrid{values: %{}}
   ```
   """
-  @spec new() :: __MODULE__.t()
+  @spec new() :: __MODULE__
   def new(), do: %__MODULE__{values: %{}}
 
   def new(grid_values) when is_map(grid_values), do: %__MODULE__{values: grid_values}
@@ -67,7 +67,7 @@ defmodule Tetrex.SparseGrid do
   %Tetrex.SparseGrid{values: %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue}}
   ```
   """
-  @spec new([[any() | nil]]) :: __MODULE__.t()
+  @spec new([[any() | nil]]) :: __MODULE__
   def new(values_2d) do
     values_map =
       for {row, row_num} <- Stream.with_index(values_2d),
@@ -82,7 +82,7 @@ defmodule Tetrex.SparseGrid do
   Create a rectangle grid filled with a given value.
   The top_left and bottom_right coordinates border the fill area, inclusive of the coordinates.
   """
-  @spec fill(any(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
+  @spec fill(any(), {y(), x()}, {y(), x()}) :: __MODULE__
   def fill(value, {top_left_y, top_left_x}, {bottom_right_y, bottom_right_x}) do
     values_map =
       for y <- top_left_y..bottom_right_y,
@@ -93,7 +93,7 @@ defmodule Tetrex.SparseGrid do
     new(values_map)
   end
 
-  @spec move(__MODULE__.t(), {y(), x()}) :: __MODULE__.t()
+  @spec move(__MODULE__, {y(), x()}) :: __MODULE__
   def move(%__MODULE__{values: grid}, {offset_y, offset_x}) do
     grid
     |> move_grid({offset_y, offset_x})
@@ -106,7 +106,7 @@ defmodule Tetrex.SparseGrid do
   """
   def rotate(grid, :zero), do: grid
 
-  @spec rotate(__MODULE__.t(), angle()) :: __MODULE__.t()
+  @spec rotate(__MODULE__, angle()) :: __MODULE__
   def rotate(grid, angle) do
     %{
       topleft: topleft,
@@ -121,7 +121,7 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Rotate the grid around a specific point of rotation
   """
-  @spec rotate(__MODULE__.t(), angle(), coordinate()) :: __MODULE__.t()
+  @spec rotate(__MODULE__, angle(), coordinate()) :: __MODULE__
   def rotate(%__MODULE__{values: grid}, angle, {rotate_at_y, rotate_at_x}) do
     # Rotating around a point is the same as moving to the origin, rotating, and moving back
     grid
@@ -135,7 +135,7 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Find the 4 corner coordinates bounding the grid
   """
-  @spec corners(__MODULE__.t()) :: %{
+  @spec corners(__MODULE__) :: %{
           topleft: coordinate(),
           topright: coordinate(),
           bottomleft: coordinate(),
@@ -174,7 +174,7 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Find the width and height of the grid, returned as `{height, width}`.
   """
-  @spec size(__MODULE__.t()) :: {y(), x()}
+  @spec size(__MODULE__) :: {y(), x()}
   def size(grid) do
     case corners(grid) do
       %{topright: {tr_y, tr_x}, bottomleft: {bl_y, bl_x}} -> {bl_y - tr_y, tr_x - bl_x}
@@ -184,7 +184,7 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Detect whether two grids have values at the same coordinates
   """
-  @spec overlaps?(__MODULE__.t(), __MODULE__.t()) :: boolean()
+  @spec overlaps?(__MODULE__, __MODULE__) :: boolean()
   def overlaps?(%__MODULE__{values: grid1}, %__MODULE__{values: grid2}) do
     !MapSet.disjoint?(MapSet.new(Map.keys(grid1)), MapSet.new(Map.keys(grid2)))
   end
@@ -192,7 +192,7 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Detect whether a grid is withing a bounding box, denoted by top_left and bottom_right coordinates.
   """
-  @spec within_bounds?(__MODULE__.t(), {y(), x()}, {y(), x()}) :: boolean()
+  @spec within_bounds?(__MODULE__, {y(), x()}, {y(), x()}) :: boolean()
   def within_bounds?(grid, {box_tl_y, box_tl_x}, {box_br_y, box_br_x}) do
     %{
       topleft: {tl_y, tl_x},
@@ -208,7 +208,7 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Combine two SparseGrids. In the case of overlaps vales from the second grid overwrite the first.
   """
-  @spec merge(__MODULE__.t(), __MODULE__.t()) :: __MODULE__.t()
+  @spec merge(__MODULE__, __MODULE__) :: __MODULE__
   def merge(%__MODULE__{values: grid1}, %__MODULE__{values: grid2}) do
     Map.merge(grid1, grid2)
     |> new()
@@ -217,7 +217,7 @@ defmodule Tetrex.SparseGrid do
   @doc """
   Move a grid so that it aligns with another grid.
   """
-  @spec align(__MODULE__.t(), alignment(), __MODULE__.t()) :: __MODULE__.t()
+  @spec align(__MODULE__, alignment(), __MODULE__) :: __MODULE__
   def align(grid_to_move, alignment, align_with_grid) do
     %{
       topleft: move_to_tl,
@@ -231,7 +231,7 @@ defmodule Tetrex.SparseGrid do
   Move a grid to align it with a given bounding box,
   denoted by a top_left and bottom_right coordinate.
   """
-  @spec align(__MODULE__.t(), alignment(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
+  @spec align(__MODULE__, alignment(), {y(), x()}, {y(), x()}) :: __MODULE__
   def align(grid, alignment, top_left, bottom_right) do
     %{
       topleft: grid_tl,
@@ -248,7 +248,7 @@ defmodule Tetrex.SparseGrid do
   Delete all entries from the grid that are within the bounding box (inclusive of edge coordinates).
   The bounding box is denoted by the coordinates of the top_left and bottom_right points.
   """
-  @spec clear(__MODULE__.t(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
+  @spec clear(__MODULE__, {y(), x()}, {y(), x()}) :: __MODULE__
   def clear(%__MODULE__{values: grid}, top_left, bottom_right) do
     grid
     |> Enum.filter(fn {coord, _} -> !coordinate_in_bounds(coord, top_left, bottom_right) end)
@@ -260,7 +260,7 @@ defmodule Tetrex.SparseGrid do
   Delete all entries from the grid that are outside the bounding box (inclusive of edge coordinates).
   The bounding box is denoted by the coordinates of the top_left and bottom_right points.
   """
-  @spec mask(__MODULE__.t(), {y(), x()}, {y(), x()}) :: __MODULE__.t()
+  @spec mask(__MODULE__, {y(), x()}, {y(), x()}) :: __MODULE__
   def mask(%__MODULE__{values: grid}, top_left, bottom_right) do
     grid
     |> Enum.filter(fn {coord, _} -> coordinate_in_bounds(coord, top_left, bottom_right) end)

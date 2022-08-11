@@ -1,6 +1,5 @@
 defmodule Tetrex.Board do
   alias Tetrex.SparseGrid
-  alias Tetrex.LazySparseGrid
   alias Tetrex.Tetromino
 
   @type placement_error :: :collision | :out_of_bounds
@@ -26,7 +25,7 @@ defmodule Tetrex.Board do
     :upcoming_tile_names
   ]
 
-  @spec new(non_neg_integer(), non_neg_integer(), integer()) :: __MODULE__.t()
+  @spec new(non_neg_integer(), non_neg_integer(), integer()) :: __MODULE__
   def new(height, width, random_seed) do
     [active_tile_name | [next_tile_name | upcoming_tile_names]] =
       Tetromino.draw_randoms(@tile_bag_size, random_seed)
@@ -47,8 +46,8 @@ defmodule Tetrex.Board do
   An error is returned if the tile could not be placed due to the playfield already being full at
   that location.
   """
-  @spec merge_active_draw_next(__MODULE__.t()) ::
-          {:ok, __MODULE__.t()} | {:error, placement_error()}
+  @spec merge_active_draw_next(__MODULE__) ::
+          {:ok, __MODULE__} | {:error, placement_error()}
 
   def merge_active_draw_next(board) do
     candidate_placement =
@@ -72,7 +71,7 @@ defmodule Tetrex.Board do
     end
   end
 
-  @spec draw_next_tile(__MODULE__.t()) :: __MODULE__.t()
+  @spec draw_next_tile(__MODULE__) :: __MODULE__
   defp draw_next_tile(board) do
     [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
 
@@ -89,7 +88,7 @@ defmodule Tetrex.Board do
   If doing so would cause it to collide with tiles on the playfield or it's at the bottom then fix
   the active_tile to the playfield and draw a new one.
   """
-  @spec move_active_down(__MODULE__.t()) :: {:ok, __MODULE__.t()} | {:error, :playfield_full}
+  @spec move_active_down(__MODULE__) :: {:ok, __MODULE__} | {:error, :playfield_full}
   def move_active_down(board) do
     case move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
       {:ok, new_board} ->
@@ -106,14 +105,14 @@ defmodule Tetrex.Board do
   Move the active_tile left on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec move_active_left(__MODULE__.t()) :: __MODULE__.t()
+  @spec move_active_left(__MODULE__) :: __MODULE__
   def move_active_left(board), do: move_active_sideways(board, -1)
 
   @doc """
   Move the active_tile right on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec move_active_right(__MODULE__.t()) :: __MODULE__.t()
+  @spec move_active_right(__MODULE__) :: __MODULE__
   def move_active_right(board), do: move_active_sideways(board, 1)
 
   @doc """
@@ -122,7 +121,7 @@ defmodule Tetrex.Board do
   If hold slot was full, swap the hold and active tiles
   If swapping the hold and active tiles is not possible due to a collision, do not swap.
   """
-  @spec hold_active(__MODULE__.t()) :: __MODULE__.t()
+  @spec hold_active(__MODULE__) :: __MODULE__
   def hold_active(board) do
     # Compute lazily as not needed in all branches
     active_at_origin = fn -> SparseGrid.align(board.active_tile, :top_left, {0, 0}, {0, 0}) end
@@ -155,7 +154,7 @@ defmodule Tetrex.Board do
   If a rotation would cause a collision the next is tried.
   If no rotation is possible then the board is returned unchanged.
   """
-  @spec rotate_active(__MODULE__.t()) :: __MODULE__.t()
+  @spec rotate_active(__MODULE__) :: __MODULE__
   def rotate_active(board) do
     # Keep attempting to rotate until it works, or every rotation has been tried and failed
     result =
@@ -178,9 +177,9 @@ defmodule Tetrex.Board do
   cause it to collide with the playfield or be outside the playfield.
   """
   @spec move_active_if_legal(
-          __MODULE__.t(),
+          __MODULE__,
           (SparseGrid.sparse_grid() -> SparseGrid.sparse_grid())
-        ) :: {:ok, __MODULE__.t()} | {:error, placement_error()}
+        ) :: {:ok, __MODULE__} | {:error, placement_error()}
   def move_active_if_legal(board, transform_fn) do
     candidate_placement = transform_fn.(board.active_tile)
 
@@ -204,7 +203,7 @@ defmodule Tetrex.Board do
   Build the flattened preview of the Board.
   This preview contains everything needed for a front end to display the Board.
   """
-  @spec preview(__MODULE__.t()) :: %{
+  @spec preview(__MODULE__) :: %{
           playfield: SparseGrid.t(),
           next_tile: SparseGrid.t(),
           hold_tile: SparseGrid.t(),
