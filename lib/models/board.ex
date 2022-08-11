@@ -71,6 +71,57 @@ defmodule Tetrex.Board do
     end
   end
 
+  @doc """
+  Clear all rows that have been completed, shifting the remaining playfield values down to
+  fill the gaps.
+  Return value is {Board, number_of_lines_cleared}
+  """
+  @spec clear_completed_rows(__MODULE__) :: {__MODULE__, non_neg_integer()}
+  def clear_completed_rows(board) do
+    {new_playfield, num_rows_cleared} =
+      Enum.reduce(
+        0..(board.playfield_height - 1),
+        {board.playfield, 0},
+        fn row_num, {playfield, num_rows_cleared} ->
+          row_start = {row_num, 0}
+          row_end = {row_num, board.playfield_width - 1}
+
+          row_is_filled = SparseGrid.filled?(playfield, row_start, row_end)
+
+          case {row_is_filled, row_num} do
+            {false, _} ->
+              # Row not filled, skip
+              {playfield, num_rows_cleared}
+
+            {true, 0} ->
+              # Top row is filled, clear it
+              new_playfield =
+                playfield
+                |> SparseGrid.clear(row_start, row_end)
+
+              {new_playfield, num_rows_cleared + 1}
+
+            {true, _} ->
+              # Some row is filled, clear it and shift everything above down
+
+              new_playfield =
+                playfield
+                |> SparseGrid.clear({0, 0}, row_end)
+                |> SparseGrid.merge(
+                  playfield
+                  |> SparseGrid.clear(row_start, row_end)
+                  |> SparseGrid.mask({0, 0}, row_end)
+                  |> SparseGrid.move(:down, 1)
+                )
+
+              {new_playfield, num_rows_cleared + 1}
+          end
+        end
+      )
+
+    {%{board | playfield: new_playfield}, num_rows_cleared}
+  end
+
   @spec draw_next_tile(__MODULE__) :: __MODULE__
   defp draw_next_tile(board) do
     [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names

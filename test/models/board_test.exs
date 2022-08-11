@@ -61,6 +61,113 @@ defmodule Tetrex.Board.Test do
     assert Board.move_active_if_legal(board, transform) == {:error, :out_of_bounds}
   end
 
+  test "clear_completed_rows/1 should clear completed rows on the playfield" do
+    board = %{
+      Board.new(6, 3, 0)
+      | playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [:b, :b, :b],
+            [:b, :b, :b],
+            [:b, :b],
+            [:b, :b],
+            [:b, :b]
+          ])
+    }
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [],
+        [],
+        [:b, :b],
+        [:b, :b],
+        [:b, :b]
+      ])
+
+    {%Tetrex.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
+
+    assert playfield == expected
+  end
+
+  test "clear_completed_rows/1 should shift rows above cleared down" do
+    board = %{
+      Board.new(7, 3, 0)
+      | playfield:
+          Tetrex.SparseGrid.new([
+            [:a],
+            [:x, :x, :x],
+            [nil, nil, :c],
+            [:x, :x, :x],
+            [:b, :b],
+            [:b, :b],
+            [:x, :x, :x]
+          ])
+    }
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [],
+        [],
+        [:a],
+        [nil, nil, :c],
+        [:b, :b],
+        [:b, :b]
+      ])
+
+    {%Tetrex.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
+
+    assert playfield == expected
+  end
+
+  test "clear_completed_rows/1 should clear top row if complete" do
+    board = %{
+      Board.new(5, 3, 0)
+      | playfield:
+          Tetrex.SparseGrid.new([
+            [:x, :x, :x],
+            [:a],
+            [nil, nil, :c],
+            [:b, :b],
+            [:b, :b]
+          ])
+    }
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [:a],
+        [nil, nil, :c],
+        [:b, :b],
+        [:b, :b]
+      ])
+
+    {%Tetrex.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
+
+    assert playfield == expected
+  end
+
+  test "clear_completed_rows/1 should correctly report number of rows cleared" do
+    board = %{
+      Board.new(7, 3, 0)
+      | playfield:
+          Tetrex.SparseGrid.new([
+            [:x, :x, :x],
+            [:a],
+            [:x, :x, :x],
+            [nil, nil, :c],
+            [:x, :x, :x],
+            [:b, :b],
+            [:b, :b]
+          ])
+    }
+
+    {_, rows_cleared} = Board.clear_completed_rows(board)
+
+    assert rows_cleared == 3
+  end
+
   test "move_active_if_legal/2 gives collision error when over a filled space in the playfield" do
     board = %{
       Board.new(5, 1, 0)
