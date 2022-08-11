@@ -101,6 +101,18 @@ defmodule Tetrex.SparseGrid do
     |> new()
   end
 
+  @spec move(__MODULE__, :up, non_neg_integer()) :: __MODULE__
+  def move(grid, :up, amount), do: move(grid, {-amount, 0})
+
+  @spec move(__MODULE__, :down, non_neg_integer()) :: __MODULE__
+  def move(grid, :down, amount), do: move(grid, {amount, 0})
+
+  @spec move(__MODULE__, :left, non_neg_integer()) :: __MODULE__
+  def move(grid, :left, amount), do: move(grid, {0, -amount})
+
+  @spec move(__MODULE__, :right, non_neg_integer()) :: __MODULE__
+  def move(grid, :right, amount), do: move(grid, {0, amount})
+
   @doc """
   Rotate the grid around the origin.
   """

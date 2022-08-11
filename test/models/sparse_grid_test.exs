@@ -94,6 +94,94 @@ defmodule SparseGrid.Test do
     assert moved == expected
   end
 
+  test "move/3 :up offsets all the coordinates in a SparseGrid" do
+    grid =
+      SparseGrid.new(%{
+        {0, 0} => :blue,
+        {0, 1} => :red,
+        {1, 0} => :red,
+        {1, 1} => :green
+      })
+
+    moved = SparseGrid.move(grid, :up, 10)
+
+    expected =
+      SparseGrid.new(%{
+        {-10, 0} => :blue,
+        {-10, 1} => :red,
+        {-9, 0} => :red,
+        {-9, 1} => :green
+      })
+
+    assert moved == expected
+  end
+
+  test "move/3 :down offsets all the coordinates in a SparseGrid" do
+    grid =
+      SparseGrid.new(%{
+        {0, 0} => :blue,
+        {0, 1} => :red,
+        {1, 0} => :red,
+        {1, 1} => :green
+      })
+
+    moved = SparseGrid.move(grid, :down, 10)
+
+    expected =
+      SparseGrid.new(%{
+        {10, 0} => :blue,
+        {10, 1} => :red,
+        {11, 0} => :red,
+        {11, 1} => :green
+      })
+
+    assert moved == expected
+  end
+
+  test "move/3 :left offsets all the coordinates in a SparseGrid" do
+    grid =
+      SparseGrid.new(%{
+        {0, 0} => :blue,
+        {0, 1} => :red,
+        {1, 0} => :red,
+        {1, 1} => :green
+      })
+
+    moved = SparseGrid.move(grid, :left, 10)
+
+    expected =
+      SparseGrid.new(%{
+        {0, -10} => :blue,
+        {0, -9} => :red,
+        {1, -10} => :red,
+        {1, -9} => :green
+      })
+
+    assert moved == expected
+  end
+
+  test "move/3 :right offsets all the coordinates in a SparseGrid" do
+    grid =
+      SparseGrid.new(%{
+        {0, 0} => :blue,
+        {0, 1} => :red,
+        {1, 0} => :red,
+        {1, 1} => :green
+      })
+
+    moved = SparseGrid.move(grid, :right, 10)
+
+    expected =
+      SparseGrid.new(%{
+        {0, 10} => :blue,
+        {0, 11} => :red,
+        {1, 10} => :red,
+        {1, 11} => :green
+      })
+
+    assert moved == expected
+  end
+
   test "rotate/2 with :zero angle leaves grid untouched" do
     blue_l =
       SparseGrid.new([
