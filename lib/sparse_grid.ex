@@ -474,9 +474,10 @@ defimpl Inspect, for: Tetrex.SparseGrid do
       |> Enum.intersperse(row_divider_capped)
       |> Enum.join("\n")
 
-    Enum.join(
-      [col_indices_row_str_capped, row_top_capped, grid_str, row_bottom_capped],
-      "\n"
-    )
+    "\n" <>
+      Enum.join(
+        [col_indices_row_str_capped, row_top_capped, grid_str, row_bottom_capped],
+        "\n"
+      )
   end
 end
