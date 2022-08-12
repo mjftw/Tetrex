@@ -41,34 +41,11 @@ defmodule Tetrex.Board do
     }
   end
 
-  @doc """
-  Attempt to place the active_tile on the playfield.
-  An error is returned if the tile could not be placed due to the playfield already being full at
-  that location.
-  """
-  @spec merge_active_draw_next(__MODULE__) ::
-          {:ok, __MODULE__} | {:error, placement_error()}
-
-  def merge_active_draw_next(board) do
-    candidate_placement =
-      SparseGrid.align(
-        board.active_tile,
-        :top_centre,
-        {0, 0},
-        {board.playfield_height, board.playfield_width}
-      )
-
-    case SparseGrid.overlaps?(candidate_placement, board.playfield) do
-      true ->
-        {:error, :collision}
-
-      false ->
-        {:ok,
-         %{
-           draw_next_tile(board)
-           | playfield: SparseGrid.merge(board.playfield, board.active_tile)
-         }}
-    end
+  defp merge_active_tile(board) do
+    %{
+      board
+      | playfield: SparseGrid.merge(board.playfield, board.active_tile)
+    }
   end
 
   @doc """
@@ -130,7 +107,13 @@ defmodule Tetrex.Board do
       board
       | next_tile: Tetromino.fetch!(next_tile_name),
         upcoming_tile_names: upcoming_tile_names,
-        active_tile: board.next_tile
+        active_tile:
+          SparseGrid.align(
+            board.next_tile,
+            :top_centre,
+            {0, 0},
+            {board.playfield_height, board.playfield_width}
+          )
     }
   end
 
@@ -138,18 +121,23 @@ defmodule Tetrex.Board do
   Move the active tile down on the playfield by one square.
   If doing so would cause it to collide with tiles on the playfield or it's at the bottom then fix
   the active_tile to the playfield and draw a new one.
+  If fixing the active_tile to the playfield results in completed rows, these rows are cleared.
+  The return value is a {new_board, number_of_rows_cleared}
   """
-  @spec move_active_down(__MODULE__) :: {:ok, __MODULE__} | {:error, :playfield_full}
+  @spec move_active_down(__MODULE__) :: {__MODULE__, non_neg_integer()}
   def move_active_down(board) do
     case move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
+      # Moved active tile down without a collision
       {:ok, new_board} ->
-        {:ok, new_board}
+        {new_board, 0}
 
       {:error, error} when error in [:collision, :out_of_bounds] ->
-        merge_active_draw_next(board)
+        # Could not move active tile down, fix in place, draw a new tile, and clear any filled rows
+        board
+        |> merge_active_tile()
+        |> draw_next_tile()
+        |> clear_completed_rows()
     end
-
-    # TODO: Need to add the logic for clearing the bottom row of playfield if filled
   end
 
   @doc """

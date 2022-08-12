@@ -10,39 +10,6 @@ defmodule Tetrex.Board.Test do
     assert board1 == board2
   end
 
-  test "merge_active_draw_next/1 should change the current tile when no overlap would occur" do
-    board = %{
-      Board.new(3, 3, 0)
-      | next_tile: Tetrex.Tetromino.fetch!(:t),
-        upcoming_tile_names: [:i, :o, :s]
-    }
-
-    expected = %{
-      board
-      | active_tile: board.next_tile,
-        next_tile: Tetrex.Tetromino.fetch!(:i),
-        playfield: board.active_tile,
-        upcoming_tile_names: [:o, :s]
-    }
-
-    assert Board.merge_active_draw_next(board) == {:ok, expected}
-  end
-
-  test "merge_active_draw_next/1 should error when an overlap would occur" do
-    full_playfield =
-      Tetrex.SparseGrid.new([
-        [:x, :x, :x, :x, :x],
-        [:x, :x, :x, :x, :x],
-        [:x, :x, :x, :x, :x],
-        [:x, :x, :x, :x, :x],
-        [:x, :x, :x, :x, :x]
-      ])
-
-    board = %{Board.new(5, 5, 0) | playfield: full_playfield}
-
-    assert Board.merge_active_draw_next(board) == {:error, :collision}
-  end
-
   test "move_active_if_legal/2 applies the transform function when legal" do
     board = Board.new(20, 10, 0)
 
@@ -189,7 +156,7 @@ defmodule Tetrex.Board.Test do
 
   test "move_active_down/1 should move the active tile down 1 when legal" do
     board = %{
-      Board.new(4, 1, 0)
+      Board.new(4, 2, 0)
       | active_tile: Tetrex.SparseGrid.new([[:a]]),
         playfield:
           Tetrex.SparseGrid.new([
@@ -200,7 +167,7 @@ defmodule Tetrex.Board.Test do
           ])
     }
 
-    {:ok, moved} = Board.move_active_down(board)
+    {moved, _} = Board.move_active_down(board)
 
     expected =
       Tetrex.SparseGrid.new([
@@ -211,28 +178,32 @@ defmodule Tetrex.Board.Test do
     assert moved.active_tile == expected
   end
 
-  test "move_active_down/1 should draw a new tile if block below" do
+  test "move_active_down/1 should draw a new tile at top centre of playfield if blocked below" do
     board = %{
-      Board.new(4, 1, 0)
+      Board.new(4, 3, 0)
       | active_tile:
           Tetrex.SparseGrid.new([
             [],
-            [:a]
+            [nil, :a]
+          ]),
+        next_tile:
+          Tetrex.SparseGrid.new([
+            [:n]
           ]),
         playfield:
           Tetrex.SparseGrid.new([
             [],
             [],
-            [:b],
-            [:b]
+            [nil, :b],
+            [nil, :b]
           ]),
         upcoming_tile_names: [:i, :o, :s]
     }
 
-    {:ok, moved} = Board.move_active_down(board)
+    {moved, _} = Board.move_active_down(board)
 
     expected = %{
-      active_tile: board.next_tile,
+      active_tile: board.next_tile |> Tetrex.SparseGrid.move(:right, 1),
       next_tile: Tetrex.Tetromino.fetch!(:i),
       upcoming_tile_names: [:o, :s]
     }
@@ -240,9 +211,9 @@ defmodule Tetrex.Board.Test do
     assert Map.take(moved, [:active_tile, :next_tile, :upcoming_tile_names]) == expected
   end
 
-  test "move_active_down/1 should fix the active tile to the playfield if block below" do
+  test "move_active_down/1 should fix the active tile to the playfield if blocked below" do
     board = %{
-      Board.new(4, 1, 0)
+      Board.new(4, 2, 0)
       | active_tile:
           Tetrex.SparseGrid.new([
             [],
@@ -257,7 +228,7 @@ defmodule Tetrex.Board.Test do
           ])
     }
 
-    {:ok, moved} = Board.move_active_down(board)
+    {moved, _} = Board.move_active_down(board)
 
     expected =
       Tetrex.SparseGrid.new([
@@ -268,6 +239,67 @@ defmodule Tetrex.Board.Test do
       ])
 
     assert moved.playfield == expected
+  end
+
+  test "move_active_down/1 should clear any rows that were filled by the move" do
+    board = %{
+      Board.new(5, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [:a],
+            [:a, :a],
+            [:a],
+            []
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [nil, nil, :b],
+            [nil, nil, :b],
+            [nil, :b, :b],
+            [:b, :b, nil]
+          ])
+    }
+
+    {moved, _} = Board.move_active_down(board)
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [],
+        [],
+        [:a, nil, :b],
+        [:b, :b, nil]
+      ])
+
+    assert moved.playfield == expected
+  end
+
+  test "move_active_down/1 should report the number of rows that were cleared" do
+    board = %{
+      Board.new(5, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [:a],
+            [:a, :a],
+            [:a],
+            []
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [nil, nil, :b],
+            [nil, nil, :b],
+            [nil, :b, :b],
+            [:b, :b, nil]
+          ])
+    }
+
+    {_, num_rows_cleared} = Board.move_active_down(board)
+
+    assert num_rows_cleared == 2
   end
 
   test "move_active_left/1 should move the active tile left by one if legal" do
