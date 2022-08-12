@@ -10,22 +10,22 @@ defmodule Tetrex.Board.Test do
     assert board1 == board2
   end
 
-  test "move_active_if_legal/2 applies the transform function when legal" do
+  test "try_move_active_if_legal/2 applies the transform function when legal" do
     board = Board.new(20, 10, 0)
 
     transform = &Tetrex.SparseGrid.move(&1, {1, 0})
 
-    {:ok, moved} = Board.move_active_if_legal(board, transform)
+    {:ok, moved} = Board.try_move_active_if_legal(board, transform)
 
     assert moved.active_tile == transform.(board.active_tile)
   end
 
-  test "move_active_if_legal/2 gives out_of_bounds error when moving off playfield" do
+  test "try_move_active_if_legal/2 gives out_of_bounds error when moving off playfield" do
     board = %{Board.new(20, 10, 0) | active_tile: Tetrex.SparseGrid.new([[:a]])}
 
     transform = &Tetrex.SparseGrid.move(&1, {-1, 0})
 
-    assert Board.move_active_if_legal(board, transform) == {:error, :out_of_bounds}
+    assert Board.try_move_active_if_legal(board, transform) == {:error, :out_of_bounds}
   end
 
   test "clear_completed_rows/1 should clear completed rows on the playfield" do
@@ -135,7 +135,7 @@ defmodule Tetrex.Board.Test do
     assert rows_cleared == 3
   end
 
-  test "move_active_if_legal/2 gives collision error when over a filled space in the playfield" do
+  test "try_move_active_if_legal/2 gives collision error when over a filled space in the playfield" do
     board = %{
       Board.new(5, 1, 0)
       | active_tile: Tetrex.SparseGrid.new([[:a]]),
@@ -151,10 +151,10 @@ defmodule Tetrex.Board.Test do
 
     transform = &Tetrex.SparseGrid.move(&1, {1, 0})
 
-    assert Board.move_active_if_legal(board, transform) == {:error, :collision}
+    assert Board.try_move_active_if_legal(board, transform) == {:error, :collision}
   end
 
-  test "move_active_down/1 should move the active tile down 1 when legal" do
+  test "try_move_active_down/1 should move the active tile down 1 when legal" do
     board = %{
       Board.new(4, 2, 0)
       | active_tile: Tetrex.SparseGrid.new([[:a]]),
@@ -167,7 +167,7 @@ defmodule Tetrex.Board.Test do
           ])
     }
 
-    {moved, _} = Board.move_active_down(board)
+    {_, moved, _} = Board.try_move_active_down(board)
 
     expected =
       Tetrex.SparseGrid.new([
@@ -178,7 +178,7 @@ defmodule Tetrex.Board.Test do
     assert moved.active_tile == expected
   end
 
-  test "move_active_down/1 should draw a new tile at top centre of playfield if blocked below" do
+  test "try_move_active_down/1 should draw a new tile at top centre of playfield if blocked below" do
     board = %{
       Board.new(4, 3, 0)
       | active_tile:
@@ -200,7 +200,7 @@ defmodule Tetrex.Board.Test do
         upcoming_tile_names: [:i, :o, :s]
     }
 
-    {moved, _} = Board.move_active_down(board)
+    {_, moved, _} = Board.try_move_active_down(board)
 
     expected = %{
       active_tile: board.next_tile |> Tetrex.SparseGrid.move(:right, 1),
@@ -211,7 +211,7 @@ defmodule Tetrex.Board.Test do
     assert Map.take(moved, [:active_tile, :next_tile, :upcoming_tile_names]) == expected
   end
 
-  test "move_active_down/1 should fix the active tile to the playfield if blocked below" do
+  test "try_move_active_down/1 should fix the active tile to the playfield if blocked below" do
     board = %{
       Board.new(4, 2, 0)
       | active_tile:
@@ -228,7 +228,7 @@ defmodule Tetrex.Board.Test do
           ])
     }
 
-    {moved, _} = Board.move_active_down(board)
+    {_, moved, _} = Board.try_move_active_down(board)
 
     expected =
       Tetrex.SparseGrid.new([
@@ -241,7 +241,85 @@ defmodule Tetrex.Board.Test do
     assert moved.playfield == expected
   end
 
-  test "move_active_down/1 should clear any rows that were filled by the move" do
+  test "try_move_active_down/1 should report :collision status if blocked below" do
+    board = %{
+      Board.new(4, 2, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [:a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [:b],
+            [:b]
+          ])
+    }
+
+    {status, _, _} = Board.try_move_active_down(board)
+
+    assert status == :collision
+  end
+
+  test "try_move_active_down/1 should fix the active tile to the playfield if at bottom of playfield" do
+    board = %{
+      Board.new(4, 2, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            [:a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            []
+          ])
+    }
+
+    {_, moved, _} = Board.try_move_active_down(board)
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [],
+        [],
+        [:a]
+      ])
+
+    assert moved.playfield == expected
+  end
+
+  test "try_move_active_down/1 should report :out_of_bounds status if at bottom of playfield" do
+    board = %{
+      Board.new(4, 2, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            [:a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            []
+          ])
+    }
+
+    {status, _, _} = Board.try_move_active_down(board)
+
+    assert status == :out_of_bounds
+  end
+
+  test "try_move_active_down/1 should clear any rows that were filled by the move" do
     board = %{
       Board.new(5, 3, 0)
       | active_tile:
@@ -262,7 +340,7 @@ defmodule Tetrex.Board.Test do
           ])
     }
 
-    {moved, _} = Board.move_active_down(board)
+    {_, moved, _} = Board.try_move_active_down(board)
 
     expected =
       Tetrex.SparseGrid.new([
@@ -276,7 +354,7 @@ defmodule Tetrex.Board.Test do
     assert moved.playfield == expected
   end
 
-  test "move_active_down/1 should report the number of rows that were cleared" do
+  test "try_move_active_down/1 should report the number of rows that were cleared" do
     board = %{
       Board.new(5, 3, 0)
       | active_tile:
@@ -297,85 +375,133 @@ defmodule Tetrex.Board.Test do
           ])
     }
 
-    {_, num_rows_cleared} = Board.move_active_down(board)
+    {_, _, num_rows_cleared} = Board.try_move_active_down(board)
 
     assert num_rows_cleared == 2
   end
 
-  test "move_active_left/1 should move the active tile left by one if legal" do
+  test "try_move_active_left/1 should move the active tile left by one if legal" do
     board = %{
       Board.new(1, 3, 0)
       | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
         playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
     }
 
-    moved = Board.move_active_left(board)
+    {_, moved} = Board.try_move_active_left(board)
 
     expected = Tetrex.SparseGrid.new([[:a]])
 
     assert moved.active_tile == expected
   end
 
-  test "move_active_left/1 should not move the active tile left blocked" do
+  test "try_move_active_left/1 should not move the active tile left blocked" do
     board = %{
       Board.new(1, 3, 0)
       | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
         playfield: Tetrex.SparseGrid.new([[:b, nil, nil]])
     }
 
-    not_moved = Board.move_active_left(board)
+    {_, not_moved} = Board.try_move_active_left(board)
 
     assert not_moved.active_tile == board.active_tile
   end
 
-  test "move_active_left/1 should not move the active tile left on edge of playfield" do
+  test "try_move_active_left/1 should give a :out_of_bounds status if active tile left if on edge of playfield" do
     board = %{
       Board.new(1, 3, 0)
       | active_tile: Tetrex.SparseGrid.new([[:a, nil, nil]]),
         playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
     }
 
-    not_moved = Board.move_active_left(board)
+    {status, _} = Board.try_move_active_left(board)
+
+    assert status == :out_of_bounds
+  end
+
+  test "try_move_active_left/1 should give a :collision status if active tile left if blocked" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
+        playfield: Tetrex.SparseGrid.new([[:b, nil, nil]])
+    }
+
+    {status, _} = Board.try_move_active_left(board)
+
+    assert status == :collision
+  end
+
+  test "try_move_active_left/1 should not move the active tile left on edge of playfield" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[:a, nil, nil]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
+    }
+
+    {_, not_moved} = Board.try_move_active_left(board)
 
     assert not_moved.active_tile == board.active_tile
   end
 
-  test "move_active_right/1 should move the active tile right by one if legal" do
+  test "try_move_active_right/1 should move the active tile right by one if legal" do
     board = %{
       Board.new(1, 3, 0)
       | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
         playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
     }
 
-    moved = Board.move_active_right(board)
+    {_, moved} = Board.try_move_active_right(board)
 
     expected = Tetrex.SparseGrid.new([[nil, nil, :a]])
 
     assert moved.active_tile == expected
   end
 
-  test "move_active_right/1 should not move the active tile right blocked" do
+  test "try_move_active_right/1 should not move the active tile right if blocked" do
     board = %{
       Board.new(1, 3, 0)
       | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
         playfield: Tetrex.SparseGrid.new([[nil, nil, :b]])
     }
 
-    not_moved = Board.move_active_right(board)
+    {_, not_moved} = Board.try_move_active_right(board)
 
     assert not_moved.active_tile == board.active_tile
   end
 
-  test "move_active_right/1 should not move the active tile right on edge of playfield" do
+  test "try_move_active_right/1 should not move the active tile right if on edge of playfield" do
     board = %{
       Board.new(1, 3, 0)
       | active_tile: Tetrex.SparseGrid.new([[nil, nil, :a]]),
         playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
     }
 
-    not_moved = Board.move_active_right(board)
+    {_, not_moved} = Board.try_move_active_right(board)
 
     assert not_moved.active_tile == board.active_tile
+  end
+
+  test "try_move_active_right/1 should give an :collision status if blocked" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, :a, nil]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, :b]])
+    }
+
+    {status, _} = Board.try_move_active_right(board)
+
+    assert status == :collision
+  end
+
+  test "try_move_active_right/1 should give a :out_of_bounds status if on edge of playfield" do
+    board = %{
+      Board.new(1, 3, 0)
+      | active_tile: Tetrex.SparseGrid.new([[nil, nil, :a]]),
+        playfield: Tetrex.SparseGrid.new([[nil, nil, nil]])
+    }
+
+    {status, _} = Board.try_move_active_right(board)
+
+    assert status == :out_of_bounds
   end
 
   test "hold_active/1 should hold the active_tile when no hold_tile" do

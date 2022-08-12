@@ -122,21 +122,25 @@ defmodule Tetrex.Board do
   If doing so would cause it to collide with tiles on the playfield or it's at the bottom then fix
   the active_tile to the playfield and draw a new one.
   If fixing the active_tile to the playfield results in completed rows, these rows are cleared.
-  The return value is a {new_board, number_of_rows_cleared}
+  The return value is a {status_atom, new_board, number_of_rows_cleared}
   """
-  @spec move_active_down(__MODULE__) :: {__MODULE__, non_neg_integer()}
-  def move_active_down(board) do
-    case move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
+  @spec try_move_active_down(__MODULE__) ::
+          {:moved | placement_error(), __MODULE__, non_neg_integer()}
+  def try_move_active_down(board) do
+    case try_move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
       # Moved active tile down without a collision
       {:ok, new_board} ->
-        {new_board, 0}
+        {:moved, new_board, 0}
 
       {:error, error} when error in [:collision, :out_of_bounds] ->
         # Could not move active tile down, fix in place, draw a new tile, and clear any filled rows
-        board
-        |> merge_active_tile()
-        |> draw_next_tile()
-        |> clear_completed_rows()
+        {new_board, num_rows_cleared} =
+          board
+          |> merge_active_tile()
+          |> draw_next_tile()
+          |> clear_completed_rows()
+
+        {error, new_board, num_rows_cleared}
     end
   end
 
@@ -144,15 +148,15 @@ defmodule Tetrex.Board do
   Move the active_tile left on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec move_active_left(__MODULE__) :: __MODULE__
-  def move_active_left(board), do: move_active_sideways(board, -1)
+  @spec try_move_active_left(__MODULE__) :: {:moved | placement_error(), __MODULE__}
+  def try_move_active_left(board), do: try_move_active_sideways(board, -1)
 
   @doc """
   Move the active_tile right on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec move_active_right(__MODULE__) :: __MODULE__
-  def move_active_right(board), do: move_active_sideways(board, 1)
+  @spec try_move_active_right(__MODULE__) :: {:moved | placement_error(), __MODULE__}
+  def try_move_active_right(board), do: try_move_active_sideways(board, 1)
 
   @doc """
   Move the active tile into the hold slot.
@@ -173,7 +177,7 @@ defmodule Tetrex.Board do
 
       _ ->
         # Swap the active and hold tiles
-        case move_active_if_legal(
+        case try_move_active_if_legal(
                board,
                fn _ -> SparseGrid.align(board.hold_tile, :top_centre, board.active_tile) end
              ) do
@@ -198,11 +202,11 @@ defmodule Tetrex.Board do
     # Keep attempting to rotate until it works, or every rotation has been tried and failed
     result =
       with {:error, _} <-
-             move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise90)),
+             try_move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise90)),
            {:error, _} <-
-             move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise180)),
+             try_move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise180)),
            {:error, _} <-
-             move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise270)),
+             try_move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise270)),
            do: :could_not_rotate
 
     case result do
@@ -215,11 +219,11 @@ defmodule Tetrex.Board do
   Apply a transform function to the active tile, checking that doing so would
   cause it to collide with the playfield or be outside the playfield.
   """
-  @spec move_active_if_legal(
+  @spec try_move_active_if_legal(
           __MODULE__,
           (SparseGrid.sparse_grid() -> SparseGrid.sparse_grid())
         ) :: {:ok, __MODULE__} | {:error, placement_error()}
-  def move_active_if_legal(board, transform_fn) do
+  def try_move_active_if_legal(board, transform_fn) do
     candidate_placement = transform_fn.(board.active_tile)
 
     collides_with_playfield = SparseGrid.overlaps?(candidate_placement, board.playfield)
@@ -259,7 +263,7 @@ defmodule Tetrex.Board do
         }
 
       true ->
-        new_board = move_active_up_until_fits(board)
+        new_board = try_move_active_up_until_fits(board)
 
         %{
           playfield: SparseGrid.merge(new_board.playfield, new_board.active_tile),
@@ -270,7 +274,7 @@ defmodule Tetrex.Board do
     end
   end
 
-  defp move_active_up_until_fits(board) do
+  defp try_move_active_up_until_fits(board) do
     case SparseGrid.overlaps?(board.active_tile, board.playfield) do
       false ->
         board
@@ -283,14 +287,14 @@ defmodule Tetrex.Board do
               |> SparseGrid.move({-1, 0})
               |> SparseGrid.mask({0, 0}, {board.playfield_height - 1, board.playfield_width - 1})
         }
-        |> move_active_up_until_fits()
+        |> try_move_active_up_until_fits()
     end
   end
 
-  defp move_active_sideways(board, x_translation) do
-    case move_active_if_legal(board, &SparseGrid.move(&1, {0, x_translation})) do
-      {:ok, new_board} -> new_board
-      {:error, error} when error in [:collision, :out_of_bounds] -> board
+  defp try_move_active_sideways(board, x_translation) do
+    case try_move_active_if_legal(board, &SparseGrid.move(&1, {0, x_translation})) do
+      {:ok, new_board} -> {:moved, new_board}
+      {:error, error} when error in [:collision, :out_of_bounds] -> {error, board}
     end
   end
 end
