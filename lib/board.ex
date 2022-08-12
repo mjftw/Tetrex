@@ -237,6 +237,25 @@ defmodule Tetrex.Board do
   end
 
   @doc """
+  Add a blocking line to the bottom of the playfield, shifting all blocks up by 1.
+  If this shift would result in blocks being pushed off the playfield, return {:playfield_full, board}
+  instead of {:moved, board}
+  """
+  @spec add_blocking_line(board()) :: {:moved, board()} | {:playfield_full, board()}
+  def add_blocking_line(board) do
+    # TODO
+  end
+
+  @doc """
+  Remove a blocking line from the bottom of the playfield, shifting all blocks down by 1.
+  If no blocking line, return {:noop, board} rather than {:moved, board}
+  """
+  @spec clear_blocking_line(board()) :: {:moved, board()} | {:noop, board()}
+  def clear_blocking_line(board) do
+    # TODO
+  end
+
+  @doc """
   Build the flattened preview of the Board.
   This preview contains everything needed for a front end to display the Board.
   """
