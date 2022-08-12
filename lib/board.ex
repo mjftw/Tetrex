@@ -49,6 +49,7 @@ defmodule Tetrex.Board do
       hold_tile: nil,
       upcoming_tile_names: upcoming_tile_names
     }
+    |> align_active_with_playfield()
   end
 
   defp merge_active_tile(board) do
@@ -117,9 +118,18 @@ defmodule Tetrex.Board do
       board
       | next_tile: Tetromino.fetch!(next_tile_name),
         upcoming_tile_names: upcoming_tile_names,
-        active_tile:
+        active_tile: board.next_tile
+    }
+    |> align_active_with_playfield()
+  end
+
+  @spec align_active_with_playfield(board()) :: board()
+  defp align_active_with_playfield(board) do
+    %{
+      board
+      | active_tile:
           SparseGrid.align(
-            board.next_tile,
+            board.active_tile,
             :top_centre,
             {0, 0},
             {board.playfield_height, board.playfield_width}

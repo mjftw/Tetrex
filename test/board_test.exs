@@ -10,6 +10,20 @@ defmodule Tetrex.Board.Test do
     assert board1 == board2
   end
 
+  test "new/3 creates places the first active tile at the top center of the playfield" do
+    board = Tetrex.Board.new(20, 10, 0)
+
+    expected =
+      Tetrex.SparseGrid.align(
+        board.active_tile,
+        :top_centre,
+        {0, 0},
+        {board.playfield_height, board.playfield_width}
+      )
+
+    assert board.active_tile == expected
+  end
+
   test "try_move_active_if_legal/2 applies the transform function when legal" do
     board = Board.new(20, 10, 0)
 
