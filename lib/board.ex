@@ -25,7 +25,17 @@ defmodule Tetrex.Board do
     :upcoming_tile_names
   ]
 
-  @spec new(non_neg_integer(), non_neg_integer(), integer()) :: __MODULE__
+  @type board :: %__MODULE__{
+          playfield: SparseGrid.sparse_grid(),
+          playfield_height: non_neg_integer(),
+          playfield_width: non_neg_integer(),
+          active_tile: SparseGrid.sparse_grid(),
+          next_tile: SparseGrid.sparse_grid(),
+          hold_tile: SparseGrid.sparse_grid(),
+          upcoming_tile_names: [Tetromino.name()]
+        }
+
+  @spec new(non_neg_integer(), non_neg_integer(), integer()) :: board()
   def new(height, width, random_seed) do
     [active_tile_name | [next_tile_name | upcoming_tile_names]] =
       Tetromino.draw_randoms(@tile_bag_size, random_seed)
@@ -53,7 +63,7 @@ defmodule Tetrex.Board do
   fill the gaps.
   Return value is {Board, number_of_lines_cleared}
   """
-  @spec clear_completed_rows(__MODULE__) :: {__MODULE__, non_neg_integer()}
+  @spec clear_completed_rows(board()) :: {board(), non_neg_integer()}
   def clear_completed_rows(board) do
     {new_playfield, num_rows_cleared} =
       Enum.reduce(
@@ -99,7 +109,7 @@ defmodule Tetrex.Board do
     {%{board | playfield: new_playfield}, num_rows_cleared}
   end
 
-  @spec draw_next_tile(__MODULE__) :: __MODULE__
+  @spec draw_next_tile(board()) :: board()
   defp draw_next_tile(board) do
     [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
 
@@ -124,8 +134,8 @@ defmodule Tetrex.Board do
   If fixing the active_tile to the playfield results in completed rows, these rows are cleared.
   The return value is a {status_atom, new_board, number_of_rows_cleared}
   """
-  @spec try_move_active_down(__MODULE__) ::
-          {:moved | placement_error(), __MODULE__, non_neg_integer()}
+  @spec try_move_active_down(board()) ::
+          {:moved | placement_error(), board(), non_neg_integer()}
   def try_move_active_down(board) do
     case try_move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
       # Moved active tile down without a collision
@@ -148,14 +158,14 @@ defmodule Tetrex.Board do
   Move the active_tile left on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec try_move_active_left(__MODULE__) :: {:moved | placement_error(), __MODULE__}
+  @spec try_move_active_left(board()) :: {:moved | placement_error(), board()}
   def try_move_active_left(board), do: try_move_active_sideways(board, -1)
 
   @doc """
   Move the active_tile right on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec try_move_active_right(__MODULE__) :: {:moved | placement_error(), __MODULE__}
+  @spec try_move_active_right(board()) :: {:moved | placement_error(), board()}
   def try_move_active_right(board), do: try_move_active_sideways(board, 1)
 
   @doc """
@@ -164,7 +174,7 @@ defmodule Tetrex.Board do
   If hold slot was full, swap the hold and active tiles
   If swapping the hold and active tiles is not possible due to a collision, do not swap.
   """
-  @spec hold_active(__MODULE__) :: __MODULE__
+  @spec hold_active(board()) :: board()
   def hold_active(board) do
     # Compute lazily as not needed in all branches
     active_at_origin = fn -> SparseGrid.align(board.active_tile, :top_left, {0, 0}, {0, 0}) end
@@ -197,7 +207,7 @@ defmodule Tetrex.Board do
   If a rotation would cause a collision the next is tried.
   If no rotation is possible then the board is returned unchanged.
   """
-  @spec rotate_active(__MODULE__) :: __MODULE__
+  @spec rotate_active(board()) :: board()
   def rotate_active(board) do
     # Keep attempting to rotate until it works, or every rotation has been tried and failed
     result =
@@ -220,9 +230,9 @@ defmodule Tetrex.Board do
   cause it to collide with the playfield or be outside the playfield.
   """
   @spec try_move_active_if_legal(
-          __MODULE__,
+          board(),
           (SparseGrid.sparse_grid() -> SparseGrid.sparse_grid())
-        ) :: {:ok, __MODULE__} | {:error, placement_error()}
+        ) :: {:ok, board()} | {:error, placement_error()}
   def try_move_active_if_legal(board, transform_fn) do
     candidate_placement = transform_fn.(board.active_tile)
 
@@ -246,7 +256,7 @@ defmodule Tetrex.Board do
   Build the flattened preview of the Board.
   This preview contains everything needed for a front end to display the Board.
   """
-  @spec preview(__MODULE__) :: %{
+  @spec preview(board()) :: %{
           playfield: SparseGrid.t(),
           next_tile: SparseGrid.t(),
           hold_tile: SparseGrid.t(),
