@@ -2,8 +2,51 @@ defmodule Tetrex.Board.Server do
   use GenServer
   alias Tetrex.Board
 
+  @type init_args :: [height: non_neg_integer(), width: non_neg_integer(), random_seed: integer()]
+
+  # Client API
+
+  @spec start_link(init_args()) :: pid()
+  def start_link(board_opts \\ []) do
+    {:ok, pid} = GenServer.start_link(__MODULE__, board_opts)
+    pid
+  end
+
+  @spec preview(pid()) :: Board.board_preview()
+  def preview(board_pid) do
+    GenServer.call(board_pid, :preview)
+  end
+
+  @spec try_move_left(pid()) :: {Board.movement_result(), Board.board_preview()}
+  def try_move_left(board_pid) do
+    GenServer.call(board_pid, :try_move_left)
+  end
+
+  @spec try_move_right(pid()) :: {Board.movement_result(), Board.board_preview()}
+  def try_move_right(board_pid) do
+    GenServer.call(board_pid, :try_move_right)
+  end
+
+  @spec try_move_down(pid()) ::
+          {Board.movement_result(), Board.board_preview(), non_neg_integer()}
+  def try_move_down(board_pid) do
+    GenServer.call(board_pid, :try_move_down)
+  end
+
+  @spec rotate(pid()) :: Board.board_preview()
+  def rotate(board_pid) do
+    GenServer.call(board_pid, :rotate)
+  end
+
+  @spec hold(pid()) :: Board.board_preview()
+  def hold(board_pid) do
+    GenServer.call(board_pid, :hold)
+  end
+
+  # Server callbacks
+
   @impl true
-  @spec init(height: non_neg_integer(), width: non_neg_integer(), random_seed: integer()) ::
+  @spec init(init_args()) ::
           {:ok, %Tetrex.Board{}}
   def init(board_opts \\ []) do
     defaults = [height: 20, width: 10, random_seed: Enum.random(0..10_000_000)]
@@ -67,5 +110,10 @@ defmodule Tetrex.Board.Server do
   @impl true
   def handle_call(_, _from, board) do
     {:reply, :unknown_command, board}
+  end
+
+  @impl true
+  def handle_cast(_, board) do
+    {:noreply, board}
   end
 end

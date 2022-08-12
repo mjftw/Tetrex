@@ -3,6 +3,7 @@ defmodule Tetrex.Board do
   alias Tetrex.Tetromino
 
   @type placement_error :: :collision | :out_of_bounds
+  @type movement_result :: :moved | placement_error()
 
   @tile_bag_size 9999
 
@@ -33,6 +34,13 @@ defmodule Tetrex.Board do
           next_tile: SparseGrid.sparse_grid(),
           hold_tile: SparseGrid.sparse_grid(),
           upcoming_tile_names: [Tetromino.name()]
+        }
+
+  @type board_preview :: %{
+          playfield: SparseGrid.t(),
+          next_tile: SparseGrid.t(),
+          hold_tile: SparseGrid.t(),
+          active_tile_fits: boolean()
         }
 
   @spec new(non_neg_integer(), non_neg_integer(), integer()) :: board()
@@ -145,7 +153,7 @@ defmodule Tetrex.Board do
   The return value is a {status_atom, new_board, number_of_rows_cleared}
   """
   @spec try_move_active_down(board()) ::
-          {:moved | placement_error(), board(), non_neg_integer()}
+          {movement_result(), board(), non_neg_integer()}
   def try_move_active_down(board) do
     case try_move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
       # Moved active tile down without a collision
@@ -168,14 +176,14 @@ defmodule Tetrex.Board do
   Move the active_tile left on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec try_move_active_left(board()) :: {:moved | placement_error(), board()}
+  @spec try_move_active_left(board()) :: {movement_result(), board()}
   def try_move_active_left(board), do: try_move_active_sideways(board, -1)
 
   @doc """
   Move the active_tile right on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
-  @spec try_move_active_right(board()) :: {:moved | placement_error(), board()}
+  @spec try_move_active_right(board()) :: {movement_result(), board()}
   def try_move_active_right(board), do: try_move_active_sideways(board, 1)
 
   @doc """
@@ -266,12 +274,7 @@ defmodule Tetrex.Board do
   Build the flattened preview of the Board.
   This preview contains everything needed for a front end to display the Board.
   """
-  @spec preview(board()) :: %{
-          playfield: SparseGrid.t(),
-          next_tile: SparseGrid.t(),
-          hold_tile: SparseGrid.t(),
-          active_tile_fits: boolean()
-        }
+  @spec preview(board()) :: board_preview()
   def preview(board) do
     case SparseGrid.overlaps?(board.active_tile, board.playfield) do
       false ->
