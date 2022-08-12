@@ -290,7 +290,7 @@ defmodule Tetrex.Board do
   defp move_active_sideways(board, x_translation) do
     case move_active_if_legal(board, &SparseGrid.move(&1, {0, x_translation})) do
       {:ok, new_board} -> new_board
-      {:error, error} when error == :collision or error == :out_of_bounds -> board
+      {:error, error} when error in [:collision, :out_of_bounds] -> board
     end
   end
 end
