@@ -60,13 +60,6 @@ defmodule Tetrex.Board do
     |> align_active_with_playfield()
   end
 
-  defp merge_active_tile(board) do
-    %{
-      board
-      | playfield: SparseGrid.merge(board.playfield, board.active_tile)
-    }
-  end
-
   @doc """
   Clear all rows that have been completed, shifting the remaining playfield values down to
   fill the gaps.
@@ -116,33 +109,6 @@ defmodule Tetrex.Board do
       )
 
     {%{board | playfield: new_playfield}, num_rows_cleared}
-  end
-
-  @spec draw_next_tile(board()) :: board()
-  defp draw_next_tile(board) do
-    [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
-
-    %{
-      board
-      | next_tile: Tetromino.fetch!(next_tile_name),
-        upcoming_tile_names: upcoming_tile_names,
-        active_tile: board.next_tile
-    }
-    |> align_active_with_playfield()
-  end
-
-  @spec align_active_with_playfield(board()) :: board()
-  defp align_active_with_playfield(board) do
-    %{
-      board
-      | active_tile:
-          SparseGrid.align(
-            board.active_tile,
-            :top_centre,
-            {0, 0},
-            {board.playfield_height, board.playfield_width}
-          )
-    }
   end
 
   @doc """
@@ -295,6 +261,40 @@ defmodule Tetrex.Board do
           active_tile_fits: false
         }
     end
+  end
+
+  defp merge_active_tile(board) do
+    %{
+      board
+      | playfield: SparseGrid.merge(board.playfield, board.active_tile)
+    }
+  end
+
+  @spec draw_next_tile(board()) :: board()
+  defp draw_next_tile(board) do
+    [next_tile_name | upcoming_tile_names] = board.upcoming_tile_names
+
+    %{
+      board
+      | next_tile: Tetromino.fetch!(next_tile_name),
+        upcoming_tile_names: upcoming_tile_names,
+        active_tile: board.next_tile
+    }
+    |> align_active_with_playfield()
+  end
+
+  @spec align_active_with_playfield(board()) :: board()
+  defp align_active_with_playfield(board) do
+    %{
+      board
+      | active_tile:
+          SparseGrid.align(
+            board.active_tile,
+            :top_centre,
+            {0, 0},
+            {board.playfield_height, board.playfield_width}
+          )
+    }
   end
 
   defp try_move_active_up_until_fits(board) do
