@@ -2,10 +2,11 @@ import Config
 
 # Configure your database
 config :tetrex, Tetrex.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "tetrex_dev",
+  username: System.get_env("PGUSER", "postgres"),
+  password: System.get_env("PGPASSWORD", "postgres"),
+  hostname: System.get_env("PGHOST", "localhost"),
+  database: System.get_env("PGDATBASE", "tetrex_dev"),
+  port: System.get_env("PGPORT", "5432"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

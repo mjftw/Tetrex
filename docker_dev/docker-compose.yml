@@ -1,0 +1,36 @@
+version: '3.1'
+
+services:
+  phoenix:
+    build:
+      context: ..
+      dockerfile: ./docker_dev/Dockerfile
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: tetrex_dev
+    ports:
+      - "4000:4000"
+      - "4443:4443"
+    depends_on:
+      - postgres
+    volumes:
+      - ../:/app
+  postgres:
+    image: postgres:14.5
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_DB: tetrex_dev
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
