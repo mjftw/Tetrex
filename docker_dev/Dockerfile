@@ -1,4 +1,4 @@
-FROM elixir:1.12
+FROM elixir:1.14
 
 RUN apt-get update && \
     apt-get install -y \
