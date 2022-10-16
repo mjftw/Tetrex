@@ -1,0 +1,8 @@
+.board {
+    background-color: cadetblue;
+}
+
+.playfield {
+    background-color: antiquewhite;
+    margin: 1em;
+}
