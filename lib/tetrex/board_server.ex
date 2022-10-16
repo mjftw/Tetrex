@@ -1,4 +1,4 @@
-defmodule Tetrex.Board.Server do
+defmodule Tetrex.BoardServer do
   use GenServer
   alias Tetrex.Board
 
