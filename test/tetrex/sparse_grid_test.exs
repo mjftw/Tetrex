@@ -1052,4 +1052,8 @@ defmodule SparseGrid.Test do
 
     assert result_to_match <> "\n" == expected
   end
+
+  test "Inspect implementation should handle empty grid" do
+    assert inspect(SparseGrid.new()) == "<Empty SparseGrid>"
+  end
 end

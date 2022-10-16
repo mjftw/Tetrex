@@ -346,6 +346,8 @@ defmodule Tetrex.SparseGrid do
 end
 
 defimpl Inspect, for: Tetrex.SparseGrid do
+  def inspect(grid, _opts) when grid.values == %{}, do: "<Empty SparseGrid>"
+
   def inspect(grid, _opts) do
     str_grid =
       Enum.map(grid.values, fn {coord, value} -> {coord, to_string(value)} end)
