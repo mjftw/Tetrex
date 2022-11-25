@@ -12,8 +12,6 @@ defmodule TetrexWeb.Components.BoardComponents do
   end
 
   defp sparsegrid_fixed(assigns) do
-    assigns |> dbg()
-
     ~H"""
       <div class="sparsegrid" style={"--num-columns: #{@width}"}>
         <%= for y <- 0..@height-1, x <- 0..@width-1 do %>
