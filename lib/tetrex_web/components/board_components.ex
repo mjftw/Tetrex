@@ -12,9 +12,11 @@ defmodule TetrexWeb.Components.BoardComponents do
   end
 
   defp sparsegrid_fixed(assigns) do
+    assigns |> dbg()
+
     ~H"""
-      <div class="sparsegrid" style={"--num-rows: #{@height}, --num-columns: #{@width}"}>
-        <%= for x <- 0..@width, y <- 0..@height do %>
+      <div class="sparsegrid" style={"--num-columns: #{@width}"}>
+        <%= for y <- 0..@height-1, x <- 0..@width-1 do %>
           <div class={@sparsegrid |> SparseGrid.get(y, x) |> tile_class()}/>
         <% end %>
       </div>

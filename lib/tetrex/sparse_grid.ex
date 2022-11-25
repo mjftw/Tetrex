@@ -201,6 +201,26 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
+  Find the number of rows in the grid.
+  """
+  @spec rows(sparse_grid()) :: integer()
+  def rows(grid) do
+    case size(grid) do
+      {_, x} -> x
+    end
+  end
+
+  @doc """
+  Find the number of columns in the grid.
+  """
+  @spec cols(sparse_grid()) :: integer()
+  def cols(grid) do
+    case size(grid) do
+      {y, _} -> y
+    end
+  end
+
+  @doc """
   Detect whether two grids have values at the same coordinates
   """
   @spec overlaps?(sparse_grid(), sparse_grid()) :: boolean()
