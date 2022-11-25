@@ -6,6 +6,7 @@ services:
       context: ..
       dockerfile: ./docker_dev/Dockerfile
     environment:
+      SERVER_PORT: 4000
       PGHOST: postgres
       PGPORT: 5432
       PGUSER: postgres
