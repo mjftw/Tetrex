@@ -101,6 +101,13 @@ defmodule Tetrex.SparseGrid do
     |> new()
   end
 
+  @doc """
+  Get the value at a given grid coordinate.
+  Returns nil if no value present.
+  """
+  @spec get(sparse_grid(), y(), x()) :: any() | nil
+  def get(grid, y, x), do: Map.get(grid.values, {y, x})
+
   @spec move(sparse_grid(), :up, non_neg_integer()) :: sparse_grid()
   def move(grid, :up, amount), do: move(grid, {-amount, 0})
 
