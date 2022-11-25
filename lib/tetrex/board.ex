@@ -43,6 +43,9 @@ defmodule Tetrex.Board do
           active_tile_fits: boolean()
         }
 
+  @doc """
+  Get a new board with a given height, width, and random seed (used for drawing tiles)
+  """
   @spec new(non_neg_integer(), non_neg_integer(), integer()) :: board()
   def new(height, width, random_seed) do
     [active_tile_name | [next_tile_name | upcoming_tile_names]] =
