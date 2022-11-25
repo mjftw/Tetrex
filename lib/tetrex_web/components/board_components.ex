@@ -1,7 +1,6 @@
 defmodule TetrexWeb.Components.BoardComponents do
   use TetrexWeb, :component
   alias Tetrex.SparseGrid
-  alias Tetrex.Tetromino
 
   def playfield(assigns) do
     ~H"""
