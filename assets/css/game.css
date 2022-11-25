@@ -4,5 +4,60 @@
 
 .playfield {
     background-color: antiquewhite;
-    margin: 1em;
 }
+
+.sparsegrid {
+    display: grid;
+    grid-template-columns: repeat(var(--num-columns), 50px);
+}
+
+
+
+.tetris-tile-red {
+    background-color: red;
+    width: 10px;
+    height: 10px;
+}
+
+.tetris-tile-green {
+    background-color: green;
+    width: 10px;
+    height: 10px;
+}
+
+.tetris-tile-blue {
+    background-color: blue;
+    width: 10px;
+    height: 10px;
+}
+
+.tetris-tile-cyan {
+    background-color: cyan;
+    width: 10px;
+    height: 10px;
+}
+
+.tetris-tile-yellow {
+    background-color: yellow;
+    width: 10px;
+    height: 10px;
+}
+
+.tetris-tile-purple {
+    background-color: purple;
+    width: 10px;
+    height: 10px;
+}
+
+.tetris-tile-grey {
+    background-color: grey;
+    width: 10px;
+    height: 10px;
+}
+
+.tetris-tile-empty {
+    background-color: none;
+    width: 10px;
+    height: 10px;
+}
+
