@@ -732,6 +732,8 @@ defmodule Tetrex.Board.Test do
     expected = %{
       hold_tile: board.hold_tile,
       next_tile: board.next_tile,
+      playfield_height: board.playfield_height,
+      playfield_width: board.playfield_width,
       playfield:
         Tetrex.SparseGrid.new([
           [nil, :a, nil],
@@ -774,6 +776,8 @@ defmodule Tetrex.Board.Test do
     expected = %{
       hold_tile: board.hold_tile,
       next_tile: board.next_tile,
+      playfield_height: board.playfield_height,
+      playfield_width: board.playfield_width,
       playfield:
         Tetrex.SparseGrid.new([
           [nil, :c, nil],

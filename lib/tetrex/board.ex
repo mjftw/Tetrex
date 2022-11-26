@@ -38,6 +38,8 @@ defmodule Tetrex.Board do
 
   @type board_preview :: %{
           playfield: SparseGrid.t(),
+          playfield_height: non_neg_integer(),
+          playfield_width: non_neg_integer(),
           next_tile: SparseGrid.t(),
           hold_tile: SparseGrid.t(),
           active_tile_fits: boolean()
@@ -251,6 +253,8 @@ defmodule Tetrex.Board do
           playfield: SparseGrid.merge(board.playfield, board.active_tile),
           next_tile: board.next_tile,
           hold_tile: board.hold_tile,
+          playfield_height: board.playfield_height,
+          playfield_width: board.playfield_width,
           active_tile_fits: true
         }
 
@@ -261,6 +265,8 @@ defmodule Tetrex.Board do
           playfield: SparseGrid.merge(new_board.playfield, new_board.active_tile),
           next_tile: new_board.next_tile,
           hold_tile: new_board.hold_tile,
+          playfield_height: board.playfield_height,
+          playfield_width: board.playfield_width,
           active_tile_fits: false
         }
     end
