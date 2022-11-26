@@ -47,6 +47,11 @@
     width: 30px;
     height: 30px;
 }
+.tetris-tile-orange {
+    background-color: orange;
+    width: 30px;
+    height: 30px;
+}
 
 .tetris-tile-grey {
     background-color: grey;
