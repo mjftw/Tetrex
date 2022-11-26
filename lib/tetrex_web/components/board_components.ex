@@ -5,7 +5,7 @@ defmodule TetrexWeb.Components.BoardComponents do
   def playfield(assigns) do
     ~H"""
       <div class="playfield">
-        <.sparsegrid_fixed sparsegrid={@board.playfield} width={@playfield_width} height={@playfield_height} />
+        <.sparsegrid_fixed sparsegrid={@board.playfield} width={@board.playfield_width} height={@board.playfield_height} />
       </div>
     """
   end
@@ -27,6 +27,7 @@ defmodule TetrexWeb.Components.BoardComponents do
   defp tile_class_suffix(:cyan), do: "cyan"
   defp tile_class_suffix(:yellow), do: "yellow"
   defp tile_class_suffix(:purple), do: "purple"
+  defp tile_class_suffix(:orange), do: "orange"
   defp tile_class_suffix(:grey), do: "grey"
   defp tile_class_suffix(nil), do: "empty"
 end

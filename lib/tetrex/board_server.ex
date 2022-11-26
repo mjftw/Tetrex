@@ -8,8 +8,7 @@ defmodule Tetrex.BoardServer do
 
   @spec start_link(init_args()) :: pid()
   def start_link(board_opts \\ []) do
-    {:ok, pid} = GenServer.start_link(__MODULE__, board_opts)
-    pid
+    GenServer.start_link(__MODULE__, board_opts)
   end
 
   @spec preview(pid()) :: Board.board_preview()
@@ -48,15 +47,12 @@ defmodule Tetrex.BoardServer do
   @impl true
   @spec init(init_args()) ::
           {:ok, %Tetrex.Board{}}
-  def init(board_opts \\ []) do
-    defaults = [height: 20, width: 10, random_seed: Enum.random(0..10_000_000)]
-    options = Keyword.merge(defaults, board_opts)
-
+  def init(opts) do
     {:ok,
      Board.new(
-       Keyword.fetch!(options, :height),
-       Keyword.fetch!(options, :width),
-       Keyword.fetch!(options, :random_seed)
+       Keyword.fetch!(opts, :height),
+       Keyword.fetch!(opts, :width),
+       Keyword.fetch!(opts, :random_seed)
      )}
   end
 

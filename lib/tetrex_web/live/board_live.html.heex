@@ -1,5 +1,5 @@
-<div class="board">
-  <h1>Board template</h1>
+<div class="board" phx-window-keydown="keypress">
+  <h1>Tetris</h1>
 
-  <BoardComponents.playfield board={@board} playfield_width={@playfield_width} playfield_height={@playfield_height}/>
+    <BoardComponents.playfield board={@board}/>
 </div>
