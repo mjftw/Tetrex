@@ -79,6 +79,14 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
+  Create an empty grid.
+  """
+  @spec empty() :: sparse_grid()
+  def empty do
+    new([])
+  end
+
+  @doc """
   Create a rectangle grid filled with a given value.
   The top_left and bottom_right coordinates border the fill area, inclusive of the coordinates.
   """
