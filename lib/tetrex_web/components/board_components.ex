@@ -10,6 +10,24 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
+  def next_tile_box(assigns) do
+    ~H"""
+      <div class="next_tile_box">
+        Next tile:
+        <.sparsegrid_fixed sparsegrid={@board.next_tile} width={4} height={4} />
+      </div>
+    """
+  end
+
+  def hold_tile_box(assigns) do
+    ~H"""
+      <div class="hold_tile_box">
+        Hold tile:
+        <.sparsegrid_fixed sparsegrid={@board.hold_tile || SparseGrid.empty()} width={4} height={4} />
+      </div>
+    """
+  end
+
   defp sparsegrid_fixed(assigns) do
     ~H"""
       <div class="sparsegrid" style={"--num-columns: #{@width}"}>

@@ -56,6 +56,12 @@ defmodule TetrexWeb.BoardLive do
   end
 
   @impl true
+  def handle_event("keypress", %{"key" => "h"}, socket) do
+    preview = BoardServer.hold(socket.assigns.board_server)
+    {:noreply, assign(socket, :board, preview)}
+  end
+
+  @impl true
   def handle_event("keypress", %{"key" => key}, socket) do
     IO.puts("Unhandled key press: #{key}")
     {:noreply, socket}
