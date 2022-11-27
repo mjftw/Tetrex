@@ -1,9 +1,14 @@
 .board {
-    width: 300px;
+    display: flex;
+    flex: auto;
+    justify-content: center;
     background-color: cadetblue;
 }
 
 .playfield {
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
     background-color: antiquewhite;
 }
 

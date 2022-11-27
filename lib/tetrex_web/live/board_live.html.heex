@@ -1,7 +1,7 @@
 <div class="board" phx-window-keydown="keypress">
-  <h1><%= @score %> lines cleared</h1>
 
     <div >
+      <h1><%= @score %> lines cleared</h1>
       <BoardComponents.playfield board={@board}/>
       <BoardComponents.next_tile_box board={@board}/>
       <BoardComponents.hold_tile_box board={@board}/>
