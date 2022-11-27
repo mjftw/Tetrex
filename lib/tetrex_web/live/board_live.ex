@@ -21,6 +21,7 @@ defmodule TetrexWeb.BoardLive do
       socket
       |> assign(board_server: board_server)
       |> assign(board: preview)
+      |> assign(score: 0)
 
     {:ok, socket}
   end
@@ -28,8 +29,19 @@ defmodule TetrexWeb.BoardLive do
   @impl true
   def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
     case BoardServer.try_move_down(socket.assigns.board_server) do
-      {:moved, preview, _rows_cleared} -> {:noreply, assign(socket, :board, preview)}
-      _ -> {:noreply, socket}
+      {:moved, preview, _} ->
+        {:noreply,
+         socket
+         |> assign(:board, preview)}
+
+      {:out_of_bounds, preview, lines_cleared} ->
+        {:noreply,
+         socket
+         |> assign(:board, preview)
+         |> update(:score, &(&1 + lines_cleared))}
+
+      _ ->
+        {:noreply, socket}
     end
   end
 

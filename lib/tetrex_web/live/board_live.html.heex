@@ -1,5 +1,5 @@
 <div class="board" phx-window-keydown="keypress">
-  <h1>Tetris</h1>
+  <h1><%= @score %> lines cleared</h1>
 
     <div >
       <BoardComponents.playfield board={@board}/>
