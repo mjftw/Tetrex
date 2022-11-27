@@ -29,19 +29,18 @@ defmodule TetrexWeb.BoardLive do
   @impl true
   def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
     case BoardServer.try_move_down(socket.assigns.board_server) do
+      # Moved without collision
       {:moved, preview, _} ->
         {:noreply,
          socket
          |> assign(:board, preview)}
 
-      {:out_of_bounds, preview, lines_cleared} ->
+      # Failed to move piece, which means it hit the bottom or another piece
+      {_, preview, lines_cleared} ->
         {:noreply,
          socket
          |> assign(:board, preview)
          |> update(:score, &(&1 + lines_cleared))}
-
-      _ ->
-        {:noreply, socket}
     end
   end
 
