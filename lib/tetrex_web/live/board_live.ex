@@ -36,11 +36,18 @@ defmodule TetrexWeb.BoardLive do
          |> assign(:board, preview)}
 
       # Failed to move piece, which means it hit the bottom or another piece
-      {_, preview, lines_cleared} ->
+      {_, preview, lines_cleared} when preview.active_tile_fits ->
         {:noreply,
          socket
          |> assign(:board, preview)
          |> update(:score, &(&1 + lines_cleared))}
+
+      # Failed to move piece, which means it hit the bottom or another piece
+      {_, preview, _} ->
+        {:noreply,
+         socket
+         |> assign(:board, preview)
+         |> put_flash(:error, "You are a failure. :-(")}
     end
   end
 
