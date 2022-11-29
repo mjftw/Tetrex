@@ -3,6 +3,8 @@
     flex: auto;
     justify-content: center;
     background-color: cadetblue;
+
+    --tile-square-size: 30px
 }
 
 .playfield {
@@ -14,59 +16,59 @@
 
 .sparsegrid {
     display: grid;
-    grid-template-columns: repeat(var(--num-columns), 30px);
+    grid-template-columns: repeat(var(--num-columns), var(--tile-square-size));
 }
 
 .tetris-tile-red {
     background-color: red;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
 .tetris-tile-green {
     background-color: green;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
 .tetris-tile-blue {
     background-color: blue;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
 .tetris-tile-cyan {
     background-color: cyan;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
 .tetris-tile-yellow {
     background-color: yellow;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
 .tetris-tile-purple {
     background-color: purple;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 .tetris-tile-orange {
     background-color: orange;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
 .tetris-tile-grey {
     background-color: grey;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
 .tetris-tile-empty {
     background-color: none;
-    width: 30px;
-    height: 30px;
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
 }
 
