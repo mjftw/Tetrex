@@ -17,7 +17,7 @@ defmodule TetrexWeb.Router do
   scope "/", TetrexWeb do
     pipe_through :browser
 
-    live "/", BoardLive
+    live "/", SinglePlayerGameLive
   end
 
   # Other scopes may use custom stacks.

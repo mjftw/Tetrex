@@ -1,4 +1,4 @@
-defmodule TetrexWeb.BoardLive do
+defmodule TetrexWeb.SinglePlayerGameLive do
   use TetrexWeb, :live_view
 
   alias TetrexWeb.Components.BoardComponents
