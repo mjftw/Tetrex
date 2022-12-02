@@ -3,6 +3,7 @@ defmodule TetrexWeb.BoardLive do
 
   alias TetrexWeb.Components.BoardComponents
   alias Tetrex.BoardServer
+  alias TetrexWeb.Components.Modal
 
   @board_height 20
   @board_width 10
@@ -22,9 +23,18 @@ defmodule TetrexWeb.BoardLive do
       |> assign(board_server: board_server)
       |> assign(board: preview)
       |> assign(score: 0)
+      |> assign(game_over: false)
 
     {:ok, socket}
   end
+
+  @impl true
+  def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{game_over: true}} = socket) do
+    {:noreply, socket |> push_redirect(to: Routes.live_path(socket, __MODULE__))}
+  end
+
+  @impl true
+  def handle_event("keypress", _, %{assigns: %{game_over: true}} = socket), do: {:noreply, socket}
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
@@ -42,12 +52,12 @@ defmodule TetrexWeb.BoardLive do
          |> assign(:board, preview)
          |> update(:score, &(&1 + lines_cleared))}
 
-      # Failed to move piece, which means it hit the bottom or another piece
+      # Game over :-(
       {_, preview, _} ->
         {:noreply,
          socket
          |> assign(:board, preview)
-         |> put_flash(:error, "You are a failure. :-(")}
+         |> assign(:game_over, true)}
     end
   end
 

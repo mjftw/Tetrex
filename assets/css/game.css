@@ -72,3 +72,15 @@
     height: var(--tile-square-size);
 }
 
+.game-over-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: aliceblue;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    width: 30%;
+    height: 20%;
+}
