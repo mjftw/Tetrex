@@ -1,8 +1,17 @@
+.single-player-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: cadetblue;
+    padding-bottom: 5%;
+}
+
 .board {
     display: flex;
     flex: auto;
+    flex-direction: row;
+    gap: 3%;
     justify-content: center;
-    background-color: cadetblue;
 
     --tile-square-size: 30px
 }
@@ -12,6 +21,16 @@
     border-width: 1px;
     border-style: solid;
     background-color: antiquewhite;
+}
+
+.tile-box {
+    height: fit-content;
+    width: fit-content;
+    background-color: antiquewhite;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+    padding: 10px;
 }
 
 .sparsegrid {
@@ -78,8 +97,8 @@
     justify-content: center;
     flex-direction: column;
     background-color: aliceblue;
-    border-style: solid;
-    border-width: 1px;
+    border-style: double;
+    border-width: 5px;
     border-color: black;
     width: 30%;
     height: 20%;

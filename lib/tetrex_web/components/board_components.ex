@@ -10,20 +10,28 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
+  def score_box(assigns) do
+    ~H"""
+    <div class="score-box">
+      <h1>Score: <%= @score %></h1>
+    </div>
+    """
+  end
+
   def next_tile_box(assigns) do
     ~H"""
-      <div class="next_tile_box">
+      <div class="tile-box">
         Next tile:
-        <.sparsegrid_fixed sparsegrid={@board.next_tile} width={4} height={4} />
+        <.sparsegrid_fixed sparsegrid={centre_single_tile(@board.next_tile)} width={4} height={4} />
       </div>
     """
   end
 
   def hold_tile_box(assigns) do
     ~H"""
-      <div class="hold_tile_box">
+      <div class="tile-box">
         Hold tile:
-        <.sparsegrid_fixed sparsegrid={@board.hold_tile || SparseGrid.empty()} width={4} height={4} />
+        <.sparsegrid_fixed sparsegrid={centre_single_tile(@board.hold_tile || SparseGrid.empty())} width={4} height={4} />
       </div>
     """
   end
@@ -48,4 +56,6 @@ defmodule TetrexWeb.Components.BoardComponents do
   defp tile_class_suffix(:orange), do: "orange"
   defp tile_class_suffix(:grey), do: "grey"
   defp tile_class_suffix(nil), do: "empty"
+
+  defp centre_single_tile(tile), do: SparseGrid.align(tile, :centre, {0, 0}, {3, 3})
 end

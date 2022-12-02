@@ -1,16 +1,18 @@
-<div class="board" phx-window-keydown="keypress">
-    <Modal.modal show={@game_over}>
-      <div class="game-over-box">
-        <h1>Game Over</h1>
-        <h2>Score: <%= @score%></h2>
-        <br/>
-        Press enter to play again
-      </div>
-    </Modal.modal>
-    <div>
-      <h1><%= @score %> lines cleared</h1>
-      <BoardComponents.playfield board={@board}/>
-      <BoardComponents.next_tile_box board={@board}/>
-      <BoardComponents.hold_tile_box board={@board}/>
+
+<div class="single-player-game" phx-window-keydown="keypress">
+  <Modal.modal show={@game_over}>
+    <div class="game-over-box">
+      <h1>Game Over</h1>
+      <h2>Score: <%= @score%></h2>
+      <br/>
+      Press enter to play again
     </div>
+  </Modal.modal>
+
+  <BoardComponents.score_box score={@score}/>
+  <div class="board">
+    <BoardComponents.hold_tile_box board={@board}/>
+    <BoardComponents.playfield board={@board}/>
+    <BoardComponents.next_tile_box board={@board}/>
+  </div>
 </div>
