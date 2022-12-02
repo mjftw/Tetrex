@@ -684,6 +684,25 @@ defmodule SparseGrid.Test do
     assert aligned == expected
   end
 
+  test "align/3 should do nothing for empty grid" do
+    empty = SparseGrid.empty()
+
+    assert empty == SparseGrid.align(empty, :centre, SparseGrid.new([[:a]]))
+  end
+
+  test "align/3 should do nothing for empty alignment grid" do
+    grid = SparseGrid.new([[:a]])
+    empty = SparseGrid.empty()
+
+    assert grid == SparseGrid.align(grid, :centre, empty)
+  end
+
+  test "align/4 should do nothing for empty grid" do
+    empty = SparseGrid.empty()
+
+    assert empty == SparseGrid.align(empty, :centre, 0, 0)
+  end
+
   test "align/4 should move a grid to align with a bounding box :top_left alignment" do
     to_move =
       SparseGrid.new([

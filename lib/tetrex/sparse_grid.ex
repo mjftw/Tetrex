@@ -261,6 +261,9 @@ defmodule Tetrex.SparseGrid do
     |> new()
   end
 
+  def align(grid, _, _) when grid.values == %{}, do: grid
+  def align(grid, _, align_with_grid) when align_with_grid.values == %{}, do: grid
+
   @doc """
   Move a grid so that it aligns with another grid.
   """
@@ -273,6 +276,8 @@ defmodule Tetrex.SparseGrid do
 
     align(grid_to_move, alignment, move_to_tl, move_to_br)
   end
+
+  def align(grid, _, _, _) when grid.values == %{}, do: grid
 
   @doc """
   Move a grid to align it with a given bounding box,
