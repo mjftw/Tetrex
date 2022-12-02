@@ -17,8 +17,7 @@ defmodule TetrexWeb.Router do
   scope "/", TetrexWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
-    live "/board", BoardLive
+    live "/", BoardLive
   end
 
   # Other scopes may use custom stacks.
