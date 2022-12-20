@@ -136,27 +136,33 @@ defmodule Tetrex.SparseGrid do
   @spec rotate(sparse_grid(), angle()) :: sparse_grid()
   def rotate(grid, angle) do
     %{
-      topleft: topleft,
+      topleft: {top_before, left_before} = topleft,
       bottomright: bottomright
     } = corners(grid)
 
     centre = alignment_coordinate(topleft, bottomright, :centre)
 
-    rotate(grid, angle, centre)
+    rotated = rotate(grid, angle, centre)
+
+    %{topleft: {top_after, left_after}} = corners(rotated)
+
+    # We are rotating around centre, so if we've translated we need to translate back
+    move(rotated, {top_before - top_after, left_before - left_after})
   end
 
   @doc """
   Rotate the grid around a specific point of rotation
   """
   @spec rotate(sparse_grid(), angle(), coordinate()) :: sparse_grid()
-  def rotate(%__MODULE__{values: grid}, angle, {rotate_at_y, rotate_at_x}) do
+  def rotate(grid, angle, {rotate_at_y, rotate_at_x}) do
     # Rotating around a point is the same as moving to the origin, rotating, and moving back
-    grid
-    |> move_grid({-rotate_at_y, -rotate_at_x})
-    |> rotate_grid(angle)
-    |> move_grid({rotate_at_y, rotate_at_x})
-    |> Map.new()
-    |> new()
+    new_grid =
+      grid.values
+      |> move_grid({-rotate_at_y, -rotate_at_x})
+      |> rotate_grid(angle)
+      |> move_grid({rotate_at_y, rotate_at_x})
+      |> Map.new()
+      |> new()
   end
 
   @doc """
