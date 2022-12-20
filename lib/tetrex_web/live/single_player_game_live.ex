@@ -14,21 +14,15 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {height, width, seed} = board_init_args()
-
     # Using name registration for now as only one game
     board_server = Tetrex.BoardServer
-
-    preview = BoardServer.new(board_server, height, width, seed)
 
     socket =
       socket
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
       |> assign(board_server: board_server)
-      |> assign(board: preview)
-      |> assign(score: 0)
-      |> assign(status: :intro)
+      |> new_game()
 
     {:ok, socket}
   end
@@ -41,19 +35,8 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket) do
-    {height, width, seed} = board_init_args()
-
-    # Start a new game
-    preview = BoardServer.new(socket.assigns.board_server, height, width, seed)
-
     # TODO: Move to common function
-    {:noreply,
-     socket
-     |> assign(status: :playing)
-     |> assign(board: preview)
-     |> assign(score: 0)
-     |> push_event("stop-audio", %{id: @game_over_audio_id})
-     |> push_event("play-audio", %{id: @theme_music_audio_id})}
+    {:noreply, new_game(socket, true)}
   end
 
   @impl true
@@ -81,9 +64,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         {:noreply,
          socket
          |> assign(:board, preview)
-         |> assign(:status, :game_over)
-         |> push_event("stop-audio", %{id: @theme_music_audio_id})
-         |> push_event("play-audio", %{id: @game_over_audio_id})}
+         |> game_over()}
     end
   end
 
@@ -121,7 +102,31 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     {:noreply, socket}
   end
 
-  defp board_init_args do
-    {@board_height, @board_width, Enum.random(0..10_000_000)}
+  defp game_over(socket) do
+    socket
+    |> assign(:status, :game_over)
+    |> push_event("stop-audio", %{id: @theme_music_audio_id})
+    |> push_event("play-audio", %{id: @game_over_audio_id})
+  end
+
+  defp new_game(socket, is_playing \\ false) do
+    status =
+      if is_playing do
+        :playing
+      else
+        :intro
+      end
+
+    seed = Enum.random(0..10_000_000)
+
+    # Start a new game
+    preview = BoardServer.new(socket.assigns.board_server, @board_height, @board_width, seed)
+
+    socket
+    |> assign(:board, preview)
+    |> assign(:status, status)
+    |> assign(score: 0)
+    |> push_event("stop-audio", %{id: @game_over_audio_id})
+    |> push_event("play-audio", %{id: @theme_music_audio_id})
   end
 end
