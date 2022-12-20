@@ -1,13 +1,26 @@
 
 <div class="single-player-game" phx-window-keydown="keypress">
-  <Modal.modal show={@game_over}>
-    <div class="game-over-box">
-      <h1>Game Over</h1>
-      <h2>Score: <%= @score%></h2>
-      <br/>
-      Press enter to play again
-    </div>
-  </Modal.modal>
+  <Soundtrack.background id="theme-music-audio" src="audio/tetris-main-theme.mp3" />
+
+  <%= case @status do %>
+    <% :intro -> %>
+      <Modal.modal show>
+        <div class="game-over-box">
+          <b>Ready Player 1</b>
+          <button phx-click="start_game" phx-value-audio-id="theme-music-audio">Start</button>
+        </div>
+    </Modal.modal>
+    <% :game_over -> %>
+      <Modal.modal show>
+        <div class="game-over-box">
+          <h1>Game Over</h1>
+          <h2>Score: <%= @score%></h2>
+          <br/>
+          Press enter to play again
+        </div>
+    </Modal.modal>
+    <% _ -> %>
+  <% end %>
 
   <BoardComponents.score_box score={@score}/>
   <div class="board">

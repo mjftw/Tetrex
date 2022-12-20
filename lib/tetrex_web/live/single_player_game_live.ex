@@ -4,6 +4,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   alias TetrexWeb.Components.BoardComponents
   alias Tetrex.BoardServer
   alias TetrexWeb.Components.Modal
+  alias TetrexWeb.Components.Soundtrack
 
   @board_height 20
   @board_width 10
@@ -23,18 +24,24 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> assign(board_server: board_server)
       |> assign(board: preview)
       |> assign(score: 0)
-      |> assign(game_over: false)
+      |> assign(status: :intro)
 
     {:ok, socket}
   end
 
   @impl true
-  def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{game_over: true}} = socket) do
+  def handle_event("start_game", %{"audio-id" => audio_id}, socket) do
+    {:noreply, socket |> assign(status: :playing) |> push_event("play-audio", %{id: audio_id})}
+  end
+
+  @impl true
+  def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket) do
     {:noreply, socket |> push_redirect(to: Routes.live_path(socket, __MODULE__))}
   end
 
   @impl true
-  def handle_event("keypress", _, %{assigns: %{game_over: true}} = socket), do: {:noreply, socket}
+  def handle_event("keypress", _, %{assigns: %{status: :game_over}} = socket),
+    do: {:noreply, socket}
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
@@ -57,7 +64,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         {:noreply,
          socket
          |> assign(:board, preview)
-         |> assign(:game_over, true)}
+         |> assign(:status, :game_over)}
     end
   end
 

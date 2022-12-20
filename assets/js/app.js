@@ -34,6 +34,13 @@ topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
 
+// Play an audio element on demand
+window.addEventListener("phx:play-audio", e => {
+    let audio = document.getElementById(e.detail.id)
+    audio.muted = false
+    audio.play()
+})
+
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 
