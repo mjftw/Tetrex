@@ -8,6 +8,8 @@ defmodule Tetrex.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      # Create a singleton game state instance
+      {Tetrex.BoardServer, name: Tetrex.BoardServer},
       # Start the Ecto repository
       Tetrex.Repo,
       # Start the Telemetry supervisor
@@ -16,8 +18,6 @@ defmodule Tetrex.Application do
       {Phoenix.PubSub, name: Tetrex.PubSub},
       # Start the Endpoint (http/https)
       TetrexWeb.Endpoint
-      # Start a worker by calling: Tetrex.Worker.start_link(arg)
-      # {Tetrex.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

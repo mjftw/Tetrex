@@ -14,13 +14,12 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    random_seed = Enum.random(0..10_000_000)
+    seed = Enum.random(0..10_000_000)
 
-    # TODO Store state elsewhere and pass in
-    {:ok, board_server} =
-      BoardServer.start_link(height: @board_height, width: @board_width, random_seed: random_seed)
+    # Using name registration for now as only one game
+    board_server = Tetrex.BoardServer
 
-    preview = BoardServer.preview(board_server)
+    preview = BoardServer.new(board_server, @board_height, @board_width, seed)
 
     socket =
       socket

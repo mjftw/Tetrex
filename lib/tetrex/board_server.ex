@@ -7,8 +7,15 @@ defmodule Tetrex.BoardServer do
   # Client API
 
   @spec start_link(init_args()) :: pid()
-  def start_link(board_opts \\ []) do
-    GenServer.start_link(__MODULE__, board_opts)
+  def start_link(opts \\ []) do
+    IO.inspect(opts, label: "Started board server")
+    GenServer.start_link(__MODULE__, [], opts)
+  end
+
+  @spec new(pid() | atom(), non_neg_integer(), non_neg_integer(), non_neg_integer()) ::
+          Board.board_preview()
+  def new(board_pid, height, width, seed) do
+    GenServer.call(board_pid, {:new, height, width, seed})
   end
 
   @spec preview(pid()) :: Board.board_preview()
@@ -50,14 +57,22 @@ defmodule Tetrex.BoardServer do
   def init(opts) do
     {:ok,
      Board.new(
-       Keyword.fetch!(opts, :height),
-       Keyword.fetch!(opts, :width),
-       Keyword.fetch!(opts, :random_seed)
+       Keyword.get(opts, :height, 20),
+       Keyword.get(opts, :width, 10),
+       Keyword.get(opts, :random_seed, Enum.random(0..10_000_000))
      )}
   end
 
   @impl true
   def handle_call(:preview, _from, board) do
+    preview = Board.preview(board)
+
+    {:reply, preview, board}
+  end
+
+  @impl true
+  def handle_call({:new, height, width, seed}, _from, _board) do
+    board = Board.new(height, width, seed)
     preview = Board.preview(board)
 
     {:reply, preview, board}
