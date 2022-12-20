@@ -52,7 +52,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
      |> assign(status: :playing)
      |> assign(board: preview)
      |> assign(score: 0)
-     |> push_event("pause-audio", %{id: @game_over_audio_id})
+     |> push_event("stop-audio", %{id: @game_over_audio_id})
      |> push_event("play-audio", %{id: @theme_music_audio_id})}
   end
 
@@ -82,7 +82,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
          socket
          |> assign(:board, preview)
          |> assign(:status, :game_over)
-         |> push_event("pause-audio", %{id: @theme_music_audio_id})
+         |> push_event("stop-audio", %{id: @theme_music_audio_id})
          |> push_event("play-audio", %{id: @game_over_audio_id})}
     end
   end
