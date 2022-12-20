@@ -1,13 +1,14 @@
 
 <div class="single-player-game" phx-window-keydown="keypress">
-  <Soundtrack.background id="theme-music-audio" src="audio/tetris-main-theme.mp3" />
+  <Soundtrack.background id={@theme_music_audio_id} src="audio/tetris-main-theme.mp3" loop/>
+  <Soundtrack.effect id={@game_over_audio_id} src="audio/game-over.mp3"/>
 
   <%= case @status do %>
     <% :intro -> %>
       <Modal.modal show>
         <div class="game-over-box">
           <b>Ready Player 1</b>
-          <button phx-click="start_game" phx-value-audio-id="theme-music-audio">Start</button>
+          <button phx-click="start_game">Start</button>
         </div>
     </Modal.modal>
     <% :game_over -> %>

@@ -8,4 +8,12 @@ defmodule TetrexWeb.Components.Soundtrack do
       </audio>
     """
   end
+
+  def effect(assigns) do
+    ~H"""
+      <audio id={@id} muted>
+        <source src={@src} type="audio/mpeg">
+      </audio>
+    """
+  end
 end

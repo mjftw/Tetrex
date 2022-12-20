@@ -9,6 +9,9 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   @board_height 20
   @board_width 10
 
+  @game_over_audio_id "game-over-audio"
+  @theme_music_audio_id "theme-music-audio"
+
   @impl true
   def mount(_params, _session, socket) do
     random_seed = Enum.random(0..10_000_000)
@@ -21,6 +24,8 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
     socket =
       socket
+      |> assign(game_over_audio_id: @game_over_audio_id)
+      |> assign(theme_music_audio_id: @theme_music_audio_id)
       |> assign(board_server: board_server)
       |> assign(board: preview)
       |> assign(score: 0)
@@ -30,8 +35,9 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   @impl true
-  def handle_event("start_game", %{"audio-id" => audio_id}, socket) do
-    {:noreply, socket |> assign(status: :playing) |> push_event("play-audio", %{id: audio_id})}
+  def handle_event("start_game", _value, socket) do
+    {:noreply,
+     socket |> assign(status: :playing) |> push_event("play-audio", %{id: @theme_music_audio_id})}
   end
 
   @impl true
@@ -64,7 +70,9 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         {:noreply,
          socket
          |> assign(:board, preview)
-         |> assign(:status, :game_over)}
+         |> assign(:status, :game_over)
+         |> push_event("pause-audio", %{id: @theme_music_audio_id})
+         |> push_event("play-audio", %{id: @game_over_audio_id})}
     end
   end
 
