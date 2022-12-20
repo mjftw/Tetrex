@@ -14,12 +14,12 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    seed = Enum.random(0..10_000_000)
+    {height, width, seed} = board_init_args()
 
     # Using name registration for now as only one game
     board_server = Tetrex.BoardServer
 
-    preview = BoardServer.new(board_server, @board_height, @board_width, seed)
+    preview = BoardServer.new(board_server, height, width, seed)
 
     socket =
       socket
@@ -41,7 +41,19 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket) do
-    {:noreply, socket |> push_redirect(to: Routes.live_path(socket, __MODULE__))}
+    {height, width, seed} = board_init_args()
+
+    # Start a new game
+    preview = BoardServer.new(socket.assigns.board_server, height, width, seed)
+
+    # TODO: Move to common function
+    {:noreply,
+     socket
+     |> assign(status: :playing)
+     |> assign(board: preview)
+     |> assign(score: 0)
+     |> push_event("pause-audio", %{id: @game_over_audio_id})
+     |> push_event("play-audio", %{id: @theme_music_audio_id})}
   end
 
   @impl true
@@ -107,5 +119,9 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   def handle_event("keypress", %{"key" => key}, socket) do
     IO.puts("Unhandled key press: #{key}")
     {:noreply, socket}
+  end
+
+  defp board_init_args do
+    {@board_height, @board_width, Enum.random(0..10_000_000)}
   end
 end
