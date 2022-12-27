@@ -10,6 +10,8 @@ defmodule Tetrex.Periodic do
 
   def stop_timer(pid), do: GenServer.cast(pid, :stop_timer)
 
+  def reset_timer(pid), do: GenServer.cast(pid, :reset_timer)
+
   def set_period(pid), do: GenServer.cast(pid, :set_period)
 
   def set_work(pid), do: GenServer.cast(pid, :set_work)
@@ -69,6 +71,13 @@ defmodule Tetrex.Periodic do
   def handle_cast(:stop_timer, %{timer_ref: timer_ref} = state) do
     Process.cancel_timer(timer_ref)
 
-    {:noreply, state}
+    {:noreply, %{state | timer_ref: nil}}
+  end
+
+  @impl true
+  def handle_cast(:reset_timer, %{timer_ref: timer_ref} = state) do
+    Process.cancel_timer(timer_ref)
+
+    {:noreply, %{state | timer_ref: nil}, {:continue, :start_timer}}
   end
 end
