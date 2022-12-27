@@ -19,30 +19,31 @@ defmodule Tetrex.Periodic do
   def init(args) do
     period_ms = Keyword.fetch!(args, :period_ms)
     work = Keyword.fetch!(args, :work)
-    running = Keyword.get(args, :start, false)
+    start = Keyword.get(args, :start, false)
 
-    {:ok,
-     %{
-       period_ms: period_ms,
-       running: running,
-       work: work
-     }, {:continue, :start_timer}}
+    state = %{
+      period_ms: period_ms,
+      work: work,
+      timer_ref: nil
+    }
+
+    if start do
+      {:ok, state, {:continue, :start_timer}}
+    else
+      {:ok, state}
+    end
   end
 
   @impl true
-  def handle_continue(:start_timer, %{period_ms: period_ms, running: running} = state) do
-    if running do
-      Process.send_after(self(), :send, period_ms)
-    end
+  def handle_continue(:start_timer, %{period_ms: period_ms} = state) do
+    timer_ref = Process.send_after(self(), :send, period_ms)
 
-    {:noreply, state}
+    {:noreply, %{state | timer_ref: timer_ref}}
   end
 
   @impl true
-  def handle_info(:send, %{running: running, work: work} = state) do
-    if(running) do
-      work.()
-    end
+  def handle_info(:send, %{work: work} = state) do
+    work.()
 
     # Requeue sending the msg by deferring to handle_continue
     {:noreply, state, {:continue, :start_timer}}
@@ -61,11 +62,13 @@ defmodule Tetrex.Periodic do
 
   @impl true
   def handle_cast(:start_timer, state) do
-    {:noreply, %{state | running: true}, {:continue, :start_timer}}
+    {:noreply, state, {:continue, :start_timer}}
   end
 
   @impl true
-  def handle_cast(:stop_timer, state) do
-    {:noreply, %{state | running: false}}
+  def handle_cast(:stop_timer, %{timer_ref: timer_ref} = state) do
+    Process.cancel_timer(timer_ref)
+
+    {:noreply, state}
   end
 end
