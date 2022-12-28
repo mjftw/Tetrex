@@ -55,6 +55,11 @@ defmodule Tetrex.BoardServer do
     GenServer.call(board_pid, :add_blocking_row)
   end
 
+  @spec remove_blocking_row(pid()) :: Board.board_preview()
+  def remove_blocking_row(board_pid) do
+    GenServer.call(board_pid, :remove_blocking_row)
+  end
+
   @spec hold(pid()) :: Board.board_preview()
   def hold(board_pid) do
     GenServer.call(board_pid, :hold)
@@ -142,6 +147,15 @@ defmodule Tetrex.BoardServer do
     new_board = Board.add_blocking_row(board)
     preview = Board.preview(new_board)
 
+    {:reply, preview, new_board}
+  end
+
+  @impl true
+  def handle_call(:remove_blocking_row, _from, board) do
+    new_board = Board.remove_blocking_row(board)
+    preview = Board.preview(new_board)
+
+    IO.inspect("REMOVE BLOCKIMG")
     {:reply, preview, new_board}
   end
 

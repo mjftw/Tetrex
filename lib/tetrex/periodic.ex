@@ -12,9 +12,10 @@ defmodule Tetrex.Periodic do
 
   def reset_timer(pid), do: GenServer.cast(pid, :reset_timer)
 
-  def set_period(pid), do: GenServer.cast(pid, :set_period)
+  def set_period(pid, period_ms) when is_integer(period_ms),
+    do: GenServer.cast(pid, {:set_period, period_ms})
 
-  def set_work(pid), do: GenServer.cast(pid, :set_work)
+  def set_work(pid, work) when is_function(work), do: GenServer.cast(pid, {:set_work, work})
 
   # Server code
   @impl true

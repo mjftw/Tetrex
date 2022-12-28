@@ -270,6 +270,37 @@ defmodule Tetrex.Board do
   end
 
   @doc """
+  Remove one blocking line from the bottom of the playfield, if there is one
+  """
+  @spec remove_blocking_row(board()) :: board()
+  def remove_blocking_row(board) do
+    has_blocking_row =
+      board.playfield
+      |> SparseGrid.mask(
+        {board.playfield_height - 1, 0},
+        {board.playfield_height - 1, board.playfield_width - 1}
+      )
+      |> SparseGrid.all?(&(&1 == @blocking_tile))
+
+    if has_blocking_row do
+      playfield =
+        board.playfield
+        |> SparseGrid.mask(
+          {0, 0},
+          {board.playfield_height - 2, board.playfield_width - 1}
+        )
+        |> SparseGrid.move({1, 0})
+
+      %__MODULE__{
+        board
+        | playfield: playfield
+      }
+    else
+      board
+    end
+  end
+
+  @doc """
   Apply a transform function to the active tile, checking that doing so would
   cause it to collide with the playfield or be outside the playfield.
   """

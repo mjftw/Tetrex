@@ -37,7 +37,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     #       rows in a more intelligent way.
     Tetrex.Periodic.start_link(
       [
-        period_ms: 10000,
+        period_ms: 15000,
         start: true,
         work: fn ->
           Process.send(this_liveview, :add_blocking_row, [])
@@ -109,7 +109,9 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         {preview, lines_cleared} when preview.active_tile_fits ->
           socket
           |> assign(:board, preview)
-          |> update(:score, &(&1 + lines_cleared))
+          |> update(:lines_cleared, &(&1 + lines_cleared))
+          |> update_level()
+          |> maybe_remove_blocking(lines_cleared)
 
         # Game over :-(
         {preview, _} ->
@@ -166,7 +168,9 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       {_, preview, lines_cleared} when preview.active_tile_fits ->
         socket
         |> assign(:board, preview)
-        |> update(:score, &(&1 + lines_cleared))
+        |> update(:lines_cleared, &(&1 + lines_cleared))
+        |> update_level()
+        |> maybe_remove_blocking(lines_cleared)
 
       # Game over :-(
       {_, preview, _} ->
@@ -204,7 +208,8 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     socket =
       socket
       |> assign(:board, preview)
-      |> assign(score: 0)
+      |> assign(lines_cleared: 0)
+      |> update_level()
       |> push_event("stop-audio", %{id: @game_over_audio_id})
 
     socket =
@@ -215,5 +220,52 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       end
 
     socket
+  end
+
+  defp maybe_remove_blocking(socket, lines_cleared) do
+    if lines_cleared >= 4 do
+      BoardServer.remove_blocking_row(socket.assigns.board_server)
+    end
+
+    socket
+  end
+
+  defp update_level(socket) do
+    speed =
+      socket.assigns.lines_cleared
+      |> level()
+      |> level_speed()
+
+    Periodic.set_period(socket.assigns.periodic_mover, floor(speed * 1000))
+
+    socket
+  end
+
+  defp level(lines_cleared) do
+    div(lines_cleared, 10)
+  end
+
+  defp level_speed(level) do
+    # For explanation see: https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
+    frames_per_gridcell =
+      case level do
+        0 -> 48
+        1 -> 43
+        2 -> 38
+        3 -> 33
+        4 -> 28
+        5 -> 23
+        6 -> 18
+        7 -> 13
+        8 -> 8
+        9 -> 6
+        _ when 10 <= level and level <= 12 -> 5
+        _ when 13 <= level and level <= 15 -> 4
+        _ when 16 <= level and level <= 18 -> 3
+        _ when 19 <= level and level <= 28 -> 2
+        _ -> 1
+      end
+
+    frames_per_gridcell / 60
   end
 end

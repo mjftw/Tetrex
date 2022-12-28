@@ -807,6 +807,61 @@ defmodule Tetrex.Board.Test do
     assert moved == expected
   end
 
+  test "remove_blocking_row/2 remove a blocking row from bottom of playfield when there is one" do
+    board = %{
+      Board.new(6, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [:a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [nil, :a, nil],
+            [:a, nil, nil],
+            [nil, :a, nil],
+            [:blocking, :blocking, :blocking]
+          ])
+    }
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [],
+        [],
+        [nil, :a, nil],
+        [:a, nil, nil],
+        [nil, :a, nil]
+      ])
+
+    %{playfield: moved} = Board.remove_blocking_row(board)
+
+    assert moved == expected
+  end
+
+  test "remove_blocking_row/2 not modify playfield when no blocking row" do
+    board = %{
+      Board.new(5, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [:a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [nil, :a, nil],
+            [:a, nil, nil],
+            [nil, :a, nil]
+          ])
+    }
+
+    %{playfield: not_moved} = Board.remove_blocking_row(board)
+
+    assert not_moved == board.playfield
+  end
+
   test "preview/1 should return flattened view of board when active tile fits" do
     board = %{
       Board.new(3, 3, 0)

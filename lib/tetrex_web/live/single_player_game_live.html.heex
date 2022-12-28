@@ -15,7 +15,7 @@
       <Modal.modal show>
         <div class="game-over-box">
           <h1>Game Over</h1>
-          <h2>Score: <%= @score%></h2>
+          <h2>Score: <%= @lines_cleared%></h2>
           <br/>
           Press enter to play again
         </div>
@@ -23,7 +23,7 @@
     <% _ -> %>
   <% end %>
 
-  <BoardComponents.score_box score={@score}/>
+  <BoardComponents.score_box score={@lines_cleared}/>
   <div class="board">
     <BoardComponents.hold_tile_box board={@board}/>
     <BoardComponents.playfield board={@board}/>
