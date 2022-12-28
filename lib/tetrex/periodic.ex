@@ -69,15 +69,18 @@ defmodule Tetrex.Periodic do
 
   @impl true
   def handle_cast(:stop_timer, %{timer_ref: timer_ref} = state) do
-    Process.cancel_timer(timer_ref)
+    cancel_timer(timer_ref)
 
     {:noreply, %{state | timer_ref: nil}}
   end
 
   @impl true
   def handle_cast(:reset_timer, %{timer_ref: timer_ref} = state) do
-    Process.cancel_timer(timer_ref)
+    cancel_timer(timer_ref)
 
     {:noreply, %{state | timer_ref: nil}, {:continue, :start_timer}}
   end
+
+  defp cancel_timer(timer_ref) when timer_ref == nil, do: :not_timer
+  defp cancel_timer(timer_ref) when timer_ref != nil, do: Process.cancel_timer(timer_ref)
 end
