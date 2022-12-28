@@ -39,6 +39,12 @@ defmodule Tetrex.BoardServer do
     GenServer.call(board_pid, :try_move_down)
   end
 
+  @spec try_drop(pid()) ::
+          {Board.movement_result(), Board.board_preview(), non_neg_integer()}
+  def try_drop(board_pid) do
+    GenServer.call(board_pid, :try_drop)
+  end
+
   @spec rotate(pid()) :: Board.board_preview()
   def rotate(board_pid) do
     GenServer.call(board_pid, :rotate)
@@ -97,6 +103,14 @@ defmodule Tetrex.BoardServer do
   @impl true
   def handle_call(:try_move_down, _from, board) do
     {status, new_board, num_lines_cleared} = Board.try_move_active_down(board)
+    preview = Board.preview(new_board)
+
+    {:reply, {status, preview, num_lines_cleared}, new_board}
+  end
+
+  @impl true
+  def handle_call(:try_drop, _from, board) do
+    {status, new_board, num_lines_cleared} = Board.try_drop(board)
     preview = Board.preview(new_board)
 
     {:reply, {status, preview, num_lines_cleared}, new_board}

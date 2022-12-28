@@ -62,7 +62,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     # Reset the move timer so we don't get double moves
     Periodic.reset_timer(socket.assigns.periodic_mover)
 
-    try_move_down(socket)
+    {:noreply, try_movement(socket, &BoardServer.try_move_down/1)}
   end
 
   @impl true
@@ -88,6 +88,10 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   @impl true
+  def handle_event("keypress", %{"key" => " "}, socket),
+    do: {:noreply, try_movement(socket, &BoardServer.try_drop/1)}
+
+  @impl true
   def handle_event("keypress", %{"key" => "h"}, socket) do
     preview = BoardServer.hold(socket.assigns.board_server)
     {:noreply, assign(socket, :board, preview)}
@@ -100,29 +104,27 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   @impl true
-  def handle_info(:try_move_down, socket), do: try_move_down(socket)
+  def handle_info(:try_move_down, socket),
+    do: {:noreply, try_movement(socket, &BoardServer.try_move_down/1)}
 
-  defp try_move_down(socket) do
-    case BoardServer.try_move_down(socket.assigns.board_server) do
+  defp try_movement(socket, move_fn) do
+    case move_fn.(socket.assigns.board_server) do
       # Moved without collision
       {:moved, preview, _} ->
-        {:noreply,
-         socket
-         |> assign(:board, preview)}
+        socket
+        |> assign(:board, preview)
 
       # Failed to move piece, which means it hit the bottom or another piece
       {_, preview, lines_cleared} when preview.active_tile_fits ->
-        {:noreply,
-         socket
-         |> assign(:board, preview)
-         |> update(:score, &(&1 + lines_cleared))}
+        socket
+        |> assign(:board, preview)
+        |> update(:score, &(&1 + lines_cleared))
 
       # Game over :-(
       {_, preview, _} ->
-        {:noreply,
-         socket
-         |> assign(:board, preview)
-         |> game_over()}
+        socket
+        |> assign(:board, preview)
+        |> game_over()
     end
   end
 

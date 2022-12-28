@@ -394,6 +394,43 @@ defmodule Tetrex.Board.Test do
     assert num_rows_cleared == 2
   end
 
+  test "try_drop/1 move active tile to lowest possible position" do
+    board = %{
+      Board.new(5, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [:a],
+            [:a, :a],
+            [:a],
+            []
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            [],
+            [nil, :c, :c],
+            [:b, :b]
+          ])
+    }
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [],
+        [],
+        [:a],
+        [:a, :a],
+        [:b, :b]
+      ])
+
+    {:collision, moved, 1} = Board.try_drop(board)
+
+    assert moved.playfield == expected
+  end
+
   test "try_move_active_left/1 should move the active tile left by one if legal" do
     board = %{
       Board.new(1, 3, 0)

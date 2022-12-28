@@ -144,6 +144,20 @@ defmodule Tetrex.Board do
   end
 
   @doc """
+  Attempt to move the active tile down until it collides with another tile.
+  See try_move_active_down for more info.
+  """
+  @spec try_drop(board()) :: {movement_result(), board(), non_neg_integer()}
+  def try_drop(board) do
+    board
+    |> try_move_active_down()
+    |> try_drop_loop()
+  end
+
+  defp try_drop_loop({:moved, board, _}), do: try_drop(board)
+  defp try_drop_loop(result), do: result
+
+  @doc """
   Move the active_tile left on the playfield by one square.
   If doing so would result in a collision or the tile moving off the board the tile is not moved.
   """
