@@ -55,6 +55,7 @@ defmodule TetrexWeb.Components.BoardComponents do
   defp tile_class_suffix(:purple), do: "purple"
   defp tile_class_suffix(:orange), do: "orange"
   defp tile_class_suffix(:grey), do: "grey"
+  defp tile_class_suffix(:drop_preview), do: "preview"
   defp tile_class_suffix(nil), do: "empty"
 
   defp centre_single_tile(tile), do: SparseGrid.align(tile, :centre, {0, 0}, {3, 3})

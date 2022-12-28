@@ -109,6 +109,15 @@
     height: var(--tile-square-size);
 }
 
+.tetris-tile-preview {
+    background-color: none;
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgba(0,0,0, 0.15);
+    width: var(--tile-square-size);
+    height: var(--tile-square-size);
+}
+
 .game-over-box {
     display: flex;
     align-items: center;

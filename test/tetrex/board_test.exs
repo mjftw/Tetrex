@@ -426,7 +426,7 @@ defmodule Tetrex.Board.Test do
         [:b, :b]
       ])
 
-    {:collision, moved, 1} = Board.try_drop(board)
+    {moved, 1} = Board.drop_active(board)
 
     assert moved.playfield == expected
   end
@@ -779,6 +779,51 @@ defmodule Tetrex.Board.Test do
         ]),
       active_tile_fits: true
     }
+
+    assert previewed == expected
+  end
+
+  test "preview/1 should return flattened view with drop preview when active tile fits" do
+    board = %{
+      Board.new(3, 3, 0)
+      | hold_tile:
+          Tetrex.SparseGrid.new([
+            [:h]
+          ]),
+        next_tile:
+          Tetrex.SparseGrid.new([
+            [:n]
+          ]),
+        active_tile:
+          Tetrex.SparseGrid.new([
+            [nil, :a, nil],
+            [nil, :a, :a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            [],
+            [:p, nil, :p],
+            [:p, :p, :p]
+          ])
+    }
+
+    %{playfield: previewed} = Board.preview(board)
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [nil, :a, nil],
+        [nil, :a, :a],
+        [nil, :drop_preview, nil],
+        [nil, :drop_preview, :drop_preview],
+        [:p, nil, :p],
+        [:p, :p, :p]
+      ])
+
+    IO.inspect(previewed, label: "previewed")
+    IO.inspect(expected, label: "expected")
 
     assert previewed == expected
   end

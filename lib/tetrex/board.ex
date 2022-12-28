@@ -144,18 +144,27 @@ defmodule Tetrex.Board do
   end
 
   @doc """
-  Attempt to move the active tile down until it collides with another tile.
-  See try_move_active_down for more info.
+  Move the active tile down until it collides with another tile.
+  If doing so would cause it to collide with tiles on the playfield or it's at the bottom then fix
+  the active_tile to the playfield and draw a new one.
+  If fixing the active_tile to the playfield results in completed rows, these rows are cleared.
+  The return value is a {new_board, number_of_rows_cleared}
   """
-  @spec try_drop(board()) :: {movement_result(), board(), non_neg_integer()}
-  def try_drop(board) do
+  @spec drop_active(board()) :: board()
+  def drop_active(board) do
     board
-    |> try_move_active_down()
-    |> try_drop_loop()
+    |> drop_active_no_merge()
+    |> merge_active_tile()
+    |> draw_next_tile()
+    |> clear_completed_rows()
   end
 
-  defp try_drop_loop({:moved, board, _}), do: try_drop(board)
-  defp try_drop_loop(result), do: result
+  defp drop_active_no_merge(board) do
+    case try_move_active_if_legal(board, &SparseGrid.move(&1, {1, 0})) do
+      {:ok, new_board} -> drop_active_no_merge(new_board)
+      {:error, err} -> board
+    end
+  end
 
   @doc """
   Move the active_tile left on the playfield by one square.
@@ -263,8 +272,16 @@ defmodule Tetrex.Board do
   def preview(board) do
     case SparseGrid.overlaps?(board.active_tile, board.playfield) do
       false ->
+        %{active_tile: dropped} = drop_active_no_merge(board)
+
+        playfield =
+          dropped
+          |> SparseGrid.replace(:drop_preview)
+          |> SparseGrid.merge(board.playfield)
+          |> SparseGrid.merge(board.active_tile)
+
         %{
-          playfield: SparseGrid.merge(board.playfield, board.active_tile),
+          playfield: playfield,
           next_tile: board.next_tile,
           hold_tile: board.hold_tile,
           playfield_height: board.playfield_height,
