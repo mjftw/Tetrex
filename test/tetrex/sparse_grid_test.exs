@@ -1006,6 +1006,50 @@ defmodule SparseGrid.Test do
     assert !SparseGrid.filled?(grid, {1, 0}, {1, 2})
   end
 
+  test "all?/2 should return true if the predicate is true for every value (arity 1 predicate)" do
+    grid =
+      SparseGrid.new([
+        [],
+        [:a],
+        [:a, :a, :a]
+      ])
+
+    assert SparseGrid.all?(grid, fn value -> value == :a end)
+  end
+
+  test "all?/2 should return false if the predicate is false for any value (arity 1 predicate)" do
+    grid =
+      SparseGrid.new([
+        [],
+        [:a],
+        [:a, :b, :a]
+      ])
+
+    assert !SparseGrid.all?(grid, fn value -> value == :a end)
+  end
+
+  test "all?/2 should return true if the predicate is true for every value (arity 2 predicate)" do
+    grid =
+      SparseGrid.new([
+        [],
+        [0],
+        [0, 1, 2]
+      ])
+
+    assert SparseGrid.all?(grid, fn {y, x}, value -> value == x end)
+  end
+
+  test "all?/2 should return false if the predicate is false for any value (arity 2 predicate)" do
+    grid =
+      SparseGrid.new([
+        [],
+        [0],
+        [0, 1, :foo]
+      ])
+
+    assert !SparseGrid.all?(grid, fn {y, x}, value -> value == x end)
+  end
+
   test "Inspect implementation should pretty print a grid" do
     grid =
       SparseGrid.new([

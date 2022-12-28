@@ -352,6 +352,22 @@ defmodule Tetrex.SparseGrid do
     )
   end
 
+  @doc """
+  Runs a given predicate function on every element in the grid and returns
+  true only if predicate returns true for every element.
+  The predicate function can either one argument, the value to test, or two,
+  the coordinate and value to test.
+  """
+  @spec all?(sparse_grid(), (any() -> boolean())) :: boolean()
+  def all?(grid, predicate) when is_function(predicate, 1) do
+    Enum.all?(grid.values, fn {_coord, value} -> predicate.(value) end)
+  end
+
+  @spec all?(sparse_grid(), (coordinate(), any() -> boolean())) :: boolean()
+  def all?(grid, predicate) when is_function(predicate, 2) do
+    Enum.all?(grid.values, fn {coord, value} -> predicate.(coord, value) end)
+  end
+
   @spec next_coordinate_generator(coordinate(), {y(), x()}, {y(), x()}) ::
           {:continue, coordinate()} | :stop
   defp next_coordinate_generator({y, x}, min_x, {max_y, max_x}) do
