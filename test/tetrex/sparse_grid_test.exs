@@ -1016,6 +1016,7 @@ defmodule SparseGrid.Test do
       ])
 
     expected = """
+
       x    0         1         2
     y ┼─────────┼─────────┼─────────┤
     0 │         │         │    1    │
@@ -1046,6 +1047,7 @@ defmodule SparseGrid.Test do
       |> SparseGrid.move({-2, -1})
 
     expected = """
+
        x   -1         0         1
      y ┼─────────┼─────────┼─────────┤
     -2 │         │         │    1    │
@@ -1075,6 +1077,7 @@ defmodule SparseGrid.Test do
       |> SparseGrid.move({-10000, 10000})
 
     expected = """
+
            x 10000   10001
          y ┼───────┼───────┤
     -10000 │   a   │       │
