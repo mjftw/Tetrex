@@ -7,6 +7,8 @@ defmodule Tetrex.Board do
 
   @tile_bag_size 9999
 
+  @blocking_tile :blocking
+
   @enforce_keys [
     :playfield,
     :playfield_height,
@@ -80,9 +82,16 @@ defmodule Tetrex.Board do
           row_start = {row_num, 0}
           row_end = {row_num, board.playfield_width - 1}
 
-          row_is_filled = SparseGrid.filled?(playfield, row_start, row_end)
+          row_filled = SparseGrid.filled?(playfield, row_start, row_end)
 
-          case {row_is_filled, row_num} do
+          blocking_row =
+            playfield
+            |> SparseGrid.mask(row_start, row_end)
+            |> SparseGrid.all?(&(&1 == @blocking_tile))
+
+          should_clear_row = row_filled && !blocking_row
+
+          case {should_clear_row, row_num} do
             {false, _} ->
               # Row not filled, skip
               {playfield, num_rows_cleared}
@@ -235,6 +244,29 @@ defmodule Tetrex.Board do
       {:ok, new_board} -> new_board
       :could_not_rotate -> board
     end
+  end
+
+  @doc """
+  Push the playfield up by adding a row to the bottom
+  """
+  @spec add_blocking_row(board()) :: board()
+  def add_blocking_row(board) do
+    blocking_row =
+      SparseGrid.fill(
+        @blocking_tile,
+        {board.playfield_height - 1, 0},
+        {board.playfield_height - 1, board.playfield_width - 1}
+      )
+
+    playfield =
+      board.playfield
+      |> SparseGrid.move({-1, 0})
+      |> SparseGrid.merge(blocking_row)
+
+    %__MODULE__{
+      board
+      | playfield: playfield
+    }
   end
 
   @doc """

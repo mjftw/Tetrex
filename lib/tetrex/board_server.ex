@@ -50,6 +50,11 @@ defmodule Tetrex.BoardServer do
     GenServer.call(board_pid, :rotate)
   end
 
+  @spec add_blocking_row(pid()) :: Board.board_preview()
+  def add_blocking_row(board_pid) do
+    GenServer.call(board_pid, :add_blocking_row)
+  end
+
   @spec hold(pid()) :: Board.board_preview()
   def hold(board_pid) do
     GenServer.call(board_pid, :hold)
@@ -127,6 +132,14 @@ defmodule Tetrex.BoardServer do
   @impl true
   def handle_call(:hold, _from, board) do
     new_board = Board.hold_active(board)
+    preview = Board.preview(new_board)
+
+    {:reply, preview, new_board}
+  end
+
+  @impl true
+  def handle_call(:add_blocking_row, _from, board) do
+    new_board = Board.add_blocking_row(board)
     preview = Board.preview(new_board)
 
     {:reply, preview, new_board}

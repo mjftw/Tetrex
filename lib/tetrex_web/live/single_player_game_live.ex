@@ -33,6 +33,20 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         []
       )
 
+    # TODO: Remove this temporary timer in favour of adding blocking
+    #       rows in a more intelligent way.
+    Tetrex.Periodic.start_link(
+      [
+        period_ms: 10000,
+        start: true,
+        work: fn ->
+          Process.send(this_liveview, :add_blocking_row, [])
+        end,
+        to: board_server
+      ],
+      []
+    )
+
     socket =
       socket
       |> assign(game_over_audio_id: @game_over_audio_id)
@@ -122,6 +136,24 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   @impl true
   def handle_info(:try_move_down, socket),
     do: {:noreply, try_move_down(socket)}
+
+  @impl true
+  def handle_info(:add_blocking_row, socket) do
+    socket =
+      case BoardServer.add_blocking_row(socket.assigns.board_server) do
+        preview when preview.active_tile_fits ->
+          socket
+          |> assign(:board, preview)
+
+        # Game over :-(
+        preview ->
+          socket
+          |> assign(:board, preview)
+          |> game_over()
+      end
+
+    {:noreply, socket}
+  end
 
   defp try_move_down(socket) do
     case BoardServer.try_move_down(socket.assigns.board_server) do

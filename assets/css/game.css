@@ -97,8 +97,11 @@
     height: var(--tile-square-size);
 }
 
-.tetris-tile-grey {
-    background-color: grey;
+.tetris-tile-blocking {
+    background-color: rgb(60, 60, 60);
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(40, 40, 40);
     width: var(--tile-square-size);
     height: var(--tile-square-size);
 }

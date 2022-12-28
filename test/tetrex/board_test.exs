@@ -394,9 +394,44 @@ defmodule Tetrex.Board.Test do
     assert num_rows_cleared == 2
   end
 
+  test "try_move_active_down/1 should not clear blocking tiles" do
+    board = %{
+      Board.new(6, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [],
+            [:a],
+            [:a, :a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [nil, nil, :b],
+            [nil, nil, :b],
+            [nil, :b, :b],
+            [:b, :b, nil],
+            [:blocking, :blocking, :blocking]
+          ])
+    }
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [nil, nil, :b],
+        [:a, :a, :b],
+        [nil, :b, :b],
+        [:b, :b, nil],
+        [:blocking, :blocking, :blocking]
+      ])
+
+    {_, moved, _} = Board.try_move_active_down(board)
+
+    assert moved.playfield == expected
+  end
+
   test "try_drop/1 move active tile to lowest possible position" do
     board = %{
-      Board.new(5, 3, 0)
+      Board.new(6, 3, 0)
       | active_tile:
           Tetrex.SparseGrid.new([
             [],
@@ -739,6 +774,39 @@ defmodule Tetrex.Board.Test do
     assert not_rotated == board
   end
 
+  test "add_blocking_row/2 should push playfield up and add a row to the bottom" do
+    board = %{
+      Board.new(6, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [:a]
+          ]),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            [nil, :a, nil],
+            [:a, nil, nil],
+            [nil, :a, nil]
+          ])
+    }
+
+    expected =
+      Tetrex.SparseGrid.new([
+        [],
+        [],
+        [nil, :a, nil],
+        [:a, nil, nil],
+        [nil, :a, nil],
+        [:blocking, :blocking, :blocking]
+      ])
+
+    %{playfield: moved} = Board.add_blocking_row(board)
+
+    assert moved == expected
+  end
+
   test "preview/1 should return flattened view of board when active tile fits" do
     board = %{
       Board.new(3, 3, 0)
@@ -785,7 +853,7 @@ defmodule Tetrex.Board.Test do
 
   test "preview/1 should return flattened view with drop preview when active tile fits" do
     board = %{
-      Board.new(3, 3, 0)
+      Board.new(6, 3, 0)
       | hold_tile:
           Tetrex.SparseGrid.new([
             [:h]
@@ -821,9 +889,6 @@ defmodule Tetrex.Board.Test do
         [:p, nil, :p],
         [:p, :p, :p]
       ])
-
-    IO.inspect(previewed, label: "previewed")
-    IO.inspect(expected, label: "expected")
 
     assert previewed == expected
   end
