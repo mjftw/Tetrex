@@ -953,6 +953,26 @@ defmodule SparseGrid.Test do
     assert cleared == expected
   end
 
+  test "replace/2 should replace all values with a given value" do
+    grid =
+      SparseGrid.new([
+        [:a, "f", 2],
+        [nil, :x, "1"],
+        [],
+        [:z]
+      ])
+
+    expected =
+      SparseGrid.new([
+        [:q, :q, :q],
+        [nil, :q, :q],
+        [],
+        [:q]
+      ])
+
+    assert SparseGrid.replace(grid, :q) == expected
+  end
+
   test "filled?/3 should return true if all cells in the bounding box are filled" do
     grid =
       SparseGrid.new([

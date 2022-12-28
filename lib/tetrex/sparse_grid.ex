@@ -327,6 +327,17 @@ defmodule Tetrex.SparseGrid do
   end
 
   @doc """
+  Replace all entries in the grid with a given value
+  """
+  @spec replace(sparse_grid(), any()) :: sparse_grid()
+  def replace(grid, value) do
+    grid.values
+    |> Enum.map(fn {coord, _} -> {coord, value} end)
+    |> Map.new()
+    |> new()
+  end
+
+  @doc """
   Check whether all grid cells in a given bounding box have a value.
   """
   @spec filled?(sparse_grid(), {y(), x()}, {y(), x()}) :: boolean()
