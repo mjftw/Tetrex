@@ -33,20 +33,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         []
       )
 
-    # TODO: Remove this temporary timer in favour of adding blocking
-    #       rows in a more intelligent way.
-    Tetrex.Periodic.start_link(
-      [
-        period_ms: 15000,
-        start: true,
-        work: fn ->
-          Process.send(this_liveview, :add_blocking_row, [])
-        end,
-        to: board_server
-      ],
-      []
-    )
-
     socket =
       socket
       |> assign(game_over_audio_id: @game_over_audio_id)
