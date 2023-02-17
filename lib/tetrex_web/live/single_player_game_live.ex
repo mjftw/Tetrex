@@ -29,8 +29,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
           start: false,
           work: fn ->
             Process.send(this_liveview, :try_move_down, [])
-          end,
-          to: board_server
+          end
         ],
         []
       )
