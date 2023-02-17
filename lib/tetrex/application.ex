@@ -9,7 +9,7 @@ defmodule Tetrex.Application do
   def start(_type, _args) do
     children = [
       # Create a singleton game state instance
-      {Registry, keys: :unique, name: Tetrex.BoardRegistry},
+      {Registry, keys: :unique, name: Tetrex.GameRegistry},
       # Start the Ecto repository
       Tetrex.Repo,
       # Start the Telemetry supervisor

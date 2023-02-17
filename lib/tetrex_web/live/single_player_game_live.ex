@@ -1,6 +1,8 @@
 defmodule TetrexWeb.SinglePlayerGameLive do
   use TetrexWeb, :live_view
 
+  alias Tetrex.GameServer
+  alias Tetrex.Game
   alias Tetrex.Periodic
   alias TetrexWeb.Components.BoardComponents
   alias Tetrex.BoardServer
@@ -15,24 +17,22 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    user_id = 1
+    player_id = 1
     # Should only ever be one game in progress, error if more
-    [{board_server, _}] = Registry.lookup(Tetrex.BoardRegistry, user_id)
+    [{game_server, _}] = Registry.lookup(Tetrex.GameRegistry, player_id)
+
+    %Game{
+      board_pid: board_server,
+      periodic_mover_pid: periodic_mover
+    } = GameServer.game(game_server)
 
     this_liveview = self()
 
-    # Create a periodic task to move the piece down
-    {:ok, periodic_mover} =
-      Tetrex.Periodic.start_link(
-        [
-          period_ms: 1000,
-          start: false,
-          work: fn ->
-            Process.send(this_liveview, :try_move_down, [])
-          end
-        ],
-        []
-      )
+    # Set the periodic task to move the piece down
+
+    Tetrex.Periodic.set_work(periodic_mover, fn ->
+      Process.send(this_liveview, :try_move_down, [])
+    end)
 
     socket =
       socket

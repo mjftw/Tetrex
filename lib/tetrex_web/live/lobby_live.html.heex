@@ -1,6 +1,6 @@
 <h1>Lobby</h1>
 
-<%= if @user_has_board do %>
+<%= if @user_has_game do %>
     <button phx-click="resume-single-player-game">Resume single player game</button>
 <% else %>
     <button phx-click="new-single-player-game">Start single player game</button>
