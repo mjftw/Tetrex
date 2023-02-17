@@ -29,15 +29,16 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     this_liveview = self()
 
     # Set the periodic task to move the piece down
-
     Tetrex.Periodic.set_work(periodic_mover, fn ->
       Process.send(this_liveview, :try_move_down, [])
     end)
 
     socket =
       socket
+      |> assign(game_server: game_server)
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
+      |> game_assigns()
       |> assign(board_server: board_server)
       |> assign(periodic_mover: periodic_mover)
       |> new_game()
@@ -50,8 +51,18 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket) do
-    # TODO: Move to common function
-    {:noreply, new_game(socket, true)}
+    # TODO: Don't pass these in here, use defaults from function
+    BoardServer.new(
+      socket.assigns.board_server,
+      @board_height,
+      @board_width,
+      Enum.random(0..10_000_000)
+    )
+
+    {:noreply,
+     socket
+     |> new_game(true)
+     |> game_assigns()}
   end
 
   @impl true
@@ -94,17 +105,18 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       case BoardServer.drop(socket.assigns.board_server) do
         # Failed to move piece, which means it hit the bottom or another piece
         {preview, lines_cleared} when preview.active_tile_fits ->
+          GameServer.update_lines_cleared(socket.assigns.game_server, &(&1 + lines_cleared))
+
           socket
-          |> assign(:board, preview)
-          |> update(:lines_cleared, &(&1 + lines_cleared))
           |> update_level()
           |> maybe_remove_blocking(lines_cleared)
+          |> game_assigns()
 
         # Game over :-(
-        {preview, _} ->
+        _ ->
           socket
-          |> assign(:board, preview)
           |> game_over()
+          |> game_assigns()
       end
 
     {:noreply, socket}
@@ -132,13 +144,13 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       case BoardServer.add_blocking_row(socket.assigns.board_server) do
         preview when preview.active_tile_fits ->
           socket
-          |> assign(:board, preview)
+          |> game_assigns()
 
         # Game over :-(
-        preview ->
+        _ ->
           socket
-          |> assign(:board, preview)
           |> game_over()
+          |> game_assigns()
       end
 
     {:noreply, socket}
@@ -147,23 +159,24 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   defp try_move_down(socket) do
     case BoardServer.try_move_down(socket.assigns.board_server) do
       # Moved without collision
-      {:moved, preview, _} ->
+      {:moved, _, _} ->
         socket
-        |> assign(:board, preview)
+        |> game_assigns()
 
       # Failed to move piece, which means it hit the bottom or another piece
       {_, preview, lines_cleared} when preview.active_tile_fits ->
+        GameServer.update_lines_cleared(socket.assigns.game_server, &(&1 + lines_cleared))
+
         socket
-        |> assign(:board, preview)
-        |> update(:lines_cleared, &(&1 + lines_cleared))
         |> update_level()
         |> maybe_remove_blocking(lines_cleared)
+        |> game_assigns()
 
       # Game over :-(
-      {_, preview, _} ->
+      _ ->
         socket
-        |> assign(:board, preview)
         |> game_over()
+        |> game_assigns()
     end
   end
 
@@ -171,38 +184,40 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     # Stop sending periodic moves
     Periodic.stop_timer(socket.assigns.periodic_mover)
 
+    GameServer.set_status(socket.assigns.game_server, :game_over)
+
     socket
-    |> assign(:status, :game_over)
     |> push_event("stop-audio", %{id: @theme_music_audio_id})
     |> push_event("play-audio", %{id: @game_over_audio_id})
+    |> game_assigns()
   end
 
-  defp start_game(socket) do
+  defp start_game(%{assigns: %{game_server: game_server}} = socket) do
     # Start sending periodic moves
     Periodic.start_timer(socket.assigns.periodic_mover)
 
+    GameServer.set_status(game_server, :playing)
+
     socket
-    |> assign(status: :playing)
     |> push_event("play-audio", %{id: @theme_music_audio_id})
   end
 
   defp new_game(socket, is_playing \\ false) do
-    preview = BoardServer.preview(socket.assigns.board_server)
-
-    # TODO: This should all be stored in the Game struct, along with the board
-    #       and NOT be on the socket props!!!
     socket =
       socket
-      |> assign(:board, preview)
-      |> assign(lines_cleared: 0)
       |> update_level()
       |> push_event("stop-audio", %{id: @game_over_audio_id})
 
     socket =
       if is_playing do
-        socket |> start_game()
+        socket
+        |> game_assigns()
+        |> start_game()
       else
-        socket |> assign(:status, :intro)
+        GameServer.set_status(socket.assigns.game_server, :intro)
+
+        socket
+        |> game_assigns()
       end
 
     socket
@@ -214,6 +229,21 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     end
 
     socket
+  end
+
+  defp game_assigns(socket) do
+    %Game{
+      board_pid: board_server,
+      lines_cleared: lines_cleared,
+      status: status
+    } = GameServer.game(socket.assigns.game_server)
+
+    preview = BoardServer.preview(board_server)
+
+    socket
+    |> assign(:board, preview)
+    |> assign(:lines_cleared, lines_cleared)
+    |> assign(:status, status)
   end
 
   defp update_level(socket) do
