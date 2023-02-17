@@ -8,8 +8,12 @@ defmodule Tetrex.BoardServer do
 
   @spec start_link(init_args()) :: pid()
   def start_link(opts \\ []) do
-    IO.inspect(opts, label: "Started board server")
     GenServer.start_link(__MODULE__, [], opts)
+  end
+
+  @spec start(init_args()) :: pid()
+  def start(opts \\ []) do
+    GenServer.start(__MODULE__, [], opts)
   end
 
   @spec new(pid() | atom(), non_neg_integer(), non_neg_integer(), non_neg_integer()) ::

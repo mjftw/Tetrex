@@ -14,10 +14,13 @@ defmodule TetrexWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", TetrexWeb do
-    pipe_through :browser
+  live_session :default do
+    scope "/", TetrexWeb do
+      pipe_through :browser
 
-    live "/", SinglePlayerGameLive
+      live "/single-player-game", SinglePlayerGameLive
+      live "/", LobbyLive
+    end
   end
 
   # Other scopes may use custom stacks.

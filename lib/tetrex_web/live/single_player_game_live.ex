@@ -15,8 +15,10 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    # Using name registration for now as only one game
-    board_server = Tetrex.BoardServer
+    user_id = 1
+    # Should only ever be one game in progress, error if more
+    [{board_server, _}] = Registry.lookup(Tetrex.BoardRegistry, user_id)
+
     this_liveview = self()
 
     # Create a periodic task to move the piece down
@@ -186,11 +188,10 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   defp new_game(socket, is_playing \\ false) do
-    seed = Enum.random(0..10_000_000)
+    preview = BoardServer.preview(socket.assigns.board_server)
 
-    # Start a new game
-    preview = BoardServer.new(socket.assigns.board_server, @board_height, @board_width, seed)
-
+    # TODO: This should all be stored in the Game struct, along with the board
+    #       and NOT be on the socket props!!!
     socket =
       socket
       |> assign(:board, preview)
