@@ -20,7 +20,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
     %Game{
       periodic_mover_pid: periodic_mover
-    } = GameServer.game(game_server)
+    } = GameServer.game(game_server) |> dbg()
 
     this_liveview = self()
 
@@ -36,6 +36,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
       |> game_assigns()
+      |> pause_game_if_playing()
 
     {:ok, socket}
   end
@@ -197,7 +198,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
     socket
     |> play_theme_audio()
-    |> game_assigns()
   end
 
   defp pause_game(%{assigns: %{game_server: game_server}} = socket) do
@@ -207,6 +207,13 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> pause_theme_audio()
     |> game_assigns()
   end
+
+  defp pause_game_if_playing(%{assigns: %{status: :playing}} = socket),
+    do:
+      socket
+      |> pause_game()
+
+  defp pause_game_if_playing(%{assigns: %{status: _}} = socket), do: socket
 
   defp game_assigns(socket) do
     %Game{
