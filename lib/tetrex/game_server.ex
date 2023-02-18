@@ -4,6 +4,9 @@ defmodule Tetrex.GameServer do
   alias Tetrex.BoardServer
   alias Tetrex.Game
 
+  @board_height 20
+  @board_width 10
+
   # Client API
 
   def start_link(opts \\ []) do
@@ -24,8 +27,16 @@ defmodule Tetrex.GameServer do
     GenServer.cast(game_server, {:update_lines_cleared, update_fn})
   end
 
-  def set_status(game_server, status) when status in [:intro, :playing, :game_over] do
-    GenServer.cast(game_server, {:set_status, status})
+  def new_game(game_server) do
+    GenServer.cast(game_server, :new_game)
+  end
+
+  def start_game(game_server) do
+    GenServer.cast(game_server, :start_game)
+  end
+
+  def pause_game(game_server) do
+    GenServer.cast(game_server, :pause_game)
   end
 
   def try_move_down(game_server) do
@@ -94,8 +105,8 @@ defmodule Tetrex.GameServer do
         _from,
         %Game{board_pid: board, lines_cleared: lines_cleared} = game
       ) do
-    {_move_result, preview, extra_lines_cleared} = BoardServer.try_move_down(board) |> dbg()
-    game = check_game_over(game, preview) |> dbg
+    {_move_result, preview, extra_lines_cleared} = BoardServer.try_move_down(board)
+    game = check_game_over(game, preview)
 
     {:reply, lines_cleared, %Game{game | lines_cleared: lines_cleared + extra_lines_cleared}}
   end
@@ -130,14 +141,31 @@ defmodule Tetrex.GameServer do
   end
 
   @impl true
-  def handle_cast({:set_status, status}, game) do
-    case status do
-      :intro -> status_intro(game)
-      :playing -> status_playing(game)
-      :game_over -> status_game_over(game)
-    end
+  def handle_cast(:new_game, %Game{periodic_mover_pid: periodic, board_pid: board} = game) do
+    Periodic.stop_timer(periodic)
 
-    {:noreply, %Game{game | status: status}}
+    BoardServer.new(
+      board,
+      @board_height,
+      @board_width,
+      Enum.random(0..10_000_000)
+    )
+
+    {:noreply, %Game{game | status: :intro}}
+  end
+
+  @impl true
+  def handle_cast(:start_game, %Game{periodic_mover_pid: periodic} = game) do
+    Periodic.start_timer(periodic)
+
+    {:noreply, %Game{game | status: :playing}}
+  end
+
+  @impl true
+  def handle_cast(:pause_game, %Game{periodic_mover_pid: periodic} = game) do
+    Periodic.stop_timer(periodic)
+
+    {:noreply, %Game{game | status: :paused}}
   end
 
   @impl true
@@ -156,21 +184,11 @@ defmodule Tetrex.GameServer do
 
   # Internal helper functions
 
-  defp status_intro(%Game{periodic_mover_pid: periodic} = game) do
-    Periodic.stop_timer(periodic)
-    %Game{game | status: :intro}
-  end
-
-  defp status_playing(%Game{periodic_mover_pid: periodic} = game) do
-    Periodic.start_timer(periodic)
-    %Game{game | status: :playing}
-  end
-
-  defp status_game_over(%Game{periodic_mover_pid: periodic} = game) do
+  defp game_over(%Game{periodic_mover_pid: periodic} = game) do
     Periodic.stop_timer(periodic)
     %Game{game | status: :game_over}
   end
 
-  defp check_game_over(game, %{active_tile_fits: false}), do: status_game_over(game)
+  defp check_game_over(game, %{active_tile_fits: false}), do: game_over(game)
   defp check_game_over(game, %{active_tile_fits: true}), do: game
 end

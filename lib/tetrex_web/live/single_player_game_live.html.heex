@@ -11,6 +11,13 @@
           <button phx-click="start_game">Start</button>
         </div>
     </Modal.modal>
+    <% :paused -> %>
+      <Modal.modal show>
+        <div class="game-over-box">
+          <b>Paused</b>
+          <button phx-click="start_game">Resume</button>
+        </div>
+    </Modal.modal>
     <% :game_over -> %>
       <Modal.modal show>
         <div class="game-over-box">

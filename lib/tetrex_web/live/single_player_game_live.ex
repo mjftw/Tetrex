@@ -9,9 +9,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   alias TetrexWeb.Components.Modal
   alias TetrexWeb.Components.Soundtrack
 
-  @board_height 20
-  @board_width 10
-
   @game_over_audio_id "game-over-audio"
   @theme_music_audio_id "theme-music-audio"
 
@@ -40,8 +37,8 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> assign(theme_music_audio_id: @theme_music_audio_id)
       |> assign(board_server: board_server)
       |> assign(periodic_mover: periodic_mover)
+      |> pause_game()
       |> game_assigns()
-      |> new_game()
 
     {:ok, socket}
   end
@@ -51,14 +48,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket) do
-    # TODO: Don't pass these in here, use defaults from function
-    BoardServer.new(
-      socket.assigns.board_server,
-      @board_height,
-      @board_width,
-      Enum.random(0..10_000_000)
-    )
-
     {:noreply,
      socket
      |> new_game()
@@ -71,7 +60,20 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     do: {:noreply, socket}
 
   @impl true
+  def handle_event("keypress", %{"key" => "Escape"}, %{assigns: %{status: :paused}} = socket),
+    do: {:noreply, socket |> start_game()}
+
+  @impl true
+  def handle_event("keypress", _, %{assigns: %{status: :paused}} = socket),
+    do: {:noreply, socket}
+
+  @impl true
+  def handle_event("keypress", %{"key" => "Escape"}, %{assigns: %{status: :playing}} = socket),
+    do: {:noreply, socket |> pause_game()}
+
+  @impl true
   def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
+    # TODO: Move into GameServer
     # Reset the move timer so we don't get double moves
     Periodic.reset_timer(socket.assigns.periodic_mover)
 
@@ -144,18 +146,32 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> push_event("play-audio", %{id: @theme_music_audio_id})
   end
 
-  defp new_game(socket) do
-    GameServer.set_status(socket.assigns.game_server, :intro)
+  defp pause_theme_audio(socket) do
+    socket
+    |> push_event("pause-audio", %{id: @theme_music_audio_id})
+  end
+
+  defp new_game(%{assigns: %{game_server: game_server}} = socket) do
+    GameServer.new_game(game_server)
 
     socket
     |> game_assigns()
   end
 
   defp start_game(%{assigns: %{game_server: game_server}} = socket) do
-    GameServer.set_status(game_server, :playing)
+    GameServer.start_game(game_server)
 
     socket
     |> play_theme_audio()
+    |> game_assigns()
+  end
+
+  defp pause_game(%{assigns: %{game_server: game_server}} = socket) do
+    GameServer.pause_game(game_server)
+
+    socket
+    |> pause_theme_audio()
+    |> game_assigns()
   end
 
   defp maybe_remove_blocking(socket, lines_cleared) do
@@ -189,6 +205,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   defp status_change_assigns(socket, _new_status), do: socket
 
+  # TODO: Move out of liveview into GameServer (or a behaviour module)
   defp update_level(socket) do
     speed =
       socket.assigns.lines_cleared
