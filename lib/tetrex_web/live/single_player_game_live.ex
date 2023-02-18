@@ -10,6 +10,8 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   @game_over_audio_id "game-over-audio"
   @theme_music_audio_id "theme-music-audio"
 
+  # LiveView Callbacks
+
   @impl true
   def mount(_params, _session, socket) do
     player_id = 1
@@ -140,7 +142,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> try_move_down()
       |> noreply_update_game_assigns()
 
-  # Helper functions
+  # Helper Functions
 
   defp noreply_update_game_assigns(socket) do
     {:noreply, game_assigns(socket)}
@@ -157,22 +159,22 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> game_assigns()
   end
 
-  defp play_game_over_audio(socket) do
-    socket
-    |> push_event("stop-audio", %{id: @theme_music_audio_id})
-    |> push_event("play-audio", %{id: @game_over_audio_id})
-  end
+  defp play_game_over_audio(socket),
+    do:
+      socket
+      |> push_event("stop-audio", %{id: @theme_music_audio_id})
+      |> push_event("play-audio", %{id: @game_over_audio_id})
 
-  defp play_theme_audio(socket) do
-    socket
-    |> push_event("stop-audio", %{id: @game_over_audio_id})
-    |> push_event("play-audio", %{id: @theme_music_audio_id})
-  end
+  defp play_theme_audio(socket),
+    do:
+      socket
+      |> push_event("stop-audio", %{id: @game_over_audio_id})
+      |> push_event("play-audio", %{id: @theme_music_audio_id})
 
-  defp pause_theme_audio(socket) do
-    socket
-    |> push_event("pause-audio", %{id: @theme_music_audio_id})
-  end
+  defp pause_theme_audio(socket),
+    do:
+      socket
+      |> push_event("pause-audio", %{id: @theme_music_audio_id})
 
   defp new_game(%{assigns: %{game_server: game_server}} = socket) do
     GameServer.new_game(game_server)
@@ -214,7 +216,9 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   defp status_change_assigns(%{assigns: %{status: old_status}} = socket, :game_over)
        when old_status != :game_over,
-       do: play_game_over_audio(socket)
+       do:
+         socket
+         |> play_game_over_audio()
 
   defp status_change_assigns(socket, _new_status), do: socket
 end
