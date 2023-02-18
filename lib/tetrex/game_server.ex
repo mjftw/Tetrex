@@ -89,7 +89,7 @@ defmodule Tetrex.GameServer do
        board_pid: board_server_pid,
        periodic_mover_pid: periodic_mover_pid,
        lines_cleared: 0,
-       status: :new_game
+       status: :intro
      }}
   end
 

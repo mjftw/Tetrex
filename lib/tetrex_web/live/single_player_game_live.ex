@@ -33,7 +33,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> assign(game_server: game_server)
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
-      |> pause_game()
       |> game_assigns()
 
     {:ok, socket}
