@@ -11,12 +11,12 @@ defmodule Tetrex.GameServer do
 
   def start_link(opts \\ []) do
     # TODO: Pass in player ID
-    GenServer.start_link(__MODULE__, [player_id: 1], opts)
+    GenServer.start_link(__MODULE__, [], opts)
   end
 
   def start(opts \\ []) do
     # TODO: Pass in player ID
-    GenServer.start(__MODULE__, [player_id: 1], opts)
+    GenServer.start(__MODULE__, [], opts)
   end
 
   def game(game_server) do
@@ -71,8 +71,6 @@ defmodule Tetrex.GameServer do
 
   @impl true
   def init(opts) do
-    player_id = Keyword.fetch!(opts, :player_id)
-
     {:ok, board_server_pid} = BoardServer.start_link([])
 
     # Create a periodic task to move the piece down
@@ -91,10 +89,7 @@ defmodule Tetrex.GameServer do
        board_pid: board_server_pid,
        periodic_mover_pid: periodic_mover_pid,
        lines_cleared: 0,
-       status: :new_game,
-       # Unused so far
-       player_id: player_id,
-       score: 0
+       status: :new_game
      }}
   end
 

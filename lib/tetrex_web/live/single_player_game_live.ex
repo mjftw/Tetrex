@@ -13,8 +13,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   # LiveView Callbacks
 
   @impl true
-  def mount(_params, _session, socket) do
-    player_id = 1
+  def mount(_params, %{"user_id" => player_id} = _session, socket) do
     # Should only ever be one game in progress, error if more
     [{game_server, _}] = Registry.lookup(Tetrex.GameRegistry, player_id)
 

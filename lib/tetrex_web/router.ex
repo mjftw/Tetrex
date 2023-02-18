@@ -8,6 +8,7 @@ defmodule TetrexWeb.Router do
     plug :put_root_layout, {TetrexWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug TetrexWeb.Plugs.UserSession
   end
 
   pipeline :api do

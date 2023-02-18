@@ -4,7 +4,7 @@ defmodule Tetrex.GameRegistry do
   def start_new_game(player_id) do
     # TODO: Start under a dynamic supervisor rather than unlinked
     GameServer.start(name: {:via, Registry, {Tetrex.GameRegistry, player_id}})
-    user_games(player_id) |> IO.inspect()
+    user_games(player_id)
   end
 
   def user_has_game?(player_id) do

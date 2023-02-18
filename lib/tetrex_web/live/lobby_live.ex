@@ -1,13 +1,9 @@
 defmodule TetrexWeb.LobbyLive do
-  alias Tetrex.GameServer
   alias Tetrex.GameRegistry
   use TetrexWeb, :live_view
 
   @impl true
-  def mount(_params, _session, socket) do
-    # TODO: Should be stored in browser session storage, or actually have a users database & login flow
-    player_id = 1
-
+  def mount(_params, %{"user_id" => player_id} = _session, socket) do
     {:ok,
      socket
      |> assign(:player_id, player_id)
