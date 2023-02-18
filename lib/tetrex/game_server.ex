@@ -103,10 +103,14 @@ defmodule Tetrex.GameServer do
   def handle_call(
         :try_move_down,
         _from,
-        %Game{board_pid: board, lines_cleared: lines_cleared} = game
+        %Game{board_pid: board, lines_cleared: lines_cleared, periodic_mover_pid: periodic} = game
       ) do
     {_move_result, preview, extra_lines_cleared} = BoardServer.try_move_down(board)
+
     game = check_game_over(game, preview)
+
+    # Reset the move timer so we don't get double moves
+    Periodic.reset_timer(periodic)
 
     {:reply, lines_cleared, %Game{game | lines_cleared: lines_cleared + extra_lines_cleared}}
   end

@@ -73,10 +73,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
-    # TODO: Move into GameServer
-    # Reset the move timer so we don't get double moves
-    Periodic.reset_timer(socket.assigns.periodic_mover)
-
     {:noreply, try_move_down(socket)}
   end
 
