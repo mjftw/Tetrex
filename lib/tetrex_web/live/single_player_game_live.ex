@@ -36,7 +36,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
       |> assign(board_server: board_server)
-      |> assign(periodic_mover: periodic_mover)
       |> pause_game()
       |> game_assigns()
 
@@ -100,7 +99,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
     {:noreply,
      socket
-     |> maybe_remove_blocking(lines_cleared)
      |> game_assigns()}
   end
 
@@ -126,7 +124,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     lines_cleared = GameServer.try_move_down(socket.assigns.game_server)
 
     socket
-    |> maybe_remove_blocking(lines_cleared)
     |> game_assigns()
   end
 
@@ -170,14 +167,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> game_assigns()
   end
 
-  defp maybe_remove_blocking(socket, lines_cleared) do
-    if lines_cleared >= 4 do
-      BoardServer.remove_blocking_row(socket.assigns.board_server)
-    end
-
-    socket
-  end
-
   defp game_assigns(socket) do
     %Game{
       board_pid: board_server,
@@ -192,7 +181,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> assign(:board, preview)
     |> assign(:lines_cleared, lines_cleared)
     |> assign(:status, status)
-    |> update_level()
   end
 
   defp status_change_assigns(%{assigns: %{status: old_status}} = socket, :game_over)
@@ -200,44 +188,4 @@ defmodule TetrexWeb.SinglePlayerGameLive do
        do: play_game_over_audio(socket)
 
   defp status_change_assigns(socket, _new_status), do: socket
-
-  # TODO: Move out of liveview into GameServer (or a behaviour module)
-  defp update_level(socket) do
-    speed =
-      socket.assigns.lines_cleared
-      |> level()
-      |> level_speed()
-
-    Periodic.set_period(socket.assigns.periodic_mover, floor(speed * 1000))
-
-    socket
-  end
-
-  defp level(lines_cleared) do
-    div(lines_cleared, 10)
-  end
-
-  defp level_speed(level) do
-    # For explanation see: https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
-    frames_per_gridcell =
-      case level do
-        0 -> 48
-        1 -> 43
-        2 -> 38
-        3 -> 33
-        4 -> 28
-        5 -> 23
-        6 -> 18
-        7 -> 13
-        8 -> 8
-        9 -> 6
-        _ when 10 <= level and level <= 12 -> 5
-        _ when 13 <= level and level <= 15 -> 4
-        _ when 16 <= level and level <= 18 -> 3
-        _ when 19 <= level and level <= 28 -> 2
-        _ -> 1
-      end
-
-    frames_per_gridcell / 60
-  end
 end

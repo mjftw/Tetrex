@@ -107,20 +107,27 @@ defmodule Tetrex.GameServer do
       ) do
     {_move_result, preview, extra_lines_cleared} = BoardServer.try_move_down(board)
 
-    game = check_game_over(game, preview)
-
     # Reset the move timer so we don't get double moves
     Periodic.reset_timer(periodic)
 
-    {:reply, lines_cleared, %Game{game | lines_cleared: lines_cleared + extra_lines_cleared}}
+    game =
+      %Game{game | lines_cleared: lines_cleared + extra_lines_cleared}
+      |> update_level()
+      |> check_game_over(preview)
+
+    {:reply, lines_cleared, game}
   end
 
   @impl true
   def handle_call(:drop, _from, %Game{board_pid: board, lines_cleared: lines_cleared} = game) do
     {preview, extra_lines_cleared} = BoardServer.drop(board)
-    game = check_game_over(game, preview)
 
-    {:reply, lines_cleared, %Game{game | lines_cleared: lines_cleared + extra_lines_cleared}}
+    game =
+      %Game{game | lines_cleared: lines_cleared + extra_lines_cleared}
+      |> update_level()
+      |> check_game_over(preview)
+
+    {:reply, lines_cleared, game}
   end
 
   @impl true
@@ -134,14 +141,6 @@ defmodule Tetrex.GameServer do
   def handle_call(:try_move_right, _from, %Game{board_pid: board} = game) do
     {move_result, _preview} = BoardServer.try_move_right(board)
     {:reply, move_result, game}
-  end
-
-  @impl true
-  def handle_cast(
-        {:update_lines_cleared, update_fn},
-        %Game{lines_cleared: lines_cleared} = game
-      ) do
-    {:noreply, %Game{game | lines_cleared: update_fn.(lines_cleared)}}
   end
 
   @impl true
@@ -195,4 +194,44 @@ defmodule Tetrex.GameServer do
 
   defp check_game_over(game, %{active_tile_fits: false}), do: game_over(game)
   defp check_game_over(game, %{active_tile_fits: true}), do: game
+
+  # TODO: Move into own behaviour module - differs from multi player game
+  defp update_level(%Game{lines_cleared: lines_cleared, periodic_mover_pid: periodic} = game) do
+    speed =
+      lines_cleared
+      |> level()
+      |> level_speed()
+
+    Periodic.set_period(periodic, floor(speed * 1000))
+
+    game
+  end
+
+  defp level(lines_cleared) do
+    div(lines_cleared, 10)
+  end
+
+  defp level_speed(level) do
+    # For explanation see: https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
+    frames_per_gridcell =
+      case level do
+        0 -> 48
+        1 -> 43
+        2 -> 38
+        3 -> 33
+        4 -> 28
+        5 -> 23
+        6 -> 18
+        7 -> 13
+        8 -> 8
+        9 -> 6
+        _ when 10 <= level and level <= 12 -> 5
+        _ when 13 <= level and level <= 15 -> 4
+        _ when 16 <= level and level <= 18 -> 3
+        _ when 19 <= level and level <= 28 -> 2
+        _ -> 1
+      end
+
+    frames_per_gridcell / 60
+  end
 end
