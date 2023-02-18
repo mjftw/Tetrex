@@ -16,6 +16,7 @@
         <div class="game-over-box">
           <b>Paused</b>
           <button phx-click="start_game">Resume</button>
+          <button phx-click="quit_game">Quit game</button>
         </div>
     </Modal.modal>
     <% :game_over -> %>
@@ -23,6 +24,7 @@
         <div class="game-over-box">
           <h1>Game Over</h1>
           <h2>Score: <%= @lines_cleared%></h2>
+          <button phx-click="quit_game">Quit game</button>
           <br/>
           Press enter to play again
         </div>

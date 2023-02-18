@@ -16,4 +16,10 @@ defmodule Tetrex.GameRegistry do
   def user_games(player_id) do
     Registry.lookup(Tetrex.GameRegistry, player_id)
   end
+
+  def remove_game(player_id) do
+    case Registry.lookup(Tetrex.GameRegistry, player_id) do
+      [{game_server_pid, _}] -> Process.exit(game_server_pid, :kill)
+    end
+  end
 end

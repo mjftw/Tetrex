@@ -2,6 +2,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   use TetrexWeb, :live_view
 
   alias Tetrex.GameServer
+  alias Tetrex.GameRegistry
   alias Tetrex.Game
   alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Modal
@@ -15,7 +16,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   @impl true
   def mount(_params, %{"user_id" => player_id} = _session, socket) do
     # Should only ever be one game in progress, error if more
-    [{game_server, _}] = Registry.lookup(Tetrex.GameRegistry, player_id)
+    [{game_server, _}] = Registry.lookup(GameRegistry, player_id)
 
     %Game{
       periodic_mover_pid: periodic_mover
@@ -30,6 +31,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
     socket =
       socket
+      |> assign(player_id: player_id)
       |> assign(game_server: game_server)
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
@@ -44,6 +46,15 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       socket
       |> start_game()
       |> noreply_update_game_assigns()
+
+  @impl true
+  def handle_event("quit_game", _value, socket) do
+    GameRegistry.remove_game(socket.assigns.player_id)
+
+    socket
+    |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))
+    |> noreply()
+  end
 
   @impl true
   def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket),
