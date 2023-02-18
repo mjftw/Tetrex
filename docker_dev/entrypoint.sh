@@ -7,6 +7,7 @@ while ! pg_isready -h postgres -p $PGPORT -U $PGUSER; do
   sleep 1
 done
 
+mix deps.get
 mix ecto.create
 mix ecto.migrate
 
