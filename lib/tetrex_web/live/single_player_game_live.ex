@@ -3,9 +3,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   alias Tetrex.GameServer
   alias Tetrex.Game
-  alias Tetrex.Periodic
   alias TetrexWeb.Components.BoardComponents
-  alias Tetrex.BoardServer
   alias TetrexWeb.Components.Modal
   alias TetrexWeb.Components.Soundtrack
 
@@ -19,7 +17,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     [{game_server, _}] = Registry.lookup(Tetrex.GameRegistry, player_id)
 
     %Game{
-      board_pid: board_server,
       periodic_mover_pid: periodic_mover
     } = GameServer.game(game_server)
 
@@ -35,7 +32,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> assign(game_server: game_server)
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
-      |> assign(board_server: board_server)
       |> pause_game()
       |> game_assigns()
 
@@ -95,7 +91,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("keypress", %{"key" => " "}, socket) do
-    lines_cleared = GameServer.drop(socket.assigns.game_server)
+    GameServer.drop(socket.assigns.game_server)
 
     {:noreply,
      socket
@@ -121,7 +117,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     do: {:noreply, try_move_down(socket)}
 
   defp try_move_down(socket) do
-    lines_cleared = GameServer.try_move_down(socket.assigns.game_server)
+    GameServer.try_move_down(socket.assigns.game_server)
 
     socket
     |> game_assigns()
@@ -169,12 +165,11 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   defp game_assigns(socket) do
     %Game{
-      board_pid: board_server,
       lines_cleared: lines_cleared,
       status: status
     } = GameServer.game(socket.assigns.game_server)
 
-    preview = BoardServer.preview(board_server)
+    preview = GameServer.board_preview(socket.assigns.game_server)
 
     socket
     |> status_change_assigns(status)

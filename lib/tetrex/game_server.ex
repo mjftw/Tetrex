@@ -23,6 +23,10 @@ defmodule Tetrex.GameServer do
     GenServer.call(game_server, :get_game)
   end
 
+  def board_preview(game_server) do
+    GenServer.call(game_server, :board_preview)
+  end
+
   def update_lines_cleared(game_server, update_fn) when is_function(update_fn, 1) do
     GenServer.cast(game_server, {:update_lines_cleared, update_fn})
   end
@@ -97,6 +101,13 @@ defmodule Tetrex.GameServer do
   @impl true
   def handle_call(:get_game, _from, game) do
     {:reply, game, game}
+  end
+
+  @impl true
+  def handle_call(:board_preview, _from, %Game{board_pid: board} = game) do
+    preview = BoardServer.preview(board)
+
+    {:reply, preview, game}
   end
 
   @impl true
