@@ -39,82 +39,116 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   @impl true
-  def handle_event("start_game", _value, socket), do: {:noreply, start_game(socket)}
+  def handle_event("start_game", _value, socket),
+    do:
+      socket
+      |> start_game()
+      |> noreply_update_game_assigns()
 
   @impl true
-  def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket) do
-    {:noreply,
-     socket
-     |> new_game()
-     |> start_game()
-     |> game_assigns()}
-  end
+  def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket),
+    do:
+      socket
+      |> new_game()
+      |> start_game()
+      |> noreply_update_game_assigns()
 
   @impl true
   def handle_event("keypress", _, %{assigns: %{status: :game_over}} = socket),
-    do: {:noreply, socket}
+    do:
+      socket
+      |> noreply()
 
   @impl true
   def handle_event("keypress", %{"key" => "Escape"}, %{assigns: %{status: :paused}} = socket),
-    do: {:noreply, socket |> start_game()}
+    do:
+      socket
+      |> start_game()
+      |> noreply_update_game_assigns()
 
   @impl true
   def handle_event("keypress", _, %{assigns: %{status: :paused}} = socket),
-    do: {:noreply, socket}
+    do:
+      socket
+      |> noreply()
 
   @impl true
   def handle_event("keypress", %{"key" => "Escape"}, %{assigns: %{status: :playing}} = socket),
-    do: {:noreply, socket |> pause_game()}
+    do:
+      socket
+      |> pause_game()
+      |> noreply_update_game_assigns()
 
   @impl true
-  def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
-    {:noreply, try_move_down(socket)}
-  end
+  def handle_event("keypress", %{"key" => "ArrowDown"}, socket),
+    do:
+      socket
+      |> try_move_down()
+      |> noreply_update_game_assigns()
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowLeft"}, socket) do
     GameServer.try_move_left(socket.assigns.game_server)
-    {:noreply, socket |> game_assigns()}
+
+    socket |> noreply_update_game_assigns()
   end
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowRight"}, socket) do
     GameServer.try_move_right(socket.assigns.game_server)
-    {:noreply, socket |> game_assigns()}
+
+    socket
+    |> noreply_update_game_assigns()
   end
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowUp"}, socket) do
     GameServer.rotate(socket.assigns.game_server)
-    {:noreply, socket |> game_assigns()}
+
+    socket
+    |> noreply_update_game_assigns()
   end
 
   @impl true
   def handle_event("keypress", %{"key" => " "}, socket) do
     GameServer.drop(socket.assigns.game_server)
 
-    {:noreply,
-     socket
-     |> game_assigns()}
+    socket
+    |> noreply_update_game_assigns()
   end
 
   @impl true
   def handle_event("keypress", %{"key" => "h"}, socket) do
     GameServer.hold(socket.assigns.game_server)
 
-    {:noreply, socket |> game_assigns()}
+    socket
+    |> noreply_update_game_assigns()
   end
 
   @impl true
   def handle_event("keypress", %{"key" => key}, socket) do
     IO.puts("Unhandled key press: #{key}")
 
-    {:noreply, socket}
+    socket
+    |> noreply()
   end
 
   @impl true
   def handle_info(:try_move_down, socket),
-    do: {:noreply, try_move_down(socket)}
+    do:
+      socket
+      |> try_move_down()
+      |> noreply_update_game_assigns()
+
+  # Helper functions
+
+  defp noreply_update_game_assigns(socket) do
+    {:noreply, game_assigns(socket)}
+  end
+
+  defp noreply(socket) do
+    {:noreply, socket}
+  end
 
   defp try_move_down(socket) do
     GameServer.try_move_down(socket.assigns.game_server)
