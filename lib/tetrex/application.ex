@@ -10,8 +10,6 @@ defmodule Tetrex.Application do
     children = [
       # Create a singleton game state instance
       {Registry, keys: :unique, name: Tetrex.GameRegistry},
-      # Start the Ecto repository
-      Tetrex.Repo,
       # Start the Telemetry supervisor
       TetrexWeb.Telemetry,
       # Start the PubSub system

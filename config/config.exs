@@ -7,9 +7,6 @@
 # General application configuration
 import Config
 
-config :tetrex,
-  ecto_repos: [Tetrex.Repo]
-
 # Configures the endpoint
 config :tetrex, TetrexWeb.Endpoint,
   url: [host: "localhost"],
