@@ -14,6 +14,23 @@ config :tetrex, TetrexWeb.Endpoint,
   pubsub_server: Tetrex.PubSub,
   live_view: [signing_salt: "b9jgWcip"]
 
+# Configure version bumping
+config :versioce,
+  pre_hooks: [Tetrex.Versioce.PreHooks.GitCheckUncommitted],
+  post_hooks: [Tetrex.Versioce.PostHooks.GitCommitUpdate, Tetrex.Versioce.PostHooks.GitTag]
+
+config :versioce, :changelog,
+  datagrabber: Versioce.Changelog.DataGrabber.Git,
+  formatter: Versioce.Changelog.Formatter.Keepachangelog,
+  anchors: %{
+    added: ["Added:", "added:"],
+    changed: ["Changed:", "changed:"],
+    deprecated: ["Depreciated:", "depreciated:"],
+    removed: ["Removed:", "removed:"],
+    fixed: ["Fixed:", "fixed:"],
+    security: ["Security:", "security:"]
+  }
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
