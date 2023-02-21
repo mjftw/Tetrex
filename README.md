@@ -30,3 +30,20 @@ Features:
 Upcoming:
 
 - Multiplayer battles!
+
+## Developer things
+
+The version is bumped using the excellent [Versiose](https://hexdocs.pm/versioce/readme.html) package.
+
+You can do this with:
+
+```sh
+mix bump patch
+#OR
+mix bump minor
+#OR
+mix bump major
+```
+
+This will only succeed if you have no uncommitted git changes.
+It will create an update commit for you, tagging the new version.
