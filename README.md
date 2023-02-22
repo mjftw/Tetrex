@@ -47,3 +47,5 @@ mix bump major
 
 This will only succeed if you have no uncommitted git changes.
 It will create an update commit for you, tagging the new version.
+
+To deploy: `fly deploy`
