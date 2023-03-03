@@ -11,12 +11,10 @@ defmodule Tetrex.GameServer do
   # Client API
 
   def start_link(opts \\ []) do
-    # TODO: Pass in user ID
     GenServer.start_link(__MODULE__, [], opts)
   end
 
   def start(opts \\ []) do
-    # TODO: Pass in user ID
     GenServer.start(__MODULE__, [], opts)
   end
 
@@ -68,7 +66,10 @@ defmodule Tetrex.GameServer do
     GenServer.cast(game_server, :rotate)
   end
 
-  def pubsub_topic(game_server), do: "game:#{game_server}"
+  def pubsub_topic(game_server), do: "game:#{Serialise.serialise(game_server)}"
+
+  def subscribe_updates(game_server),
+    do: Phoenix.PubSub.subscribe(Tetrex.PubSub, pubsub_topic(game_server))
 
   # Server callbacks
 
@@ -98,18 +99,16 @@ defmodule Tetrex.GameServer do
 
   @impl true
   def handle_continue(:publish_state, game) do
-    board_preview = BoardServer.board_preview(game.board_pid)
+    board_preview = BoardServer.preview(game.board_pid)
 
-    game_message = %GameMessage{
+    game_update = %GameMessage{
       game_pid: self(),
-      type: :single_player,
       lines_cleared: game.lines_cleared,
       status: game.status,
       board_preview: board_preview
     }
 
-    # TODO handle errors?
-    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(self()), {:game_state, game_message})
+    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(self()), game_update)
 
     {:noreply, game}
   end
