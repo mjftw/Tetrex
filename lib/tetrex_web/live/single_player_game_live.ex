@@ -14,23 +14,31 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
-    # Should only ever be one game in progress, error if more
-    [{game_server, _}] = Registry.lookup(GameRegistry, user_id)
+    games_found = Registry.lookup(GameRegistry, user_id)
 
-    if connected?(socket) do
-      GameServer.subscribe_updates(game_server)
+    if Enum.count(games_found) == 0 do
+      {:ok,
+       socket
+       |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
+    else
+      # Should only ever be one game in progress, error if more
+      [{game_server, _}] = games_found
+
+      if connected?(socket) do
+        GameServer.subscribe_updates(game_server)
+      end
+
+      socket =
+        socket
+        |> assign(user_id: user_id)
+        |> assign(game_server: game_server)
+        |> assign(game_over_audio_id: @game_over_audio_id)
+        |> assign(theme_music_audio_id: @theme_music_audio_id)
+        |> initial_game_assigns()
+        |> pause_game_if_playing()
+
+      {:ok, socket}
     end
-
-    socket =
-      socket
-      |> assign(user_id: user_id)
-      |> assign(game_server: game_server)
-      |> assign(game_over_audio_id: @game_over_audio_id)
-      |> assign(theme_music_audio_id: @theme_music_audio_id)
-      |> initial_game_assigns()
-      |> pause_game_if_playing()
-
-    {:ok, socket}
   end
 
   @impl true
