@@ -14,6 +14,8 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   # LiveView Callbacks
 
+  # TODO: Subscribe to game updates and never directly ask game for state
+
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
     # Should only ever be one game in progress, error if more

@@ -3,6 +3,7 @@ defmodule Tetrex.GameServer do
   alias Tetrex.Periodic
   alias Tetrex.BoardServer
   alias Tetrex.Game
+  alias Tetrex.GameMessage
 
   @board_height 20
   @board_width 10
@@ -67,6 +68,8 @@ defmodule Tetrex.GameServer do
     GenServer.cast(game_server, :rotate)
   end
 
+  def pubsub_topic(game_server), do: "game:#{game_server}"
+
   # Server callbacks
 
   @impl true
@@ -91,6 +94,24 @@ defmodule Tetrex.GameServer do
        lines_cleared: 0,
        status: :intro
      }}
+  end
+
+  @impl true
+  def handle_continue(:publish_state, game) do
+    board_preview = BoardServer.board_preview(game.board_pid)
+
+    game_message = %GameMessage{
+      game_pid: self(),
+      type: :single_player,
+      lines_cleared: game.lines_cleared,
+      status: game.status,
+      board_preview: board_preview
+    }
+
+    # TODO handle errors?
+    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(self()), {:game_state, game_message})
+
+    {:noreply, game}
   end
 
   @impl true
@@ -121,7 +142,7 @@ defmodule Tetrex.GameServer do
       |> update_level()
       |> check_game_over(preview)
 
-    {:reply, lines_cleared, game}
+    {:reply, lines_cleared, game, {:continue, :publish_state}}
   end
 
   @impl true
@@ -133,20 +154,20 @@ defmodule Tetrex.GameServer do
       |> update_level()
       |> check_game_over(preview)
 
-    {:reply, lines_cleared, game}
+    {:reply, lines_cleared, game, {:continue, :publish_state}}
   end
 
   @impl true
   def handle_call(:try_move_left, _from, %Game{board_pid: board} = game) do
     {move_result, _preview} = BoardServer.try_move_left(board)
 
-    {:reply, move_result, game}
+    {:reply, move_result, game, {:continue, :publish_state}}
   end
 
   @impl true
   def handle_call(:try_move_right, _from, %Game{board_pid: board} = game) do
     {move_result, _preview} = BoardServer.try_move_right(board)
-    {:reply, move_result, game}
+    {:reply, move_result, game, {:continue, :publish_state}}
   end
 
   @impl true
@@ -160,35 +181,35 @@ defmodule Tetrex.GameServer do
       Enum.random(0..10_000_000)
     )
 
-    {:noreply, %Game{game | status: :intro}}
+    {:noreply, %Game{game | status: :intro}, {:continue, :publish_state}}
   end
 
   @impl true
   def handle_cast(:start_game, %Game{periodic_mover_pid: periodic} = game) do
     Periodic.start_timer(periodic)
 
-    {:noreply, %Game{game | status: :playing}}
+    {:noreply, %Game{game | status: :playing}, {:continue, :publish_state}}
   end
 
   @impl true
   def handle_cast(:pause_game, %Game{periodic_mover_pid: periodic} = game) do
     Periodic.stop_timer(periodic)
 
-    {:noreply, %Game{game | status: :paused}}
+    {:noreply, %Game{game | status: :paused}, {:continue, :publish_state}}
   end
 
   @impl true
   def handle_cast(:hold, %Game{board_pid: board} = game) do
     BoardServer.hold(board)
 
-    {:noreply, game}
+    {:noreply, game, {:continue, :publish_state}}
   end
 
   @impl true
   def handle_cast(:rotate, %Game{board_pid: board} = game) do
     BoardServer.rotate(board)
 
-    {:noreply, game}
+    {:noreply, game, {:continue, :publish_state}}
   end
 
   # Internal helper functions
@@ -240,4 +261,6 @@ defmodule Tetrex.GameServer do
 
     frames_per_gridcell / 60
   end
+
+  defp game_id, do: self()
 end
