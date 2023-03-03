@@ -1,6 +1,6 @@
-defmodule TetrexWeb.PresenceUserTracking do
+defmodule LiveViewUserTracking do
   @moduledoc """
-    Use this module to automatically add user tracking via Phoenix Presence to your LiveView
+    Use this module to automatically add user tracking via Phoenix Presence to your LiveView.
 
     Example usage:
     ```
@@ -8,9 +8,13 @@ defmodule TetrexWeb.PresenceUserTracking do
         use MyAppWeb, :live_view
 
         use PresenceUserTracking,
-          module: MyAppWeb.Presence,
+          # Your Phoenix Presence module
+          presence: MyAppWeb.Presence,
+          # The topic to publish/subscribe to presence updates on
           topic: "room:lobby",
+          # The key in the socket assigns to read current user from
           socket_current_user_assign_key: :current_user,
+          # The key in the socket assigns to write store the present users list
           socket_users_assign_key: :users
 
         @impl true
@@ -22,17 +26,11 @@ defmodule TetrexWeb.PresenceUserTracking do
         end
       end
     ```
-
-    Opts:
-      module: Your Phoenix Presence module,
-      topic: The topic to publish/subscribe to presence updates on,
-      socket_current_user_assign_key: The key in the socket assigns where the current user can be found,
-      socket_users_assign_key: The key in the socket assigns where the present users list should be stored
   """
   @spec __using__(any) :: {:__block__, [], [{:=, [], [...]} | {:__block__, [...], [...]}, ...]}
   defmacro __using__(opts) do
     quote location: :keep, bind_quoted: [opts: opts] do
-      presence_module = Keyword.fetch!(opts, :module)
+      presence_module = Keyword.fetch!(opts, :presence)
       presence_topic = Keyword.fetch!(opts, :topic)
       presence_current_user_assign_key = Keyword.fetch!(opts, :socket_current_user_assign_key)
       presence_users_assign_key = Keyword.fetch!(opts, :socket_users_assign_key)

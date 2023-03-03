@@ -1,13 +1,12 @@
 defmodule TetrexWeb.LobbyLive do
-  alias TetrexWeb.PresenceUserTracking
   alias Tetrex.GameRegistry
   use TetrexWeb, :live_view
 
   @socket_presence_assign_key :users
   @current_user_key :user_id
 
-  use PresenceUserTracking,
-    module: TetrexWeb.Presence,
+  use LiveViewUserTracking,
+    presence: TetrexWeb.Presence,
     topic: "room:lobby",
     socket_current_user_assign_key: @current_user_key,
     socket_users_assign_key: @socket_presence_assign_key
