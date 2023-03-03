@@ -21,17 +21,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       GameServer.subscribe_updates(game_server)
     end
 
-    %Game{
-      periodic_mover_pid: periodic_mover
-    } = GameServer.game(game_server)
-
-    this_liveview = self()
-
-    # Set the periodic task to move the piece down
-    Tetrex.Periodic.set_work(periodic_mover, fn ->
-      Process.send(this_liveview, :try_move_down, [])
-    end)
-
     socket =
       socket
       |> assign(user_id: user_id)
@@ -56,13 +45,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         |> assign(:lines_cleared, lines_cleared)
         |> assign(:status, status)
         |> noreply()
-
-  @impl true
-  def handle_info(:try_move_down, socket),
-    do:
-      socket
-      |> try_move_down()
-      |> noreply()
 
   @impl true
   def handle_event("start_game", _value, socket),
@@ -115,11 +97,10 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> noreply()
 
   @impl true
-  def handle_event("keypress", %{"key" => "ArrowDown"}, socket),
-    do:
-      socket
-      |> try_move_down()
-      |> noreply()
+  def handle_event("keypress", %{"key" => "ArrowDown"}, socket) do
+    GameServer.try_move_down(socket.assigns.game_server)
+    socket |> noreply()
+  end
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowLeft"}, socket) do
@@ -187,11 +168,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> assign(:board, preview)
     |> assign(:lines_cleared, lines_cleared)
     |> assign(:status, status)
-  end
-
-  defp try_move_down(socket) do
-    GameServer.try_move_down(socket.assigns.game_server)
-    socket
   end
 
   defp play_game_over_audio(socket),

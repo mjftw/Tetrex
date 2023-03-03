@@ -1,5 +1,6 @@
 defmodule Tetrex.GameServer do
   use GenServer
+  alias Tetrex.GameServer
   alias Tetrex.Periodic
   alias Tetrex.BoardServer
   alias Tetrex.Game
@@ -74,7 +75,7 @@ defmodule Tetrex.GameServer do
   # Server callbacks
 
   @impl true
-  def init(opts) do
+  def init(_opts) do
     {:ok, board_server_pid} = BoardServer.start_link([])
 
     # Create a periodic task to move the piece down
@@ -94,7 +95,7 @@ defmodule Tetrex.GameServer do
        periodic_mover_pid: periodic_mover_pid,
        lines_cleared: 0,
        status: :intro
-     }}
+     }, {:continue, :init_periodic}}
   end
 
   @impl true
@@ -109,6 +110,18 @@ defmodule Tetrex.GameServer do
     }
 
     Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(self()), game_update)
+
+    {:noreply, game}
+  end
+
+  @impl true
+  def handle_continue(:init_periodic, %Game{periodic_mover_pid: periodic_mover_pid} = game) do
+    this_game_server = self()
+
+    # Set the periodic task to move the piece down
+    Tetrex.Periodic.set_work(periodic_mover_pid, fn ->
+      GameServer.try_move_down(this_game_server)
+    end)
 
     {:noreply, game}
   end
