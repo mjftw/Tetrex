@@ -1,13 +1,38 @@
 defmodule TetrexWeb.LobbyLive do
+  alias TetrexWeb.Presence
   alias Tetrex.GameRegistry
   use TetrexWeb, :live_view
 
+  @room_type "lobby"
+  @presence_channel Presence.channel_name(@room_type)
+
   @impl true
   def mount(_params, %{"user_id" => player_id} = _session, socket) do
+    if connected?(socket) do
+      Presence.track_room(player_id, @room_type)
+
+      Phoenix.PubSub.subscribe(Tetrex.PubSub, Presence.all_rooms())
+    end
+
     {:ok,
      socket
      |> assign(:player_id, player_id)
-     |> assign(:user_has_game, GameRegistry.user_has_game?(player_id))}
+     |> assign(:user_has_game, GameRegistry.user_has_game?(player_id))
+     |> assign(:users, %{})
+     |> presence_assigns()}
+  end
+
+  @impl true
+  def handle_info(
+        %Phoenix.Socket.Broadcast{
+          event: "presence_diff",
+          payload: _joins_leaves
+        },
+        socket
+      ) do
+    {:noreply,
+     socket
+     |> presence_assigns()}
   end
 
   @impl true
@@ -40,5 +65,10 @@ defmodule TetrexWeb.LobbyLive do
        socket
        |> put_flash(:error, "Cannot find single player game")}
     end
+  end
+
+  defp presence_assigns(socket) do
+    socket
+    |> assign(:users, Presence.list(@presence_channel))
   end
 end

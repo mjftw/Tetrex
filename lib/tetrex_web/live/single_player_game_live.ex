@@ -1,6 +1,7 @@
 defmodule TetrexWeb.SinglePlayerGameLive do
   use TetrexWeb, :live_view
 
+  alias TetrexWeb.Presence
   alias Tetrex.GameServer
   alias Tetrex.GameRegistry
   alias Tetrex.Game
@@ -18,9 +19,13 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     # Should only ever be one game in progress, error if more
     [{game_server, _}] = Registry.lookup(GameRegistry, player_id)
 
+    if connected?(socket) do
+      Presence.track_room(player_id, "single_player_game", game_server)
+    end
+
     %Game{
       periodic_mover_pid: periodic_mover
-    } = GameServer.game(game_server) |> dbg()
+    } = GameServer.game(game_server)
 
     this_liveview = self()
 
