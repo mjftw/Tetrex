@@ -1,7 +1,27 @@
 defmodule TetrexWeb.PresenceUserTracking do
   @moduledoc """
     Use this module to automatically add user tracking via Phoenix Presence to your LiveView
-    To use, make sure to call `mount_presence_init` at the end of your LiveView's `mount` function.
+
+    Example usage:
+    ```
+      defmodule MyAppWeb.LobbyLive do
+        use MyAppWeb, :live_view
+
+        use PresenceUserTracking,
+          module: MyAppWeb.Presence,
+          topic: "room:lobby",
+          socket_current_user_assign_key: :current_user,
+          socket_users_assign_key: :users
+
+        @impl true
+        def mount(_params, %{"user_id" => user_id} = _session, socket) do
+          {:ok,
+          socket
+          |> assign(:user_id, user_id)
+          |> mount_presence_init()}
+        end
+      end
+    ```
 
     Opts:
       module: Your Phoenix Presence module,
