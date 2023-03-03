@@ -14,6 +14,8 @@ defmodule Tetrex.Application do
       TetrexWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Tetrex.PubSub},
+      # Start the Presence module
+      TetrexWeb.Presence,
       # Start the Endpoint (http/https)
       TetrexWeb.Endpoint
     ]

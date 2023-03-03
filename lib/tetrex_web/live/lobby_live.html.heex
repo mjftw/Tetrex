@@ -5,3 +5,12 @@
 <% else %>
     <button phx-click="new-single-player-game">Start single player game</button>
 <% end %>
+
+<div>
+    <h2>Online users:</h2>
+    <ul>
+        <%= for {user_id, _} <- @users do %>
+            <li> <%= user_id %> </li>
+        <% end %>
+    </ul>
+</div>
