@@ -1,7 +1,7 @@
 defmodule TetrexWeb.SinglePlayerGameLive do
   use TetrexWeb, :live_view
 
-  alias TetrexWeb.Presence
+  alias Tetrex.GameMessage
   alias Tetrex.GameServer
   alias Tetrex.GameRegistry
   alias Tetrex.Game
@@ -12,17 +12,13 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   @game_over_audio_id "game-over-audio"
   @theme_music_audio_id "theme-music-audio"
 
-  # LiveView Callbacks
-
-  # TODO: Subscribe to game updates and never directly ask game for state
-
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
     # Should only ever be one game in progress, error if more
     [{game_server, _}] = Registry.lookup(GameRegistry, user_id)
 
     if connected?(socket) do
-      Presence.track_room(user_id, "single_player_game", game_server)
+      GameServer.subscribe_updates(game_server)
     end
 
     %Game{
@@ -42,18 +38,38 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> assign(game_server: game_server)
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
-      |> game_assigns()
+      |> initial_game_assigns()
       |> pause_game_if_playing()
 
     {:ok, socket}
   end
 
   @impl true
+  def handle_info(
+        %GameMessage{board_preview: preview, status: status, lines_cleared: lines_cleared},
+        socket
+      ),
+      do:
+        socket
+        |> status_change_assigns(status)
+        |> assign(:board, preview)
+        |> assign(:lines_cleared, lines_cleared)
+        |> assign(:status, status)
+        |> noreply()
+
+  @impl true
+  def handle_info(:try_move_down, socket),
+    do:
+      socket
+      |> try_move_down()
+      |> noreply()
+
+  @impl true
   def handle_event("start_game", _value, socket),
     do:
       socket
       |> start_game()
-      |> noreply_update_game_assigns()
+      |> noreply()
 
   @impl true
   def handle_event("quit_game", _value, socket) do
@@ -70,7 +86,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       socket
       |> new_game()
       |> start_game()
-      |> noreply_update_game_assigns()
+      |> noreply()
 
   @impl true
   def handle_event("keypress", _, %{assigns: %{status: :game_over}} = socket),
@@ -83,7 +99,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     do:
       socket
       |> start_game()
-      |> noreply_update_game_assigns()
+      |> noreply()
 
   @impl true
   def handle_event("keypress", _, %{assigns: %{status: :paused}} = socket),
@@ -96,20 +112,20 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     do:
       socket
       |> pause_game()
-      |> noreply_update_game_assigns()
+      |> noreply()
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowDown"}, socket),
     do:
       socket
       |> try_move_down()
-      |> noreply_update_game_assigns()
+      |> noreply()
 
   @impl true
   def handle_event("keypress", %{"key" => "ArrowLeft"}, socket) do
     GameServer.try_move_left(socket.assigns.game_server)
 
-    socket |> noreply_update_game_assigns()
+    socket |> noreply()
   end
 
   @impl true
@@ -117,7 +133,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     GameServer.try_move_right(socket.assigns.game_server)
 
     socket
-    |> noreply_update_game_assigns()
+    |> noreply()
   end
 
   @impl true
@@ -125,7 +141,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     GameServer.rotate(socket.assigns.game_server)
 
     socket
-    |> noreply_update_game_assigns()
+    |> noreply()
   end
 
   @impl true
@@ -133,7 +149,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     GameServer.drop(socket.assigns.game_server)
 
     socket
-    |> noreply_update_game_assigns()
+    |> noreply()
   end
 
   @impl true
@@ -141,7 +157,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     GameServer.hold(socket.assigns.game_server)
 
     socket
-    |> noreply_update_game_assigns()
+    |> noreply()
   end
 
   @impl true
@@ -152,28 +168,30 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> noreply()
   end
 
-  @impl true
-  def handle_info(:try_move_down, socket),
-    do:
-      socket
-      |> try_move_down()
-      |> noreply_update_game_assigns()
-
   # Helper Functions
-
-  defp noreply_update_game_assigns(socket) do
-    {:noreply, game_assigns(socket)}
-  end
 
   defp noreply(socket) do
     {:noreply, socket}
   end
 
-  defp try_move_down(socket) do
-    GameServer.try_move_down(socket.assigns.game_server)
+  defp initial_game_assigns(socket) do
+    %Game{
+      lines_cleared: lines_cleared,
+      status: status
+    } = GameServer.game(socket.assigns.game_server)
+
+    preview = GameServer.board_preview(socket.assigns.game_server)
 
     socket
-    |> game_assigns()
+    |> status_change_assigns(status)
+    |> assign(:board, preview)
+    |> assign(:lines_cleared, lines_cleared)
+    |> assign(:status, status)
+  end
+
+  defp try_move_down(socket) do
+    GameServer.try_move_down(socket.assigns.game_server)
+    socket
   end
 
   defp play_game_over_audio(socket),
@@ -197,7 +215,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     GameServer.new_game(game_server)
 
     socket
-    |> game_assigns()
   end
 
   defp start_game(%{assigns: %{game_server: game_server}} = socket) do
@@ -212,7 +229,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
     socket
     |> pause_theme_audio()
-    |> game_assigns()
   end
 
   defp pause_game_if_playing(%{assigns: %{status: :playing}} = socket),
@@ -221,21 +237,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
       |> pause_game()
 
   defp pause_game_if_playing(%{assigns: %{status: _}} = socket), do: socket
-
-  defp game_assigns(socket) do
-    %Game{
-      lines_cleared: lines_cleared,
-      status: status
-    } = GameServer.game(socket.assigns.game_server)
-
-    preview = GameServer.board_preview(socket.assigns.game_server)
-
-    socket
-    |> status_change_assigns(status)
-    |> assign(:board, preview)
-    |> assign(:lines_cleared, lines_cleared)
-    |> assign(:status, status)
-  end
 
   defp status_change_assigns(%{assigns: %{status: old_status}} = socket, :game_over)
        when old_status != :game_over,
