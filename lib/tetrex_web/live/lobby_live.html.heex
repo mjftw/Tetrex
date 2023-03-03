@@ -10,7 +10,7 @@
     <h2>Online users:</h2>
     <ul>
         <%= for {user_id, _} <- @users do %>
-            <li> <%= user_id %> </li>
+            <li> <%= if user_id == @user_id do "You" else user_id end %> </li>
         <% end %>
     </ul>
 </div>

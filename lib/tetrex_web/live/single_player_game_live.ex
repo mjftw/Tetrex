@@ -15,12 +15,12 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   # LiveView Callbacks
 
   @impl true
-  def mount(_params, %{"user_id" => player_id} = _session, socket) do
+  def mount(_params, %{"user_id" => user_id} = _session, socket) do
     # Should only ever be one game in progress, error if more
-    [{game_server, _}] = Registry.lookup(GameRegistry, player_id)
+    [{game_server, _}] = Registry.lookup(GameRegistry, user_id)
 
     if connected?(socket) do
-      Presence.track_room(player_id, "single_player_game", game_server)
+      Presence.track_room(user_id, "single_player_game", game_server)
     end
 
     %Game{
@@ -36,7 +36,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
     socket =
       socket
-      |> assign(player_id: player_id)
+      |> assign(user_id: user_id)
       |> assign(game_server: game_server)
       |> assign(game_over_audio_id: @game_over_audio_id)
       |> assign(theme_music_audio_id: @theme_music_audio_id)
@@ -55,7 +55,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("quit_game", _value, socket) do
-    GameRegistry.remove_game(socket.assigns.player_id)
+    GameRegistry.remove_game(socket.assigns.user_id)
 
     socket
     |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))
