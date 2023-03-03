@@ -1,6 +1,7 @@
 defmodule TetrexWeb.PresenceUserTracking do
   @moduledoc """
     Use this module to automatically add user tracking via Phoenix Presence to your LiveView
+    To use, make sure to call `mount_presence_init` at the end of your LiveView's `mount` function.
 
     Opts:
       module: Your Phoenix Presence module,
