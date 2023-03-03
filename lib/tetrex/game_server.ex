@@ -10,12 +10,12 @@ defmodule Tetrex.GameServer do
   # Client API
 
   def start_link(opts \\ []) do
-    # TODO: Pass in player ID
+    # TODO: Pass in user ID
     GenServer.start_link(__MODULE__, [], opts)
   end
 
   def start(opts \\ []) do
-    # TODO: Pass in player ID
+    # TODO: Pass in user ID
     GenServer.start(__MODULE__, [], opts)
   end
 

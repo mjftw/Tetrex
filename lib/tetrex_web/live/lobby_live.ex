@@ -7,17 +7,17 @@ defmodule TetrexWeb.LobbyLive do
   @presence_channel Presence.channel_name(@room_type)
 
   @impl true
-  def mount(_params, %{"user_id" => player_id} = _session, socket) do
+  def mount(_params, %{"user_id" => user_id} = _session, socket) do
     if connected?(socket) do
-      Presence.track_room(player_id, @room_type)
+      Presence.track_room(user_id, @room_type)
 
       Phoenix.PubSub.subscribe(Tetrex.PubSub, Presence.all_rooms())
     end
 
     {:ok,
      socket
-     |> assign(:player_id, player_id)
-     |> assign(:user_has_game, GameRegistry.user_has_game?(player_id))
+     |> assign(:user_id, user_id)
+     |> assign(:user_has_game, GameRegistry.user_has_game?(user_id))
      |> assign(:users, %{})
      |> presence_assigns()}
   end
@@ -37,10 +37,10 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def handle_event("new-single-player-game", _value, socket) do
-    player_id = socket.assigns.player_id
+    user_id = socket.assigns.user_id
 
-    if !GameRegistry.user_has_game?(player_id) do
-      Tetrex.GameRegistry.start_new_game(player_id)
+    if !GameRegistry.user_has_game?(user_id) do
+      Tetrex.GameRegistry.start_new_game(user_id)
 
       {:noreply,
        socket
@@ -54,9 +54,9 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def handle_event("resume-single-player-game", _value, socket) do
-    player_id = socket.assigns.player_id
+    user_id = socket.assigns.user_id
 
-    if GameRegistry.user_has_game?(player_id) do
+    if GameRegistry.user_has_game?(user_id) do
       {:noreply,
        socket
        |> push_redirect(to: Routes.live_path(socket, TetrexWeb.SinglePlayerGameLive))}
