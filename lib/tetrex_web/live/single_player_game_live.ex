@@ -1,10 +1,10 @@
 defmodule TetrexWeb.SinglePlayerGameLive do
   use TetrexWeb, :live_view
 
-  alias Tetrex.GameMessage
-  alias Tetrex.GameServer
+  alias Tetrex.SinglePlayer.GameMessage
+  alias Tetrex.SinglePlayer.GameServer
   alias Tetrex.GameRegistry
-  alias Tetrex.Game
+  alias Tetrex.SinglePlayer.Game
   alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Modal
   alias TetrexWeb.Components.Soundtrack
