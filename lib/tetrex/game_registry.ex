@@ -1,5 +1,5 @@
 defmodule Tetrex.GameRegistry do
-  alias Tetrex.GameServer
+  alias Tetrex.SinglePlayer.GameServer
 
   def start_new_game(user_id) do
     # TODO: Start under a dynamic supervisor rather than unlinked

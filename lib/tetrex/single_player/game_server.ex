@@ -1,10 +1,9 @@
-defmodule Tetrex.GameServer do
+defmodule Tetrex.SinglePlayer.GameServer do
   use GenServer
-  alias Tetrex.GameServer
   alias Tetrex.Periodic
   alias Tetrex.BoardServer
-  alias Tetrex.Game
-  alias Tetrex.GameMessage
+  alias Tetrex.SinglePlayer.Game
+  alias Tetrex.SinglePlayer.GameMessage
 
   @board_height 20
   @board_width 10

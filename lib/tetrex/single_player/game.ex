@@ -1,4 +1,4 @@
-defmodule Tetrex.Game do
+defmodule Tetrex.SinglePlayer.Game do
   @enforce_keys [:lines_cleared, :board_pid, :periodic_mover_pid, :status]
   defstruct [:lines_cleared, :board_pid, :periodic_mover_pid, :status]
 end
