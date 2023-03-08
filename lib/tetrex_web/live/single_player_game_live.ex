@@ -55,6 +55,33 @@ defmodule TetrexWeb.SinglePlayerGameLive do
         |> noreply()
 
   @impl true
+  def handle_event("touch-input", js_touches, socket) do
+    last_touch_direction =
+      js_touches
+      |> Enum.to_list()
+      |> List.last()
+      |> Enum.map(&TetrexWeb.Touch.from_js_touch/1)
+      |> TetrexWeb.Touch.quadrant_direction()
+      |> dbg()
+
+    case last_touch_direction do
+      :left ->
+        GameServer.try_move_left(socket.assigns.game_server)
+
+      :up ->
+        GameServer.rotate(socket.assigns.game_server)
+
+      :right ->
+        GameServer.try_move_right(socket.assigns.game_server)
+
+      :down ->
+        GameServer.drop(socket.assigns.game_server)
+    end
+
+    socket
+  end
+
+  @impl true
   def handle_event("start_game", _value, socket),
     do:
       socket
