@@ -8,10 +8,10 @@ defmodule Tetrex.Multiplayer.Game do
               online: boolean()
             }
           },
-          status: :awaiting_start | :playing | :finished,
+          status: :players_joining | :all_ready | :playing | :finished,
           periodic_mover_pid: pid()
         }
 
-  @enforce_keys [:players, :status]
-  defstruct [:players, :status]
+  @enforce_keys [:players, :status, :periodic_mover_pid]
+  defstruct [:players, :status, :periodic_mover_pid]
 end

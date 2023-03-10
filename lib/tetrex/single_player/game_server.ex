@@ -10,16 +10,17 @@ defmodule Tetrex.SinglePlayer.GameServer do
 
   # Client API
 
-  def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, [], opts)
-  end
-
-  def start(opts \\ []) do
-    GenServer.start(__MODULE__, [], opts)
+  def start_link(user_id: user_id) do
+    GenServer.start_link(__MODULE__, [user_id: user_id], [])
   end
 
   def game(game_server) do
     GenServer.call(game_server, :get_game)
+  end
+
+  def user_id(game_server) do
+    %Game{user_id: user_id} = GenServer.call(game_server, :get_game)
+    user_id
   end
 
   def board_preview(game_server) do
@@ -74,7 +75,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
   # Server callbacks
 
   @impl true
-  def init(_opts) do
+  def init(user_id: user_id) do
     {:ok, board_server_pid} = BoardServer.start_link([])
 
     # Create a periodic task to move the piece down
@@ -90,6 +91,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
 
     {:ok,
      %Game{
+       user_id: user_id,
        board_pid: board_server_pid,
        periodic_mover_pid: periodic_mover_pid,
        lines_cleared: 0,

@@ -1,5 +1,5 @@
 defmodule TetrexWeb.LobbyLive do
-  alias Tetrex.GameRegistry
+  alias Tetrex.GameDynamicSupervisor
   use TetrexWeb, :live_view
 
   @socket_presence_assign_key :users
@@ -16,7 +16,7 @@ defmodule TetrexWeb.LobbyLive do
     {:ok,
      socket
      |> assign(:user_id, user_id)
-     |> assign(:user_has_game, GameRegistry.user_has_game?(user_id))
+     |> assign(:user_has_game, GameDynamicSupervisor.user_has_single_player_game?(user_id))
      |> assign(:users, %{})
      |> mount_presence_init()}
   end
@@ -25,8 +25,8 @@ defmodule TetrexWeb.LobbyLive do
   def handle_event("new-single-player-game", _value, socket) do
     user_id = socket.assigns.user_id
 
-    if !GameRegistry.user_has_game?(user_id) do
-      Tetrex.GameRegistry.start_new_game(user_id)
+    if !GameDynamicSupervisor.user_has_single_player_game?(user_id) do
+      GameDynamicSupervisor.start_single_player_game(user_id)
 
       {:noreply,
        socket
@@ -42,7 +42,7 @@ defmodule TetrexWeb.LobbyLive do
   def handle_event("resume-single-player-game", _value, socket) do
     user_id = socket.assigns.user_id
 
-    if GameRegistry.user_has_game?(user_id) do
+    if GameDynamicSupervisor.user_has_single_player_game?(user_id) do
       {:noreply,
        socket
        |> push_redirect(to: Routes.live_path(socket, TetrexWeb.SinglePlayerGameLive))}
