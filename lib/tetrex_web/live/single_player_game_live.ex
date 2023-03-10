@@ -1,9 +1,9 @@
 defmodule TetrexWeb.SinglePlayerGameLive do
   use TetrexWeb, :live_view
 
+  alias Tetrex.GameDynamicSupervisor
   alias Tetrex.SinglePlayer.GameMessage
   alias Tetrex.SinglePlayer.GameServer
-  alias Tetrex.GameRegistry
   alias Tetrex.SinglePlayer.Game
   alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Modal
@@ -14,30 +14,25 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
-    games_found = Registry.lookup(GameRegistry, user_id)
+    case GameDynamicSupervisor.user_single_player_game(user_id) do
+      nil ->
+        {:ok, push_redirect(socket, to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
 
-    if Enum.count(games_found) == 0 do
-      {:ok,
-       socket
-       |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
-    else
-      # Should only ever be one game in progress, error if more
-      [{game_server, _}] = games_found
+      {game_server, _game} ->
+        if connected?(socket) do
+          GameServer.subscribe_updates(game_server)
+        end
 
-      if connected?(socket) do
-        GameServer.subscribe_updates(game_server)
-      end
+        socket =
+          socket
+          |> assign(user_id: user_id)
+          |> assign(game_server: game_server)
+          |> assign(game_over_audio_id: @game_over_audio_id)
+          |> assign(theme_music_audio_id: @theme_music_audio_id)
+          |> initial_game_assigns()
+          |> pause_game_if_playing()
 
-      socket =
-        socket
-        |> assign(user_id: user_id)
-        |> assign(game_server: game_server)
-        |> assign(game_over_audio_id: @game_over_audio_id)
-        |> assign(theme_music_audio_id: @theme_music_audio_id)
-        |> initial_game_assigns()
-        |> pause_game_if_playing()
-
-      {:ok, socket}
+        {:ok, socket}
     end
   end
 
@@ -63,7 +58,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   @impl true
   def handle_event("quit_game", _value, socket) do
-    GameRegistry.remove_game(socket.assigns.user_id)
+    GameDynamicSupervisor.remove_single_player_game(socket.assigns.user_id)
 
     socket
     |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))

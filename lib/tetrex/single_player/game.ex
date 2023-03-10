@@ -1,5 +1,6 @@
 defmodule Tetrex.SinglePlayer.Game do
   @type t :: %__MODULE__{
+          user_id: String.t(),
           lines_cleared: non_neg_integer(),
           board_pid: pid(),
           periodic_mover_pid: pid(),
@@ -10,6 +11,6 @@ defmodule Tetrex.SinglePlayer.Game do
             | :game_over
         }
 
-  @enforce_keys [:lines_cleared, :board_pid, :periodic_mover_pid, :status]
-  defstruct [:lines_cleared, :board_pid, :periodic_mover_pid, :status]
+  @enforce_keys [:user_id, :lines_cleared, :board_pid, :periodic_mover_pid, :status]
+  defstruct [:user_id, :lines_cleared, :board_pid, :periodic_mover_pid, :status]
 end
