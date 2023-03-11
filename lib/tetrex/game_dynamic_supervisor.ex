@@ -2,6 +2,7 @@ defmodule Tetrex.GameDynamicSupervisor do
   # Automatically defines child_spec/1
   use DynamicSupervisor
   alias Tetrex.SinglePlayer
+  alias Tetrex.Multiplayer
 
   def start_link(init_arg) do
     DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
@@ -56,6 +57,17 @@ defmodule Tetrex.GameDynamicSupervisor do
     case user_single_player_game(user_id) do
       nil -> false
       _game -> true
+    end
+  end
+
+  def start_multiplayer_game() do
+    case DynamicSupervisor.start_child(__MODULE__, %{
+           id: :ignored,
+           start: {Multiplayer.GameServer, :start_link, [[]]}
+         }) do
+      :ignore -> {:error, "Multiplayer.GameServer ignored start request"}
+      {:error, error} -> {:error, error}
+      {:ok, child_pid} -> {:ok, child_pid}
     end
   end
 end
