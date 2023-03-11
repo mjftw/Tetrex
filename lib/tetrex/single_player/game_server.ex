@@ -67,10 +67,16 @@ defmodule Tetrex.SinglePlayer.GameServer do
     GenServer.cast(game_server, :rotate)
   end
 
-  def pubsub_topic(game_server), do: "game:#{Serialise.serialise(game_server)}"
+  def pubsub_topic(user_id), do: "single-player-game:#{user_id}"
 
   def subscribe_updates(game_server),
-    do: Phoenix.PubSub.subscribe(Tetrex.PubSub, pubsub_topic(game_server))
+    do:
+      Phoenix.PubSub.subscribe(
+        Tetrex.PubSub,
+        game_server
+        |> user_id()
+        |> pubsub_topic()
+      )
 
   # Server callbacks
 
