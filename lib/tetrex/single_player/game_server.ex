@@ -18,7 +18,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
     GenServer.call(game_server, :get_game)
   end
 
-  def user_id(game_server) do
+  def game_user_id(game_server) do
     %Game{user_id: user_id} = GenServer.call(game_server, :get_game)
     user_id
   end
@@ -74,7 +74,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
       Phoenix.PubSub.subscribe(
         Tetrex.PubSub,
         game_server
-        |> user_id()
+        |> game_user_id()
         |> pubsub_topic()
       )
 
@@ -106,17 +106,25 @@ defmodule Tetrex.SinglePlayer.GameServer do
   end
 
   @impl true
-  def handle_continue(:publish_state, game) do
-    board_preview = BoardServer.preview(game.board_pid)
+  def handle_continue(
+        :publish_state,
+        %Game{
+          board_pid: board_pid,
+          lines_cleared: lines_cleared,
+          status: status,
+          user_id: user_id
+        } = game
+      ) do
+    board_preview = BoardServer.preview(board_pid)
 
     game_update = %GameMessage{
       game_pid: self(),
-      lines_cleared: game.lines_cleared,
-      status: game.status,
+      lines_cleared: lines_cleared,
+      status: status,
       board_preview: board_preview
     }
 
-    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(self()), game_update)
+    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(user_id), game_update)
 
     {:noreply, game}
   end
@@ -127,7 +135,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
 
     # Set the periodic task to move the piece down
     Tetrex.Periodic.set_work(periodic_mover_pid, fn ->
-      GameServer.try_move_down(this_game_server)
+      try_move_down(this_game_server)
     end)
 
     {:noreply, game}
