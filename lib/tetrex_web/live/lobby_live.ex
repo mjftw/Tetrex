@@ -1,4 +1,5 @@
 defmodule TetrexWeb.LobbyLive do
+  alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
   use TetrexWeb, :live_view
 
@@ -13,11 +14,22 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
+    if connected?(socket) do
+      GameDynamicSupervisor.subscribe_multiplayer_game_updates()
+    end
+
     {:ok,
      socket
      |> assign(:user_id, user_id)
-     |> assign(:user_has_game, GameDynamicSupervisor.user_has_single_player_game?(user_id))
+     |> assign(
+       :user_has_single_player_game,
+       GameDynamicSupervisor.user_has_single_player_game?(user_id)
+     )
      |> assign(:users, %{})
+     |> assign(
+       :multiplayer_games,
+       GameDynamicSupervisor.multiplayer_games() |> Enum.map(fn {_pid, game} -> game end)
+     )
      |> mount_presence_init()}
   end
 
@@ -51,5 +63,25 @@ defmodule TetrexWeb.LobbyLive do
        socket
        |> put_flash(:error, "Cannot find single player game")}
     end
+  end
+
+  @impl true
+  def handle_info({:created_multiplayer_game, game}, socket) do
+    {
+      :noreply,
+      assign(socket, :multiplayer_games, [game | socket.assigns.multiplayer_games])
+    }
+  end
+
+  @impl true
+  def handle_info({:removed_multiplayer_game, game_id}, socket) do
+    {
+      :noreply,
+      assign(
+        socket,
+        :multiplayer_games,
+        Enum.filter(socket.assigns.multiplayer_games, &(&1.game_id != game_id))
+      )
+    }
   end
 end

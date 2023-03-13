@@ -1,6 +1,6 @@
 <h1>Lobby</h1>
 
-<%= if @user_has_game do %>
+<%= if @user_has_single_player_game do %>
     <button phx-click="resume-single-player-game">Resume single player game</button>
 <% else %>
     <button phx-click="new-single-player-game">Start single player game</button>
@@ -11,6 +11,15 @@
     <ul>
         <%= for {user_id, _} <- @users do %>
             <li> <%= if user_id == @user_id do "You" else user_id end %> </li>
+        <% end %>
+    </ul>
+</div>
+
+<div>
+    <h2>Multiplayer games:</h2>
+    <ul>
+        <%= for game <- @multiplayer_games do %>
+            <li><%= game.game_id %></li>
         <% end %>
     </ul>
 </div>
