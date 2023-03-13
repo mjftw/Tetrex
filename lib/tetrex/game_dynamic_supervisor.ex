@@ -70,4 +70,12 @@ defmodule Tetrex.GameDynamicSupervisor do
       {:ok, child_pid} -> {:ok, child_pid}
     end
   end
+
+  def multiplayer_games() do
+    DynamicSupervisor.which_children(__MODULE__)
+    |> Stream.filter(&match?({_, _pid, :worker, [Tetrex.Multiplayer.GameServer]}, &1))
+    |> Stream.map(fn {_, pid, _, _} -> pid end)
+    |> Stream.map(&Task.async(fn -> {&1, Multiplayer.GameServer.game(&1)} end))
+    |> Enum.map(&Task.await/1)
+  end
 end
