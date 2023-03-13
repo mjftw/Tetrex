@@ -12,8 +12,8 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.call(game_server, :get_game_id)
   end
 
-  def get_state(game_server) do
-    GenServer.call(game_server, :get_state)
+  def game(game_server) do
+    GenServer.call(game_server, :game)
   end
 
   def move_all_games_down(game_server) do
@@ -22,6 +22,10 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   def join_game(game_server, user_id) do
     GenServer.call(game_server, {:join_game, user_id})
+  end
+
+  def leave_game(game_server, user_id) do
+    GenServer.call(game_server, {:leave_game, user_id})
   end
 
   def subscribe_updates(game_server) do
@@ -114,18 +118,13 @@ defmodule Tetrex.Multiplayer.GameServer do
     {:reply, game_id, game}
   end
 
-  def handle_call(:get_state, _from, game) do
+  def handle_call(:game, _from, game) do
     {:reply, game, game}
   end
 
   @impl true
   def handle_call({:join_game, user_id}, _from, %Game{players: players} = game) do
-    player_in_game =
-      players
-      |> Enum.filter(fn {player_user_id, _} -> user_id == player_user_id end)
-      |> Enum.count() > 0
-
-    if player_in_game do
+    if player_in_game?(user_id, game) do
       {:reply, {:error, :already_in_game}, game}
     else
       {:ok, board_pid} = BoardServer.start_link()
@@ -142,4 +141,27 @@ defmodule Tetrex.Multiplayer.GameServer do
        {:continue, :publish_state}}
     end
   end
+
+  @impl true
+  def handle_call({:leave_game, user_id}, _from, %Game{players: players} = game) do
+    player = get_player(user_id, game)
+
+    if is_nil(player) do
+      {:reply, {:error, :not_in_game}, game}
+    else
+      Process.exit(player.board_pid, :kill)
+
+      {:reply, :ok,
+       %Game{
+         game
+         | players: List.delete(players, player)
+       }, {:continue, :publish_state}}
+    end
+  end
+
+  defp get_player(user_id, %Game{players: players}),
+    do: Enum.find(players, nil, &(&1.user_id == user_id))
+
+  defp player_in_game?(user_id, %Game{players: players}),
+    do: Enum.any?(players, &(&1.user_id == user_id))
 end
