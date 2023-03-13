@@ -1,6 +1,7 @@
 defmodule Tetrex.GameDynamicSupervisor do
   # Automatically defines child_spec/1
   use DynamicSupervisor
+  alias Phoenix.PubSub
   alias Tetrex.SinglePlayer
   alias Tetrex.Multiplayer
 
@@ -8,9 +9,13 @@ defmodule Tetrex.GameDynamicSupervisor do
     DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
   end
 
-  @impl true
-  def init(_init_arg) do
-    DynamicSupervisor.init(strategy: :one_for_one)
+  def multiplayer_pubsub_topic, do: "GameDynamicSupervisor:multiplayer-game"
+
+  def subscribe_multiplayer_game_updates() do
+    Phoenix.PubSub.subscribe(
+      Tetrex.PubSub,
+      multiplayer_pubsub_topic()
+    )
   end
 
   # TODO prevent creating a new game for a user that has one already
@@ -27,7 +32,7 @@ defmodule Tetrex.GameDynamicSupervisor do
 
   def remove_single_player_game(user_id) do
     case user_single_player_game(user_id) do
-      nil -> :ok
+      nil -> {:error, :game_not_found}
       {game_pid, _} -> DynamicSupervisor.terminate_child(__MODULE__, game_pid)
     end
   end
@@ -65,9 +70,15 @@ defmodule Tetrex.GameDynamicSupervisor do
            id: :ignored,
            start: {Multiplayer.GameServer, :start_link, [[]]}
          }) do
-      :ignore -> {:error, "Multiplayer.GameServer ignored start request"}
-      {:error, error} -> {:error, error}
-      {:ok, child_pid} -> {:ok, child_pid}
+      :ignore ->
+        {:error, "Multiplayer.GameServer ignored start request"}
+
+      {:error, error} ->
+        {:error, error}
+
+      {:ok, child_pid} ->
+        publish_create_multiplayer_game(child_pid)
+        {:ok, child_pid}
     end
   end
 
@@ -77,5 +88,42 @@ defmodule Tetrex.GameDynamicSupervisor do
     |> Stream.map(fn {_, pid, _, _} -> pid end)
     |> Stream.map(&Task.async(fn -> {&1, Multiplayer.GameServer.game(&1)} end))
     |> Enum.map(&Task.await/1)
+  end
+
+  def multiplayer_game_by_id(game_id) do
+    multiplayer_games()
+    |> Enum.find(fn {_pid, game} -> game.game_id == game_id end)
+  end
+
+  def remove_multiplayer_game(game_id) do
+    case multiplayer_game_by_id(game_id) do
+      nil ->
+        {:error, :game_not_found}
+
+      {game_pid, _game} ->
+        DynamicSupervisor.terminate_child(__MODULE__, game_pid)
+        publish_remove_multiplayer_game(game_id)
+    end
+  end
+
+  defp publish_create_multiplayer_game(multiplayer_game_pid),
+    do:
+      PubSub.broadcast!(
+        Tetrex.PubSub,
+        multiplayer_pubsub_topic(),
+        {:created_multiplayer_game, Multiplayer.GameServer.game(multiplayer_game_pid)}
+      )
+
+  defp publish_remove_multiplayer_game(game_id),
+    do:
+      PubSub.broadcast!(
+        Tetrex.PubSub,
+        multiplayer_pubsub_topic(),
+        {:removed_multiplayer_game, game_id}
+      )
+
+  @impl true
+  def init(_init_arg) do
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 end
