@@ -20,6 +20,7 @@ defmodule TetrexWeb.Router do
       pipe_through :browser
 
       live "/single-player-game", SinglePlayerGameLive
+      live "/multiplayer-game/:game_id", MultiplayerGameLive
       live "/", LobbyLive
     end
   end
