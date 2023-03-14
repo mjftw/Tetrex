@@ -19,7 +19,9 @@
     <h2>Multiplayer games:</h2>
     <ul>
         <%= for game <- @multiplayer_games do %>
-            <li><%= game.game_id %></li>
+            <li>
+                Join game: <%= live_redirect game.game_id, to: Routes.live_path(@socket, TetrexWeb.MultiplayerGameLive, game.game_id) %>
+            </li>
         <% end %>
     </ul>
 </div>

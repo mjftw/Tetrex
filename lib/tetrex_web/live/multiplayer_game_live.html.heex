@@ -1,0 +1,9 @@
+<h1>Multiplayer game</h1>
+
+Game ID: <%= @game.game_id %><br/>
+Players:
+<ul>
+    <%= for player <- @game.players do %>
+        <li><%= player.user_id %></li>
+    <% end %>
+</ul>

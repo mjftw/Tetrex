@@ -1,5 +1,4 @@
 defmodule TetrexWeb.LobbyLive do
-  alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
   use TetrexWeb, :live_view
 
