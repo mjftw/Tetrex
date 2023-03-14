@@ -3,6 +3,7 @@ defmodule Tetrex.Multiplayer.GameMessage do
   alias Tetrex.Board
 
   @type t :: %__MODULE__{
+          game_id: String.t(),
           players: %{
             String.t() => %{
               board_preview: Board.board_preview(),
@@ -14,6 +15,6 @@ defmodule Tetrex.Multiplayer.GameMessage do
           status: Game.game_status()
         }
 
-  @enforce_keys [:players, :status]
-  defstruct [:players, :status]
+  @enforce_keys [:game_id, :players, :status]
+  defstruct [:game_id, :players, :status]
 end
