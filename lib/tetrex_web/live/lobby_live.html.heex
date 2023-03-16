@@ -22,7 +22,7 @@
     <ul>
         <%= for game <- @multiplayer_games, Multiplayer.Game.user_in_game?(game, @user_id) do %>
             <li>
-                <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Rejoin multiplayer game: <%=game.game_id%></button>
+                <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Rejoin multiplayer game: <%=game.game_id%> - <%= Multiplayer.Game.num_players(game) %> player(s)</button>
             </li>
         <% end %>
     </ul>
@@ -31,7 +31,7 @@
     <h2>Multiplayer games you could join:</h2>
         <%= for game <- @multiplayer_games, !Multiplayer.Game.user_in_game?(game, @user_id) do %>
             <li>
-                <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join multiplayer game: <%=game.game_id%></button>
+                <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join multiplayer game: <%=game.game_id%> - <%= Multiplayer.Game.num_players(game) %> player(s)</button>
             </li>
         <% end %>
     </ul>
