@@ -6,7 +6,7 @@
     <button phx-click="new-single-player-game">Start single player game</button>
 <% end %>
 
-<button phx-click="new-multiplayer-game">Start multiplayer game</button>
+<button phx-click="new-multiplayer-game">Start new multiplayer game</button>
 
 <div>
     <h2>Online users:</h2>
@@ -28,7 +28,7 @@
     </ul>
 
     <ul>
-    <h2>Multiplayer you could join:</h2>
+    <h2>Multiplayer games you could join:</h2>
         <%= for game <- @multiplayer_games, !Multiplayer.Game.user_in_game?(game, @user_id) do %>
             <li>
                 <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join multiplayer game: <%=game.game_id%></button>
