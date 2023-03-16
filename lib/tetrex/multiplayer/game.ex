@@ -20,4 +20,7 @@ defmodule Tetrex.Multiplayer.Game do
 
   @enforce_keys [:game_id, :players, :status, :periodic_mover_pid]
   defstruct [:game_id, :players, :status, :periodic_mover_pid]
+
+  def user_in_game?(%__MODULE__{players: players}, user_id),
+    do: Enum.any?(players, fn %{user_id: player_user_id} -> player_user_id == user_id end)
 end
