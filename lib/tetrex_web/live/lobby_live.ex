@@ -83,6 +83,32 @@ defmodule TetrexWeb.LobbyLive do
     end
   end
 
+  @impl true
+  def handle_event(
+        "join-multiplayer-game",
+        %{"game-id" => game_id},
+        %{assigns: %{user_id: user_id}} = socket
+      ) do
+    result =
+      with {:ok, game_server_pid, _game} <- GameDynamicSupervisor.multiplayer_game_by_id(game_id),
+           result when result in [:ok, {:error, :already_in_game}] <-
+             Multiplayer.GameServer.join_game(game_server_pid, user_id),
+           do: :ok
+
+    case result do
+      :ok ->
+        {:noreply,
+         socket
+         |> push_redirect(to: Routes.live_path(socket, TetrexWeb.MultiplayerGameLive, game_id))}
+
+      # TODO: Log error
+      {:error, _error} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Failed to join multiplayer game")}
+    end
+  end
+
   # PubSub handlers
   @impl true
   def handle_info({:created_multiplayer_game, game}, socket) do
