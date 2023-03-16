@@ -23,4 +23,7 @@ defmodule Tetrex.Multiplayer.Game do
 
   def user_in_game?(%__MODULE__{players: players}, user_id),
     do: Enum.any?(players, fn %{user_id: player_user_id} -> player_user_id == user_id end)
+
+  def num_players(%__MODULE__{players: players}),
+    do: Enum.count(players)
 end
