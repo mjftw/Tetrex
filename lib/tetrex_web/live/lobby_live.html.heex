@@ -22,7 +22,7 @@
     <ul>
         <%= for game <- @multiplayer_games do %>
             <li>
-                Join game: <%= live_redirect game.game_id, to: Routes.live_path(@socket, TetrexWeb.MultiplayerGameLive, game.game_id) %>
+                <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join multiplayer game: <%=game.game_id%></button>
             </li>
         <% end %>
     </ul>

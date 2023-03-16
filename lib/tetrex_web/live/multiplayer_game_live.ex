@@ -13,10 +13,11 @@ defmodule TetrexWeb.MultiplayerGameLive do
   @impl true
   def handle_params(%{"game_id" => game_id}, _uri, socket) do
     case GameDynamicSupervisor.multiplayer_game_by_id(game_id) do
-      nil ->
+      # TODO: Log an error here
+      {:error, _error} ->
         {:noreply, push_redirect(socket, to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
 
-      {game_server, _game} ->
+      {:ok, game_server, _game} ->
         if connected?(socket) do
           GameServer.subscribe_updates(game_server)
         end

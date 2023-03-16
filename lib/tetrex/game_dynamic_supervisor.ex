@@ -91,16 +91,18 @@ defmodule Tetrex.GameDynamicSupervisor do
   end
 
   def multiplayer_game_by_id(game_id) do
-    multiplayer_games()
-    |> Enum.find(fn {_pid, game} -> game.game_id == game_id end)
+    case Enum.find(multiplayer_games(), nil, fn {_pid, game} -> game.game_id == game_id end) do
+      nil -> {:error, :game_not_found}
+      {game_pid, game} -> {:ok, game_pid, game}
+    end
   end
 
   def remove_multiplayer_game(game_id) do
     case multiplayer_game_by_id(game_id) do
-      nil ->
-        {:error, :game_not_found}
+      {:error, error} ->
+        {:error, error}
 
-      {game_pid, _game} ->
+      {:ok, game_pid, _game} ->
         DynamicSupervisor.terminate_child(__MODULE__, game_pid)
         publish_remove_multiplayer_game(game_id)
     end
