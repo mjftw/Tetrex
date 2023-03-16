@@ -1,4 +1,5 @@
 defmodule TetrexWeb.LobbyLive do
+  alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
   use TetrexWeb, :live_view
 
@@ -64,6 +65,25 @@ defmodule TetrexWeb.LobbyLive do
     end
   end
 
+  @impl true
+  def handle_event("new-multiplayer-game", _value, %{assigns: %{user_id: user_id}} = socket) do
+    case GameDynamicSupervisor.start_multiplayer_game() do
+      {:ok, game_server_pid} ->
+        game_id = Multiplayer.GameServer.get_game_id(game_server_pid)
+        :ok = Multiplayer.GameServer.join_game(game_server_pid, user_id)
+
+        {:noreply,
+         socket
+         |> push_redirect(to: Routes.live_path(socket, TetrexWeb.MultiplayerGameLive, game_id))}
+
+      {:error, _error} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Failed to create multiplayer game")}
+    end
+  end
+
+  # PubSub handlers
   @impl true
   def handle_info({:created_multiplayer_game, game}, socket) do
     {
