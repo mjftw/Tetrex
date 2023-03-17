@@ -15,16 +15,40 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.call(game_server, :game)
   end
 
-  def move_all_games_down(game_server) do
-    GenServer.cast(game_server, :move_all_boards_down)
-  end
-
   def join_game(game_server, user_id) do
     GenServer.call(game_server, {:join_game, user_id})
   end
 
   def leave_game(game_server, user_id) do
     GenServer.call(game_server, {:leave_game, user_id})
+  end
+
+  def move_all_games_down(game_server) do
+    GenServer.cast(game_server, :move_all_boards_down)
+  end
+
+  def try_move_down(game_server, user_id) do
+    GenServer.call(game_server, {:try_move_down, user_id})
+  end
+
+  def drop(game_server, user_id) do
+    GenServer.call(game_server, {:drop, user_id})
+  end
+
+  def try_move_left(game_server, user_id) do
+    GenServer.call(game_server, {:try_move_left, user_id})
+  end
+
+  def try_move_right(game_server, user_id) do
+    GenServer.call(game_server, {:try_move_right, user_id})
+  end
+
+  def hold(game_server, user_id) do
+    GenServer.call(game_server, {:hold, user_id})
+  end
+
+  def rotate(game_server, user_id) do
+    GenServer.call(game_server, {:rotate, user_id})
   end
 
   def subscribe_updates(game_server) do
@@ -98,6 +122,75 @@ defmodule Tetrex.Multiplayer.GameServer do
     |> Enum.map(fn {_user_id, %{board_pid: board_pid}} -> BoardServer.try_move_down(board_pid) end)
 
     {:noreply, game, {:continue, :publish_state}}
+  end
+
+  def handle_call({:try_move_down, user_id}, _from, game) do
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        # TODO: Update lines cleared
+        BoardServer.try_move_down(board_pid)
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
+  end
+
+  def handle_call({:drop, user_id}, _from, game) do
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        # TODO: Update lines cleared
+
+        BoardServer.drop(board_pid)
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
+  end
+
+  def handle_call({:try_move_left, user_id}, _from, game) do
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        BoardServer.try_move_left(board_pid)
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
+  end
+
+  def handle_call({:try_move_right, user_id}, _from, game) do
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        BoardServer.try_move_right(board_pid)
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
+  end
+
+  def handle_call({:hold, user_id}, _from, game) do
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        BoardServer.hold(board_pid)
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
+  end
+
+  def handle_call({:rotate, user_id}, _from, game) do
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        BoardServer.rotate(board_pid)
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
   end
 
   def handle_call(:get_game_id, _from, %Game{game_id: game_id} = game) do

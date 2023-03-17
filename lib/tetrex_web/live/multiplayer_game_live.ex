@@ -4,6 +4,8 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias Tetrex.Multiplayer.GameMessage
   alias Tetrex.Multiplayer.GameServer
   alias Tetrex.GameDynamicSupervisor
+  alias TetrexWeb.Components.BoardComponents
+
   use TetrexWeb, :live_view
 
   @impl true
@@ -45,7 +47,79 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
   @impl true
   def handle_info(%GameMessage{} = game_state, socket) do
+    IO.inspect(game_state)
     {:noreply, assign(socket, game: game_state)}
+  end
+
+  @impl true
+  def handle_event(
+        "keypress",
+        %{"key" => "ArrowDown"},
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.try_move_down(game_server_pid, user_id)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "keypress",
+        %{"key" => "ArrowLeft"},
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.try_move_left(game_server_pid, user_id)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "keypress",
+        %{"key" => "ArrowRight"},
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.try_move_right(game_server_pid, user_id)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "keypress",
+        %{"key" => "ArrowUp"},
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.rotate(game_server_pid, user_id)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "keypress",
+        %{"key" => " "},
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.drop(game_server_pid, user_id)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "keypress",
+        %{"key" => "h"},
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.hold(game_server_pid, user_id)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("keypress", %{"key" => key}, socket) do
+    IO.puts("Unhandled key press: #{key}")
+
+    {:noreply, socket}
   end
 
   defp redirect_to_lobby(socket),
