@@ -1,9 +1,26 @@
-<h1>Multiplayer game</h1>
 
-Game ID: <%= @game.game_id %><br/>
-Players:
-<ul>
-    <%= for player <- @game.players do %>
-        <li><%= player.user_id %></li>
+<div class="multiplayer-game" phx-window-keydown="keypress">
+Multiplayer Game ID: <%= @game.game_id %><br/>
+
+    <!-- Display current user's boards -->
+    <%= for %{board_preview: board_preview, lines_cleared: lines_cleared} = player  <- @game.players, player.user_id == @user_id do %>
+        <h3>User: You </h3>
+        <BoardComponents.score_box score={lines_cleared}/>
+        <div class="board">
+            <BoardComponents.hold_tile_box board={board_preview}/>
+            <BoardComponents.playfield board={board_preview}/>
+            <BoardComponents.next_tile_box board={board_preview}/>
+        </div>
     <% end %>
-</ul>
+
+    <!-- Display other users's boards -->
+    <%= for %{user_id: user_id, board_preview: board_preview, lines_cleared: lines_cleared} = player  <- @game.players, player.user_id != @user_id do %>
+        <h3>User: <%= user_id %> </h3>
+        <BoardComponents.score_box score={lines_cleared}/>
+        <div class="board">
+            <BoardComponents.hold_tile_box board={board_preview}/>
+            <BoardComponents.playfield board={board_preview}/>
+            <BoardComponents.next_tile_box board={board_preview}/>
+        </div>
+    <% end %>
+</div>
