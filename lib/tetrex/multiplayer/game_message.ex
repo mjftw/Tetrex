@@ -4,14 +4,15 @@ defmodule Tetrex.Multiplayer.GameMessage do
 
   @type t :: %__MODULE__{
           game_id: String.t(),
-          players: %{
-            String.t() => %{
+          players: [
+            %{
+              user_id: String.t(),
               board_preview: Board.board_preview(),
               lines_cleared: non_neg_integer(),
               status: Game.player_status(),
               online: boolean()
             }
-          },
+          ],
           status: Game.game_status()
         }
 

@@ -9,7 +9,7 @@
 <button phx-click="new-multiplayer-game">Start new multiplayer game</button>
 
 <div>
-    <h2>Online users:</h2>
+    <h2>Users in lobby:</h2>
     <ul>
         <%= for {user_id, _} <- @users do %>
             <li> <%= if user_id == @user_id do "You" else user_id end %> </li>

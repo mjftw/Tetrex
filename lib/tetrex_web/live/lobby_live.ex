@@ -28,7 +28,8 @@ defmodule TetrexWeb.LobbyLive do
      |> assign(:users, %{})
      |> assign(
        :multiplayer_games,
-       GameDynamicSupervisor.multiplayer_games() |> Enum.map(fn {_pid, game} -> game end)
+       GameDynamicSupervisor.multiplayer_games()
+       |> Enum.map(fn {_pid, %Multiplayer.Game{} = game} -> game end)
      )
      |> mount_presence_init()}
   end
@@ -111,7 +112,10 @@ defmodule TetrexWeb.LobbyLive do
 
   # PubSub handlers
   @impl true
-  def handle_info({:created_multiplayer_game, game}, socket) do
+  def handle_info({:created_multiplayer_game, game_server_pid}, socket) do
+    Multiplayer.GameServer.subscribe_updates(game_server_pid)
+    game = Multiplayer.GameServer.game(game_server_pid)
+
     {
       :noreply,
       assign(socket, :multiplayer_games, [game | socket.assigns.multiplayer_games])
@@ -128,5 +132,25 @@ defmodule TetrexWeb.LobbyLive do
         Enum.filter(socket.assigns.multiplayer_games, &(&1.game_id != game_id))
       )
     }
+  end
+
+  @impl true
+  def handle_info(%Multiplayer.GameMessage{game_id: game_id}, socket) do
+    games = socket.assigns.multiplayer_games
+
+    {:ok, _game_server_pid, game} = GameDynamicSupervisor.multiplayer_game_by_id(game_id)
+
+    case Enum.find_index(games, &(&1.game_id == game_id)) do
+      nil ->
+        # TODO: Maybe log something here?
+
+        # Didn't know about game, add to list
+        {:noreply, assign(socket, multiplayer_games: [game | games])}
+
+      game_index ->
+        updated_games = List.replace_at(games, game_index, game)
+
+        {:noreply, assign(socket, multiplayer_games: updated_games)}
+    end
   end
 end
