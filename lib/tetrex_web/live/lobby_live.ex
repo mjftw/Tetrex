@@ -116,7 +116,7 @@ defmodule TetrexWeb.LobbyLive do
   end
 
   @impl true
-  def handle_info(%Multiplayer.GameMessage{game_id: game_id} = game_message, socket) do
+  def handle_info(%Multiplayer.GameMessage{game_id: game_id}, socket) do
     games = socket.assigns.multiplayer_games
 
     {:ok, _game_server_pid, game} = GameDynamicSupervisor.multiplayer_game_by_id(game_id)
