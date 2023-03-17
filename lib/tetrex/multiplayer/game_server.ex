@@ -140,7 +140,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     if is_nil(player) do
       {:reply, {:error, :not_in_game}, game}
     else
-      Process.exit(player.board_pid, :kill)
+      # Process.exit(player.board_pid, :kill)
 
       {:reply, :ok,
        %Game{
@@ -150,9 +150,9 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
-  defp publish_update(%Game{game_id: game_id} = game),
-    do:
-      Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(game_id), Game.to_game_message(game))
+  defp publish_update(%Game{game_id: game_id} = game) do
+    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(game_id), Game.to_game_message(game))
+  end
 
   defp get_player(user_id, %Game{players: players}),
     do: Enum.find(players, nil, &(&1.user_id == user_id))
