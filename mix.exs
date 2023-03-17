@@ -4,7 +4,7 @@ defmodule Tetrex.MixProject do
   def project do
     [
       app: :tetrex,
-      version: "0.4.2",
+      version: "0.5.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
