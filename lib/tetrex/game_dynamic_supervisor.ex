@@ -113,7 +113,7 @@ defmodule Tetrex.GameDynamicSupervisor do
       PubSub.broadcast!(
         Tetrex.PubSub,
         multiplayer_pubsub_topic(),
-        {:created_multiplayer_game, Multiplayer.GameServer.game(multiplayer_game_pid)}
+        {:created_multiplayer_game, multiplayer_game_pid}
       )
 
   defp publish_remove_multiplayer_game(game_id),

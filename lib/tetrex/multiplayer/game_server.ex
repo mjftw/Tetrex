@@ -1,7 +1,6 @@
 defmodule Tetrex.Multiplayer.GameServer do
   alias Tetrex.BoardServer
   alias Tetrex.Multiplayer.Game
-  alias Tetrex.Multiplayer.GameMessage
   use GenServer
 
   def start_link(_opts) do
@@ -32,6 +31,15 @@ defmodule Tetrex.Multiplayer.GameServer do
     game_id = get_game_id(game_server)
 
     Phoenix.PubSub.subscribe(
+      Tetrex.PubSub,
+      pubsub_topic(game_id)
+    )
+  end
+
+  def unsubscribe_updates(game_server) do
+    game_id = get_game_id(game_server)
+
+    Phoenix.PubSub.unsubscribe(
       Tetrex.PubSub,
       pubsub_topic(game_id)
     )
@@ -101,8 +109,8 @@ defmodule Tetrex.Multiplayer.GameServer do
   end
 
   @impl true
-  def handle_call(:game_message, _from, %Game{game_id: game_id} = game) do
-    {:reply, game_message(game), game}
+  def handle_call(:game_message, _from, game) do
+    {:reply, Game.to_game_message(game), game}
   end
 
   @impl true
@@ -142,33 +150,9 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
-  defp game_message(%Game{
-         game_id: game_id,
-         players: players,
-         status: game_status
-       }) do
-    player_update =
-      players
-      |> Stream.map(fn
-        %{
-          user_id: user_id,
-          board_pid: board_pid,
-          lines_cleared: lines_cleared,
-          status: player_status
-        } ->
-          %{
-            user_id: user_id,
-            board_preview: BoardServer.preview(board_pid),
-            lines_cleared: lines_cleared,
-            status: player_status
-          }
-      end)
-
-    %GameMessage{game_id: game_id, players: player_update, status: game_status}
-  end
-
   defp publish_update(%Game{game_id: game_id} = game),
-    do: Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(game_id), game_message(game))
+    do:
+      Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(game_id), Game.to_game_message(game))
 
   defp get_player(user_id, %Game{players: players}),
     do: Enum.find(players, nil, &(&1.user_id == user_id))
