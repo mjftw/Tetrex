@@ -8,8 +8,10 @@ defmodule Tetrex.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      # Allow monitoring processes
+      ProcessMonitor,
       # Start a dynamic supervisor to start games under
-      Tetrex.GameDynamicSupervisor.child_spec([]),
+      Tetrex.GameDynamicSupervisor,
       # Start the Telemetry supervisor
       TetrexWeb.Telemetry,
       # Start the PubSub system
