@@ -11,7 +11,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
   end
 
   @impl true
-  def handle_params(%{"game_id" => game_id}, _uri, socket) do
+  def handle_params(%{"game_id" => game_id}, _uri, %{assigns: %{user_id: user_id}} = socket) do
     case GameDynamicSupervisor.multiplayer_game_by_id(game_id) do
       # TODO: Log an error here
       {:error, _error} ->
@@ -20,6 +20,8 @@ defmodule TetrexWeb.MultiplayerGameLive do
       {:ok, game_server, _game} ->
         if connected?(socket) do
           GameServer.subscribe_updates(game_server)
+          GameServer.join_game(game_server, user_id)
+          ProcessMonitor.monitor(fn _reason -> GameServer.leave_game(game_server, user_id) end)
         end
 
         initial_game_state = GameServer.get_game_message(game_server)

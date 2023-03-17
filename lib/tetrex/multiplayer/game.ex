@@ -31,7 +31,7 @@ defmodule Tetrex.Multiplayer.Game do
       }) do
     player_update =
       players
-      |> Stream.map(fn
+      |> Enum.map(fn
         %{
           user_id: user_id,
           board_pid: board_pid,

@@ -14,8 +14,13 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
+    {multiplayer_game_pids, multiplayer_games} =
+      Enum.unzip(GameDynamicSupervisor.multiplayer_games())
+
     if connected?(socket) do
       GameDynamicSupervisor.subscribe_multiplayer_game_updates()
+
+      Enum.each(multiplayer_game_pids, &Multiplayer.GameServer.subscribe_updates(&1))
     end
 
     {:ok,
@@ -26,11 +31,7 @@ defmodule TetrexWeb.LobbyLive do
        GameDynamicSupervisor.user_has_single_player_game?(user_id)
      )
      |> assign(:users, %{})
-     |> assign(
-       :multiplayer_games,
-       GameDynamicSupervisor.multiplayer_games()
-       |> Enum.map(fn {_pid, %Multiplayer.Game{} = game} -> game end)
-     )
+     |> assign(:multiplayer_games, multiplayer_games)
      |> mount_presence_init()}
   end
 
@@ -67,11 +68,10 @@ defmodule TetrexWeb.LobbyLive do
   end
 
   @impl true
-  def handle_event("new-multiplayer-game", _value, %{assigns: %{user_id: user_id}} = socket) do
+  def handle_event("new-multiplayer-game", _value, socket) do
     case GameDynamicSupervisor.start_multiplayer_game() do
       {:ok, game_server_pid} ->
         game_id = Multiplayer.GameServer.get_game_id(game_server_pid)
-        :ok = Multiplayer.GameServer.join_game(game_server_pid, user_id)
 
         {:noreply,
          socket
@@ -85,29 +85,10 @@ defmodule TetrexWeb.LobbyLive do
   end
 
   @impl true
-  def handle_event(
-        "join-multiplayer-game",
-        %{"game-id" => game_id},
-        %{assigns: %{user_id: user_id}} = socket
-      ) do
-    result =
-      with {:ok, game_server_pid, _game} <- GameDynamicSupervisor.multiplayer_game_by_id(game_id),
-           result when result in [:ok, {:error, :already_in_game}] <-
-             Multiplayer.GameServer.join_game(game_server_pid, user_id),
-           do: :ok
-
-    case result do
-      :ok ->
-        {:noreply,
-         socket
-         |> push_redirect(to: Routes.live_path(socket, TetrexWeb.MultiplayerGameLive, game_id))}
-
-      # TODO: Log error
-      {:error, _error} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Failed to join multiplayer game")}
-    end
+  def handle_event("join-multiplayer-game", %{"game-id" => game_id}, socket) do
+    {:noreply,
+     socket
+     |> push_redirect(to: Routes.live_path(socket, TetrexWeb.MultiplayerGameLive, game_id))}
   end
 
   # PubSub handlers
@@ -135,7 +116,7 @@ defmodule TetrexWeb.LobbyLive do
   end
 
   @impl true
-  def handle_info(%Multiplayer.GameMessage{game_id: game_id}, socket) do
+  def handle_info(%Multiplayer.GameMessage{game_id: game_id} = game_message, socket) do
     games = socket.assigns.multiplayer_games
 
     {:ok, _game_server_pid, game} = GameDynamicSupervisor.multiplayer_game_by_id(game_id)
