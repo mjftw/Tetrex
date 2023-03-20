@@ -6,6 +6,25 @@
     padding-bottom: 5%;
 }
 
+.multiplayer-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: cadetblue;
+    padding-bottom: 5%;
+    padding-left: 3%;
+    padding-right: 3%;
+    border: 1px;
+    border-style: double;
+}
+
+.multiplayer-games-container {
+    justify-content: center;
+    display: flex;
+    gap: 1%;
+    flex-direction: row;
+}
+
 .board {
     display: flex;
     flex: auto;
@@ -36,11 +55,11 @@
     border-color: black;
     border-width: 1px;
     border-radius: 10px;
-
     background-color: antiquewhite;
 }
 
 .tile-box {
+    text-align: center;
     height: fit-content;
     width: fit-content;
     background-color: antiquewhite;
