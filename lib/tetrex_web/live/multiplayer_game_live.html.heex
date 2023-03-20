@@ -1,26 +1,32 @@
 
-<div class="multiplayer-game" phx-window-keydown="keypress">
-Multiplayer Game ID: <%= @game.game_id %><br/>
+<div phx-window-keydown="keypress">
+    Multiplayer Game ID: <%= @game.game_id %><br/>
 
-    <!-- Display current user's boards -->
-    <%= for %{board_preview: board_preview, lines_cleared: lines_cleared} = player  <- @game.players, player.user_id == @user_id do %>
-        <h3>User: You </h3>
-        <BoardComponents.score_box score={lines_cleared}/>
-        <div class="board">
-            <BoardComponents.hold_tile_box board={board_preview}/>
-            <BoardComponents.playfield board={board_preview}/>
-            <BoardComponents.next_tile_box board={board_preview}/>
-        </div>
-    <% end %>
+    <div class="multiplayer-games-container">
+        <!-- Display current user's boards -->
+        <%= for %{board_preview: board_preview, lines_cleared: lines_cleared} = player  <- @game.players, player.user_id == @user_id do %>
+            <div class="multiplayer-game">
+                <h3>User: You </h3>
+                <BoardComponents.score_box score={lines_cleared}/>
+                <div class="board">
+                    <BoardComponents.hold_tile_box board={board_preview}/>
+                    <BoardComponents.playfield board={board_preview}/>
+                    <BoardComponents.next_tile_box board={board_preview}/>
+                </div>
+            </div>
+        <% end %>
 
-    <!-- Display other users's boards -->
-    <%= for %{user_id: user_id, board_preview: board_preview, lines_cleared: lines_cleared} = player  <- @game.players, player.user_id != @user_id do %>
-        <h3>User: <%= user_id %> </h3>
-        <BoardComponents.score_box score={lines_cleared}/>
-        <div class="board">
-            <BoardComponents.hold_tile_box board={board_preview}/>
-            <BoardComponents.playfield board={board_preview}/>
-            <BoardComponents.next_tile_box board={board_preview}/>
-        </div>
-    <% end %>
+        <!-- Display other users's boards -->
+        <%= for %{user_id: user_id, board_preview: board_preview, lines_cleared: lines_cleared} = player  <- @game.players, player.user_id != @user_id do %>
+            <div class="multiplayer-game">
+                <h3>User: <%= user_id %> </h3>
+                <BoardComponents.score_box score={lines_cleared}/>
+                <div class="board">
+                    <BoardComponents.hold_tile_box board={board_preview}/>
+                    <BoardComponents.playfield board={board_preview}/>
+                    <BoardComponents.next_tile_box board={board_preview}/>
+                </div>
+            </div>
+        <% end %>
+    </div>
 </div>
