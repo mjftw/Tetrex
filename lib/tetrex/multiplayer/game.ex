@@ -37,8 +37,6 @@ defmodule Tetrex.Multiplayer.Game do
         players: players,
         status: game_status
       }) do
-    dbg(players)
-
     player_update =
       for {user_id,
            %{
@@ -54,7 +52,6 @@ defmodule Tetrex.Multiplayer.Game do
                lines_cleared: lines_cleared,
                status: player_status
              }}
-            |> dbg()
 
     %GameMessage{game_id: game_id, players: player_update, status: game_status}
   end
