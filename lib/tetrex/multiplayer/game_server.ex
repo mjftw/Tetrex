@@ -203,7 +203,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_call({:join_game, user_id}, _from, game) do
-    if player_in_game?(user_id, game) do
+    if Game.user_in_game?(game, user_id) do
       {:reply, {:error, :already_in_game}, game}
     else
       {:ok, board_pid} = BoardServer.start_link()
@@ -215,10 +215,8 @@ defmodule Tetrex.Multiplayer.GameServer do
   end
 
   @impl true
-  def handle_call({:leave_game, user_id}, _from, %Game{players: players} = game) do
-    player = get_player(user_id, game)
-
-    if is_nil(player) do
+  def handle_call({:leave_game, user_id}, _from, game) do
+    if Game.user_in_game?(game, user_id) do
       {:reply, {:error, :not_in_game}, game}
     else
       # TODO: Fix board process hanging around
@@ -231,12 +229,10 @@ defmodule Tetrex.Multiplayer.GameServer do
   end
 
   defp publish_update(%Game{game_id: game_id} = game) do
-    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(game_id), Game.to_game_message(game))
+    Phoenix.PubSub.broadcast!(
+      Tetrex.PubSub,
+      pubsub_topic(game_id),
+      Game.to_game_message(game)
+    )
   end
-
-  defp get_player(user_id, %Game{players: players}),
-    do: Enum.find(players, nil, &(&1.user_id == user_id))
-
-  defp player_in_game?(user_id, %Game{players: players}),
-    do: Enum.any?(players, &(&1.user_id == user_id))
 end
