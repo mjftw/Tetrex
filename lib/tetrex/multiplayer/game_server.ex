@@ -88,13 +88,7 @@ defmodule Tetrex.Multiplayer.GameServer do
         []
       )
 
-    {:ok,
-     %Game{
-       game_id: UUID.uuid1(),
-       players: [],
-       status: :players_joining,
-       periodic_mover_pid: periodic_mover_pid
-     }, {:continue, :init_periodic}}
+    {:ok, Game.new(periodic_mover_pid), {:continue, :init_periodic}}
   end
 
   @impl true
@@ -139,9 +133,10 @@ defmodule Tetrex.Multiplayer.GameServer do
   def handle_call({:drop, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
-        # TODO: Update lines cleared
+        {_, num_lines_cleared} = BoardServer.drop(board_pid)
 
-        BoardServer.drop(board_pid)
+        {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
+
         {:reply, :ok, game, {:continue, :publish_state}}
 
       {:error, error} ->
@@ -207,22 +202,15 @@ defmodule Tetrex.Multiplayer.GameServer do
   end
 
   @impl true
-  def handle_call({:join_game, user_id}, _from, %Game{players: players} = game) do
+  def handle_call({:join_game, user_id}, _from, game) do
     if player_in_game?(user_id, game) do
       {:reply, {:error, :already_in_game}, game}
     else
       {:ok, board_pid} = BoardServer.start_link()
 
-      player = %{
-        user_id: user_id,
-        board_pid: board_pid,
-        lines_cleared: 0,
-        status: :not_ready,
-        online: true
-      }
+      game = Game.add_player(game, user_id, board_pid)
 
-      {:reply, :ok, %Game{game | players: [player | players], status: :players_joining},
-       {:continue, :publish_state}}
+      {:reply, :ok, game, {:continue, :publish_state}}
     end
   end
 
@@ -233,13 +221,12 @@ defmodule Tetrex.Multiplayer.GameServer do
     if is_nil(player) do
       {:reply, {:error, :not_in_game}, game}
     else
+      # TODO: Fix board process hanging around
       # Process.exit(player.board_pid, :kill)
 
-      {:reply, :ok,
-       %Game{
-         game
-         | players: List.delete(players, player)
-       }, {:continue, :publish_state}}
+      game = Game.drop_player(game, user_id)
+
+      {:reply, :ok, game, {:continue, :publish_state}}
     end
   end
 
