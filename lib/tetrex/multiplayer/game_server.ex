@@ -203,7 +203,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_call({:join_game, user_id}, _from, game) do
-    if Game.user_in_game?(game, user_id) do
+    if Game.player_in_game?(game, user_id) do
       {:reply, {:error, :already_in_game}, game}
     else
       {:ok, board_pid} = BoardServer.start_link()
@@ -216,7 +216,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_call({:leave_game, user_id}, _from, game) do
-    if !Game.user_in_game?(game, user_id) do
+    if !Game.player_in_game?(game, user_id) do
       {:reply, {:error, :not_in_game}, game}
     else
       # TODO: Fix board process hanging around
