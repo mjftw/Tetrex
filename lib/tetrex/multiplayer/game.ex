@@ -74,8 +74,7 @@ defmodule Tetrex.Multiplayer.Game do
       | players: Map.delete(players, user_id)
     }
 
-  def user_in_game?(%__MODULE__{players: players}, user_id),
-    do: Map.has_key?(players, user_id)
+  def user_in_game?(%__MODULE__{players: players}, user_id), do: Map.has_key?(players, user_id)
 
   def num_players(%__MODULE__{players: players}),
     do: Enum.count(players)
