@@ -21,7 +21,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
         {:noreply, redirect_to_lobby(socket)}
 
       {:ok, game_server_pid, game} ->
-        if Multiplayer.Game.user_in_game?(game, user_id) do
+        if Multiplayer.Game.player_in_game?(game, user_id) do
           {:noreply,
            socket
            |> put_flash(
