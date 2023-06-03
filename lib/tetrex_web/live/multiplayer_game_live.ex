@@ -47,7 +47,6 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
   @impl true
   def handle_info(%GameMessage{} = game_state, socket) do
-    IO.inspect(game_state)
     {:noreply, assign(socket, game: game_state)}
   end
 
