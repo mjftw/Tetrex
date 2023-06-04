@@ -81,32 +81,11 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def init(_opts) do
-    # Create a periodic task to move the piece down
-    {:ok, periodic_mover_pid} =
-      Tetrex.Periodic.start_link(
-        [
-          period_ms: 1000,
-          start: false,
-          work: fn -> nil end
-        ],
-        []
-      )
+    # This will set the Periodic mover timer for all new players that join.
+    #  It will be updated as the game progresses
+    initial_push_down_period_ms = 1000
 
-    {:ok, Game.new(periodic_mover_pid), {:continue, :init_periodic}}
-  end
-
-  @impl true
-  def handle_continue(:init_periodic, %Game{periodic_mover_pid: periodic_mover_pid} = game) do
-    this_game_server = self()
-
-    # Set the periodic task to move the piece down
-    Tetrex.Periodic.set_work(periodic_mover_pid, fn ->
-      try_move_all_down(this_game_server)
-    end)
-
-    Tetrex.Periodic.start_timer(periodic_mover_pid)
-
-    {:noreply, game, {:continue, :publish_state}}
+    {:ok, Game.new(initial_push_down_period_ms)}
   end
 
   @impl true
@@ -226,13 +205,34 @@ defmodule Tetrex.Multiplayer.GameServer do
   end
 
   @impl true
-  def handle_call({:join_game, user_id}, _from, game) do
+  def handle_call(
+        {:join_game, user_id},
+        _from,
+        %Game{periodic_timer_period: periodic_timer_period} = game
+      ) do
     if Game.player_in_game?(game, user_id) do
       {:reply, {:error, :already_in_game}, game}
     else
       {:ok, board_pid} = BoardServer.start_link()
 
-      game = Game.add_player(game, user_id, board_pid)
+      this_game_server = self()
+
+      # Must be one Periodic timer per board though as you need to reset the timer
+      #   when a player moves a piece down manually, but this must be done on
+      # a per player basis.
+      {:ok, periodic_mover_pid} =
+        Tetrex.Periodic.start_link(
+          [
+            period_ms: periodic_timer_period,
+            start: true,
+            work: fn ->
+              try_move_down(this_game_server, user_id)
+            end
+          ],
+          []
+        )
+
+      game = Game.add_player(game, user_id, board_pid, periodic_mover_pid)
 
       {:reply, :ok, game, {:continue, :publish_state}}
     end
