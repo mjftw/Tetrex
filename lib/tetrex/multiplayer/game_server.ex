@@ -1,4 +1,5 @@
 defmodule Tetrex.Multiplayer.GameServer do
+  alias Tetrex.Periodic
   alias Tetrex.BoardServer
   alias Tetrex.Multiplayer.Game
   use GenServer
@@ -98,8 +99,9 @@ defmodule Tetrex.Multiplayer.GameServer do
   @impl true
   def handle_call({:try_move_down, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
-      {:ok, %{board_pid: board_pid}} ->
+      {:ok, %{board_pid: board_pid, periodic_mover_pid: periodic_mover_pid}} ->
         {_status, _new_board, num_lines_cleared} = BoardServer.try_move_down(board_pid)
+        Periodic.reset_timer(periodic_mover_pid)
 
         {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
         {:reply, :ok, game, {:continue, :publish_state}}
