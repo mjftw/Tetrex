@@ -252,15 +252,18 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_call({:leave_game, user_id}, _from, game) do
-    if !Game.player_in_game?(game, user_id) do
-      {:reply, {:error, :not_in_game}, game}
-    else
-      # TODO: Fix board process hanging around
-      # Process.exit(player.board_pid, :kill)
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        # Kill board process as no longer required
+        Process.unlink(board_pid)
+        Process.exit(board_pid, :kill)
 
-      game = Game.drop_player(game, user_id)
+        game = Game.drop_player(game, user_id)
 
-      {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
     end
   end
 
