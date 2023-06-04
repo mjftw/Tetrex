@@ -105,6 +105,10 @@ defmodule Tetrex.Multiplayer.GameServer do
 
         Periodic.reset_timer(periodic_mover_pid)
 
+        if num_lines_cleared > 0 do
+          update_level_speed(game)
+        end
+
         {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
 
         {:ok, game} =
@@ -123,17 +127,22 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_call(:try_move_all_down, _from, %Game{players: players} = game) do
-    game =
+    {game, total_lines_cleared} =
       players
       |> Stream.map(fn {user_id, %{board_pid: board_pid}} -> {user_id, board_pid} end)
       |> Stream.map(fn {user_id, board_pid} ->
         Task.async(fn -> {user_id, BoardServer.try_move_down(board_pid)} end)
       end)
       |> Stream.map(&Task.await/1)
-      |> Enum.reduce(game, fn {user_id, {_status, _preview, num_lines_cleared}}, game ->
+      |> Enum.reduce({game, 0}, fn {user_id, {_status, _preview, num_lines_cleared}},
+                                   {game, total_lines_cleared} ->
         {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
-        game
+        {game, total_lines_cleared + num_lines_cleared}
       end)
+
+    if total_lines_cleared > 0 do
+      update_level_speed(game)
+    end
 
     {:reply, :ok, game, {:continue, :publish_state}}
   end
@@ -143,6 +152,10 @@ defmodule Tetrex.Multiplayer.GameServer do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
         {_, num_lines_cleared} = BoardServer.drop(board_pid)
+
+        if num_lines_cleared > 0 do
+          update_level_speed(game)
+        end
 
         {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
 
@@ -275,5 +288,52 @@ defmodule Tetrex.Multiplayer.GameServer do
       pubsub_topic(game_id),
       Game.to_game_message(game)
     )
+  end
+
+  defp update_level_speed(%Game{players: players}) do
+    # The player with the mst lines cleared sets the game speed
+
+    speed =
+      players
+      |> Enum.map(fn {_user_id, %{lines_cleared: lines_cleared}} -> lines_cleared end)
+      |> Enum.max()
+      |> level()
+      |> level_speed()
+
+    period_ms = floor(speed * 1000)
+
+    players
+    |> Stream.map(fn {_user_id, %{periodic_mover_pid: periodic_mover_pid}} ->
+      Task.async(fn -> Periodic.set_period(periodic_mover_pid, period_ms) end)
+    end)
+    |> Enum.map(&Task.await/1)
+  end
+
+  defp level(lines_cleared) do
+    div(lines_cleared, 10)
+  end
+
+  defp level_speed(level) do
+    # For explanation see: https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
+    frames_per_gridcell =
+      case level do
+        0 -> 48
+        1 -> 43
+        2 -> 38
+        3 -> 33
+        4 -> 28
+        5 -> 23
+        6 -> 18
+        7 -> 13
+        8 -> 8
+        9 -> 6
+        _ when 10 <= level and level <= 12 -> 5
+        _ when 13 <= level and level <= 15 -> 4
+        _ when 16 <= level and level <= 18 -> 3
+        _ when 19 <= level and level <= 28 -> 2
+        _ -> 1
+      end
+
+    frames_per_gridcell / 60
   end
 end
