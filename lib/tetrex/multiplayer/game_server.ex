@@ -101,9 +101,19 @@ defmodule Tetrex.Multiplayer.GameServer do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid, periodic_mover_pid: periodic_mover_pid}} ->
         {_status, _new_board, num_lines_cleared} = BoardServer.try_move_down(board_pid)
+        %{active_tile_fits: player_still_alive} = BoardServer.preview(board_pid)
+
         Periodic.reset_timer(periodic_mover_pid)
 
         {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
+
+        {:ok, game} =
+          if player_still_alive do
+            {:ok, game}
+          else
+            Game.kill_player(game, user_id)
+          end
+
         {:reply, :ok, game, {:continue, :publish_state}}
 
       {:error, error} ->
