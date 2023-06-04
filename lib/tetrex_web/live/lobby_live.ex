@@ -3,6 +3,8 @@ defmodule TetrexWeb.LobbyLive do
   alias Tetrex.GameDynamicSupervisor
   use TetrexWeb, :live_view
 
+  require Logger
+
   @socket_presence_assign_key :users
   @current_user_key :user_id
 
@@ -77,7 +79,9 @@ defmodule TetrexWeb.LobbyLive do
          socket
          |> push_redirect(to: Routes.live_path(socket, TetrexWeb.MultiplayerGameLive, game_id))}
 
-      {:error, _error} ->
+      {:error, error} ->
+        Logger.error("Failed to create multiplayer game: #{inspect(error)}")
+
         {:noreply,
          socket
          |> put_flash(:error, "Failed to create multiplayer game")}
