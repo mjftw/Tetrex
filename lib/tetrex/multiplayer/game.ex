@@ -88,6 +88,14 @@ defmodule Tetrex.Multiplayer.Game do
     end
   end
 
+  def kill_player(%__MODULE__{} = game, user_id) do
+    update_player_state(
+      game,
+      user_id,
+      &%{&1 | status: :dead}
+    )
+  end
+
   def increment_player_lines_cleared(%__MODULE__{} = game, user_id, extra_lines_cleared) do
     update_player_state(
       game,
