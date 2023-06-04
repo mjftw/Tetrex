@@ -31,6 +31,10 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.call(game_server, {:try_move_down, user_id})
   end
 
+  def try_move_all_down(game_server) do
+    GenServer.call(game_server, :try_move_all_down)
+  end
+
   def drop(game_server, user_id) do
     GenServer.call(game_server, {:drop, user_id})
   end
@@ -97,8 +101,10 @@ defmodule Tetrex.Multiplayer.GameServer do
 
     # Set the periodic task to move the piece down
     Tetrex.Periodic.set_work(periodic_mover_pid, fn ->
-      move_all_games_down(this_game_server)
+      try_move_all_down(this_game_server)
     end)
+
+    Tetrex.Periodic.start_timer(periodic_mover_pid)
 
     {:noreply, game, {:continue, :publish_state}}
   end
@@ -111,18 +117,12 @@ defmodule Tetrex.Multiplayer.GameServer do
   end
 
   @impl true
-  def handle_cast(:move_all_boards_down, %Game{players: players} = game) do
-    players
-    |> Enum.map(fn {_user_id, %{board_pid: board_pid}} -> BoardServer.try_move_down(board_pid) end)
-
-    {:noreply, game, {:continue, :publish_state}}
-  end
-
   def handle_call({:try_move_down, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
-        # TODO: Update lines cleared
-        BoardServer.try_move_down(board_pid)
+        {_status, _new_board, num_lines_cleared} = BoardServer.try_move_down(board_pid)
+
+        {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
         {:reply, :ok, game, {:continue, :publish_state}}
 
       {:error, error} ->
@@ -130,6 +130,24 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
+  @impl true
+  def handle_call(:try_move_all_down, _from, %Game{players: players} = game) do
+    game =
+      players
+      |> Stream.map(fn {user_id, %{board_pid: board_pid}} -> {user_id, board_pid} end)
+      |> Stream.map(fn {user_id, board_pid} ->
+        Task.async(fn -> {user_id, BoardServer.try_move_down(board_pid)} end)
+      end)
+      |> Stream.map(&Task.await/1)
+      |> Enum.reduce(game, fn {user_id, {_status, _preview, num_lines_cleared}}, game ->
+        {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
+        game
+      end)
+
+    {:reply, :ok, game, {:continue, :publish_state}}
+  end
+
+  @impl true
   def handle_call({:drop, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
@@ -144,6 +162,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
+  @impl true
   def handle_call({:try_move_left, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
@@ -155,6 +174,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
+  @impl true
   def handle_call({:try_move_right, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
@@ -166,6 +186,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
+  @impl true
   def handle_call({:hold, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
@@ -177,6 +198,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
+  @impl true
   def handle_call({:rotate, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
@@ -188,10 +210,12 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
+  @impl true
   def handle_call(:get_game_id, _from, %Game{game_id: game_id} = game) do
     {:reply, game_id, game}
   end
 
+  @impl true
   def handle_call(:game, _from, game) do
     {:reply, game, game}
   end
