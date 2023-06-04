@@ -11,24 +11,25 @@ defmodule Tetrex.Multiplayer.Game do
           players: %{
             id() => %{
               board_pid: pid(),
+              periodic_mover_pid: pid(),
               lines_cleared: non_neg_integer(),
               status: player_status(),
               online: boolean()
             }
           },
           status: game_status(),
-          periodic_mover_pid: pid()
+          periodic_timer_period: non_neg_integer()
         }
 
-  @enforce_keys [:game_id, :players, :status, :periodic_mover_pid]
-  defstruct [:game_id, :players, :status, :periodic_mover_pid]
+  @enforce_keys [:game_id, :players, :status, :periodic_timer_period]
+  defstruct [:game_id, :players, :status, :periodic_timer_period]
 
-  def new(periodic_mover_pid) do
+  def new(periodic_timer_period) do
     %__MODULE__{
       game_id: UUID.uuid1(),
       players: %{},
       status: :players_joining,
-      periodic_mover_pid: periodic_mover_pid
+      periodic_timer_period: periodic_timer_period
     }
   end
 
@@ -56,12 +57,13 @@ defmodule Tetrex.Multiplayer.Game do
     %GameMessage{game_id: game_id, players: player_update, status: game_status}
   end
 
-  def add_player(%__MODULE__{players: players} = game, user_id, board_pid),
+  def add_player(%__MODULE__{players: players} = game, user_id, board_pid, periodic_mover_pid),
     do: %__MODULE__{
       game
       | players:
           Map.put(players, user_id, %{
             board_pid: board_pid,
+            periodic_mover_pid: periodic_mover_pid,
             lines_cleared: 0,
             status: :not_ready,
             online: true
