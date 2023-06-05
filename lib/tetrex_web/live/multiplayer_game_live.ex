@@ -121,6 +121,21 @@ defmodule TetrexWeb.MultiplayerGameLive do
     {:noreply, socket}
   end
 
+  def user_player_data(players, user_id), do: Map.get(players, user_id)
+
+  def even_users_player_data(players, current_user_id),
+    do:
+      players
+      |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
+      |> Enum.take_every(2)
+
+  def odd_users_player_data(players, current_user_id),
+    do:
+      players
+      |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
+      |> Stream.drop(1)
+      |> Enum.take_every(2)
+
   defp redirect_to_lobby(socket),
     do: push_redirect(socket, to: Routes.live_path(socket, TetrexWeb.LobbyLive))
 end

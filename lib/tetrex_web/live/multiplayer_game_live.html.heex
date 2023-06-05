@@ -3,8 +3,18 @@
     Multiplayer Game ID: <%= @game.game_id %><br/>
 
     <div class="multiplayer-games-container">
+        <!-- Display other users's boards -->
+        <%= for {user_id, %{board_preview: board_preview}} <- even_users_player_data(@game.players, @user_id) do %>
+            <div class="multiplayer-game">
+                <h3>User: <%= user_id %> </h3>
+                <div class="board">
+                    <BoardComponents.playfield board={board_preview}/>
+                </div>
+            </div>
+        <% end %>
+
         <!-- Display current user's boards -->
-        <%= for {user_id, %{board_preview: board_preview, lines_cleared: lines_cleared}}  <- @game.players, user_id == @user_id do %>
+        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared} <- user_player_data(@game.players, @user_id) do %>
             <div class="multiplayer-game">
                 <h3>User: You </h3>
                 <BoardComponents.score_box score={lines_cleared}/>
@@ -17,14 +27,11 @@
         <% end %>
 
         <!-- Display other users's boards -->
-        <%= for {user_id, %{board_preview: board_preview, lines_cleared: lines_cleared}} <- @game.players, user_id != @user_id do %>
+        <%= for {user_id, %{board_preview: board_preview}} <- odd_users_player_data(@game.players, @user_id) do %>
             <div class="multiplayer-game">
                 <h3>User: <%= user_id %> </h3>
-                <BoardComponents.score_box score={lines_cleared}/>
                 <div class="board">
-                    <BoardComponents.hold_tile_box board={board_preview}/>
                     <BoardComponents.playfield board={board_preview}/>
-                    <BoardComponents.next_tile_box board={board_preview}/>
                 </div>
             </div>
         <% end %>
