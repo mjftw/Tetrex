@@ -2,8 +2,8 @@ defmodule Tetrex.Multiplayer.Game do
   alias Tetrex.BoardServer
   alias Tetrex.Multiplayer.GameMessage
 
-  @type player_status :: :not_ready | :ready | :playing | :dead
-  @type game_status :: :players_joining | :all_ready | :playing | :finished
+  @type player_status :: :not_ready | :ready | :dead
+  @type game_status :: :players_joining | :playing | :finished
   @type id :: String.t()
 
   @type t :: %__MODULE__{
@@ -96,12 +96,39 @@ defmodule Tetrex.Multiplayer.Game do
     )
   end
 
+  def set_player_ready(%__MODULE__{} = game, user_id, is_ready?) do
+    update_player_state(
+      game,
+      user_id,
+      &%{
+        &1
+        | player_status:
+            case {&1.status, is_ready?} do
+              {:not_ready, true} -> :ready
+              {:ready, true} -> :ready
+              {:ready, false} -> :not_ready
+              {:dead, _} -> :dead
+            end
+      }
+    )
+  end
+
   def increment_player_lines_cleared(%__MODULE__{} = game, user_id, extra_lines_cleared) do
     update_player_state(
       game,
       user_id,
       &%{&1 | lines_cleared: &1.lines_cleared + extra_lines_cleared}
     )
+  end
+
+  def start(%__MODULE__{} = game), do: %__MODULE__{game | status: :playing}
+
+  def ready_to_start?(%__MODULE__{players: players, status: status}) do
+    status == :players_joining && Enum.all?(players, &player_is_ready/1)
+  end
+
+  defp player_is_ready(player_state) do
+    player_state.status in [:ready, :dead]
   end
 
   defp update_player_state(%__MODULE__{players: players} = game, user_id, update_fn) do

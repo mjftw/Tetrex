@@ -24,6 +24,10 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.call(game_server, {:leave_game, user_id})
   end
 
+  def set_player_ready(game_server, user_id, is_ready?) do
+    GenServer.call(game_server, {:set_player_ready, user_id, is_ready?})
+  end
+
   def move_all_games_down(game_server) do
     GenServer.cast(game_server, :move_all_boards_down)
   end
@@ -249,7 +253,7 @@ defmodule Tetrex.Multiplayer.GameServer do
         Tetrex.Periodic.start_link(
           [
             period_ms: periodic_timer_period,
-            start: true,
+            start: false,
             work: fn ->
               try_move_down(this_game_server, user_id)
             end
@@ -274,6 +278,19 @@ defmodule Tetrex.Multiplayer.GameServer do
         Process.exit(periodic_mover_pid, :kill)
 
         game = Game.drop_player(game, user_id)
+
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
+  end
+
+  @impl true
+  def handle_call({:set_player_ready, user_id, is_ready?}, _from, game) do
+    case Game.set_player_ready(game, user_id, is_ready?) do
+      {:ok, game} ->
+        game = if Game.ready_to_start?(game), do: start_game(game), else: game
 
         {:reply, :ok, game, {:continue, :publish_state}}
 
@@ -335,5 +352,15 @@ defmodule Tetrex.Multiplayer.GameServer do
       end
 
     frames_per_gridcell / 60
+  end
+
+  defp start_game(%Game{players: players} = game) do
+    players
+    |> Stream.map(fn {_user_id, %{periodic_mover_pid: periodic_mover_pid}} ->
+      Task.async(fn -> Periodic.start_timer(periodic_mover_pid) end)
+    end)
+    |> Enum.map(&Task.await/1)
+
+    Game.start(game)
   end
 end
