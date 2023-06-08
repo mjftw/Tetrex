@@ -102,7 +102,7 @@ defmodule Tetrex.Multiplayer.Game do
       user_id,
       &%{
         &1
-        | player_status:
+        | status:
             case {&1.status, is_ready?} do
               {:not_ready, true} -> :ready
               {:ready, true} -> :ready
@@ -124,10 +124,11 @@ defmodule Tetrex.Multiplayer.Game do
   def start(%__MODULE__{} = game), do: %__MODULE__{game | status: :playing}
 
   def ready_to_start?(%__MODULE__{players: players, status: status}) do
-    status == :players_joining && Enum.all?(players, &player_is_ready/1)
+    status == :players_joining &&
+      Enum.all?(players, fn {_user_id, player_state} -> player_ready?(player_state) end)
   end
 
-  defp player_is_ready(player_state) do
+  defp player_ready?(player_state) do
     player_state.status in [:ready, :dead]
   end
 
@@ -137,4 +138,24 @@ defmodule Tetrex.Multiplayer.Game do
       {:ok, %__MODULE__{game | players: Map.put(players, user_id, new_player_state)}}
     end
   end
+
+  def finish_if_required(%__MODULE__{players: players, status: :playing} = game) do
+    num_players_alive =
+      players
+      |> Stream.filter(fn {_user_id, %{status: status}} -> status == :ready end)
+      |> Enum.count()
+
+    num_players_dead =
+      players
+      |> Stream.filter(fn {_user_id, %{status: status}} -> status == :dead end)
+      |> Enum.count()
+
+    if num_players_alive == 1 && num_players_dead > 0 do
+      %__MODULE__{game | status: :finished}
+    else
+      game
+    end
+  end
+
+  def finish_if_required(%__MODULE__{} = game), do: game
 end

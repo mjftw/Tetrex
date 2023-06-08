@@ -105,22 +105,10 @@ defmodule Tetrex.Multiplayer.GameServer do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid, periodic_mover_pid: periodic_mover_pid}} ->
         {_status, _new_board, num_lines_cleared} = BoardServer.try_move_down(board_pid)
-        %{active_tile_fits: player_still_alive} = BoardServer.preview(board_pid)
 
         Periodic.reset_timer(periodic_mover_pid)
 
-        if num_lines_cleared > 0 do
-          update_level_speed(game)
-        end
-
-        {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
-
-        {:ok, game} =
-          if player_still_alive do
-            {:ok, game}
-          else
-            Game.kill_player(game, user_id)
-          end
+        game = update_game_after_player_moved_down(game, user_id, board_pid, num_lines_cleared)
 
         {:reply, :ok, game, {:continue, :publish_state}}
 
@@ -138,15 +126,27 @@ defmodule Tetrex.Multiplayer.GameServer do
         Task.async(fn -> {user_id, BoardServer.try_move_down(board_pid)} end)
       end)
       |> Stream.map(&Task.await/1)
-      |> Enum.reduce({game, 0}, fn {user_id, {_status, _preview, num_lines_cleared}},
+      |> Enum.reduce({game, 0}, fn {user_id,
+                                    {_status, %{active_tile_fits: player_still_alive},
+                                     num_lines_cleared}},
                                    {game, total_lines_cleared} ->
         {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
+
+        {:ok, game} =
+          if player_still_alive do
+            {:ok, game}
+          else
+            Game.kill_player(game, user_id)
+          end
+
         {game, total_lines_cleared + num_lines_cleared}
       end)
 
     if total_lines_cleared > 0 do
       update_level_speed(game)
     end
+
+    game = finish_game_if_required(game)
 
     {:reply, :ok, game, {:continue, :publish_state}}
   end
@@ -157,11 +157,7 @@ defmodule Tetrex.Multiplayer.GameServer do
       {:ok, %{board_pid: board_pid}} ->
         {_, num_lines_cleared} = BoardServer.drop(board_pid)
 
-        if num_lines_cleared > 0 do
-          update_level_speed(game)
-        end
-
-        {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
+        game = update_game_after_player_moved_down(game, user_id, board_pid, num_lines_cleared)
 
         {:reply, :ok, game, {:continue, :publish_state}}
 
@@ -362,5 +358,39 @@ defmodule Tetrex.Multiplayer.GameServer do
     |> Enum.map(&Task.await/1)
 
     Game.start(game)
+  end
+
+  defp update_game_after_player_moved_down(game, user_id, board_pid, num_lines_cleared) do
+    %{active_tile_fits: player_still_alive} = BoardServer.preview(board_pid)
+
+    if num_lines_cleared > 0 do
+      update_level_speed(game)
+    end
+
+    {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
+
+    {:ok, game} =
+      if player_still_alive do
+        {:ok, game}
+      else
+        {:ok, game} = Game.kill_player(game, user_id)
+        {:ok, finish_game_if_required(game)}
+      end
+
+    game
+  end
+
+  defp finish_game_if_required(%Game{players: players} = game) do
+    game = Game.finish_if_required(game)
+
+    if game.status == :finished do
+      players
+      |> Stream.map(fn {_user_id, %{periodic_mover_pid: periodic_mover_pid}} ->
+        Task.async(fn -> Periodic.stop_timer(periodic_mover_pid) end)
+      end)
+      |> Enum.map(&Task.await/1)
+    end
+
+    game
   end
 end
