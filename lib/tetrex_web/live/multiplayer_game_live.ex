@@ -4,7 +4,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias Tetrex.Multiplayer.GameMessage
   alias Tetrex.Multiplayer.GameServer
   alias Tetrex.GameDynamicSupervisor
-  alias TetrexWeb.Components.BoardComponents
+  alias TetrexWeb.Components.{BoardComponents, Modal}
 
   use TetrexWeb, :live_view
 
@@ -121,7 +121,27 @@ defmodule TetrexWeb.MultiplayerGameLive do
     {:noreply, socket}
   end
 
-  def user_player_data(players, user_id), do: Map.get(players, user_id)
+  @impl true
+  def handle_event(
+        "player-ready",
+        %{"user-id" => user_id},
+        %{assigns: %{game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.set_player_ready(game_server_pid, user_id, true)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "player-not-ready",
+        %{"user-id" => user_id},
+        %{assigns: %{game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.set_player_ready(game_server_pid, user_id, false)
+    {:noreply, socket}
+  end
+
+  def user_player_data!(%GameMessage{players: players}, user_id), do: Map.fetch!(players, user_id)
 
   def even_users_player_data(players, current_user_id),
     do:
@@ -135,6 +155,8 @@ defmodule TetrexWeb.MultiplayerGameLive do
       |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
       |> Stream.drop(1)
       |> Enum.take_every(2)
+
+  def num_players_in_game(%GameMessage{players: players}), do: Enum.count(players)
 
   defp redirect_to_lobby(socket),
     do: push_redirect(socket, to: Routes.live_path(socket, TetrexWeb.LobbyLive))
