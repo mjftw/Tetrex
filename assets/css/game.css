@@ -41,6 +41,7 @@
     border-style: solid;
     border-radius: 5px;
     background-color: antiquewhite;
+    height: fit-content;
 }
 
 .score-box {

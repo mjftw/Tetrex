@@ -45,9 +45,8 @@
 
     <div class="multiplayer-games-container">
         <!-- Display other users's boards -->
-        <%= for {user_id, %{board_preview: board_preview}} <- even_users_player_data(@game.players, @user_id) do %>
+        <%= for {_user_id, %{board_preview: board_preview}} <- even_users_player_data(@game.players, @user_id) do %>
             <div class="multiplayer-game">
-                <h3>User: <%= user_id %> </h3>
                 <div class="board">
                     <BoardComponents.playfield board={board_preview}/>
                 </div>
@@ -57,7 +56,6 @@
         <!-- Display current user's boards -->
         <%= with %{board_preview: board_preview, lines_cleared: lines_cleared} <- user_player_data do %>
             <div class="multiplayer-game">
-                <h3>User: You </h3>
                 <BoardComponents.score_box score={lines_cleared}/>
                 <div class="board">
                     <BoardComponents.hold_tile_box board={board_preview}/>
@@ -68,9 +66,8 @@
         <% end %>
 
         <!-- Display other users's boards -->
-        <%= for {user_id, %{board_preview: board_preview}} <- odd_users_player_data(@game.players, @user_id) do %>
+        <%= for {_user_id, %{board_preview: board_preview}} <- odd_users_player_data(@game.players, @user_id) do %>
             <div class="multiplayer-game">
-                <h3>User: <%= user_id %> </h3>
                 <div class="board">
                     <BoardComponents.playfield board={board_preview}/>
                 </div>
