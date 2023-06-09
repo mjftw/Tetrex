@@ -21,26 +21,37 @@ defmodule TetrexWeb.MultiplayerGameLive do
         {:noreply, redirect_to_lobby(socket)}
 
       {:ok, game_server_pid, game} ->
-        if Multiplayer.Game.player_in_game?(game, user_id) do
-          {:noreply,
-           socket
-           |> put_flash(
-             :error,
-             "Cannot join as you're already in the game. Is it open in another tab?"
-           )
-           |> redirect_to_lobby()}
-        else
-          if connected?(socket) do
-            GameServer.subscribe_updates(game_server_pid)
-            GameServer.join_game(game_server_pid, user_id)
+        cond do
+          Multiplayer.Game.player_in_game?(game, user_id) ->
+            {:noreply,
+             socket
+             |> put_flash(
+               :error,
+               "Cannot join as you're already in the game. Is it open in another tab?"
+             )
+             |> redirect_to_lobby()}
 
-            ProcessMonitor.monitor(fn _reason ->
-              GameServer.leave_game(game_server_pid, user_id)
-            end)
-          end
+          Multiplayer.Game.has_started?(game) ->
+            {:noreply,
+             socket
+             |> put_flash(
+               :error,
+               "Cannot join game as it's already started"
+             )
+             |> redirect_to_lobby()}
 
-          initial_game_state = GameServer.get_game_message(game_server_pid)
-          {:noreply, assign(socket, game: initial_game_state, game_server_pid: game_server_pid)}
+          true ->
+            if connected?(socket) do
+              GameServer.subscribe_updates(game_server_pid)
+              GameServer.join_game(game_server_pid, user_id)
+
+              ProcessMonitor.monitor(fn _reason ->
+                GameServer.leave_game(game_server_pid, user_id)
+              end)
+            end
+
+            initial_game_state = GameServer.get_game_message(game_server_pid)
+            {:noreply, assign(socket, game: initial_game_state, game_server_pid: game_server_pid)}
         end
     end
   end

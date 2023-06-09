@@ -128,6 +128,9 @@ defmodule Tetrex.Multiplayer.Game do
       Enum.all?(players, fn {_user_id, player_state} -> player_ready?(player_state) end)
   end
 
+  def has_started?(%__MODULE__{status: status}) when status == :players_joining, do: false
+  def has_started?(%__MODULE__{}), do: true
+
   defp player_ready?(player_state) do
     player_state.status in [:ready, :dead]
   end

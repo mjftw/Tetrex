@@ -9,7 +9,7 @@
 <button phx-click="new-multiplayer-game">Start new multiplayer game</button>
 
 <div>
-    <h2>Users in lobby:</h2>
+    <h2>Users in lobby</h2>
     <ul>
         <%= for {user_id, _} <- @users do %>
             <li> <%= if user_id == @user_id do "You" else user_id end %> </li>
@@ -19,10 +19,20 @@
 
 <div>
     <ul>
-    <h2>Multiplayer games:</h2>
-        <%= for game <- @multiplayer_games do %>
+    <h2>Joinable multiplayer games</h2>
+        <%= for game <- joinable_multiplayer_games(@multiplayer_games) do %>
             <li>
                 <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join multiplayer game: <%=game.game_id%> - <%= Multiplayer.Game.num_players(game) %> player(s)</button>
+            </li>
+        <% end %>
+    </ul>
+</div>
+<div>
+    <ul>
+    <h2>Games in progress</h2>
+        <%= for game <- in_progress_multiplayer_games(@multiplayer_games) do %>
+            <li>
+                 Multiplayer game <%=game.game_id%> - <%= Multiplayer.Game.num_players(game) %> player(s)
             </li>
         <% end %>
     </ul>
