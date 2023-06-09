@@ -138,4 +138,10 @@ defmodule TetrexWeb.LobbyLive do
         {:noreply, assign(socket, multiplayer_games: updated_games)}
     end
   end
+
+  def joinable_multiplayer_games(multiplayer_games),
+    do: Enum.filter(multiplayer_games, &(!Multiplayer.Game.has_started?(&1)))
+
+  def in_progress_multiplayer_games(multiplayer_games),
+    do: Enum.filter(multiplayer_games, &Multiplayer.Game.has_started?(&1))
 end
