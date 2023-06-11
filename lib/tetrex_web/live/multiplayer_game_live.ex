@@ -46,7 +46,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
               GameServer.join_game(game_server_pid, user_id)
 
               ProcessMonitor.monitor(fn _reason ->
-                GameServer.leave_game(game_server_pid, user_id)
+                GameServer.kill_player(game_server_pid, user_id)
               end)
             end
 
