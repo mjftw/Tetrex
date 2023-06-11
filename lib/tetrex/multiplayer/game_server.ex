@@ -28,6 +28,10 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.call(game_server, {:set_player_ready, user_id, is_ready?})
   end
 
+  def kill_player(game_server, user_id) do
+    GenServer.call(game_server, {:kill_player, user_id})
+  end
+
   def move_all_games_down(game_server) do
     GenServer.cast(game_server, :move_all_boards_down)
   end
@@ -136,7 +140,7 @@ defmodule Tetrex.Multiplayer.GameServer do
           if player_still_alive do
             {:ok, game}
           else
-            {:ok, game} = kill_player(game, user_id)
+            kill_player_stop_timer(game, user_id)
           end
 
         {game, total_lines_cleared + num_lines_cleared}
@@ -295,6 +299,18 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
+  @impl true
+  def handle_call({:kill_player, user_id}, _from, game) do
+    case kill_player_stop_timer(game, user_id) do
+      {:ok, game} ->
+        game = finish_game_if_required(game)
+        {:reply, :ok, game, {:continue, :publish_state}}
+
+      {:error, error} ->
+        {:reply, {:error, error}, game}
+    end
+  end
+
   defp publish_update(%Game{game_id: game_id} = game) do
     Phoenix.PubSub.broadcast!(
       Tetrex.PubSub,
@@ -373,8 +389,9 @@ defmodule Tetrex.Multiplayer.GameServer do
       if player_still_alive do
         {:ok, game}
       else
-        {:ok, game} = kill_player(game, user_id)
-        {:ok, finish_game_if_required(game)}
+        {:ok, game} = kill_player_stop_timer(game, user_id)
+        game = finish_game_if_required(game)
+        {:ok, game}
       end
 
     game
@@ -394,7 +411,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     game
   end
 
-  defp kill_player(game, user_id) do
+  defp kill_player_stop_timer(game, user_id) do
     with {:ok, %{periodic_mover_pid: periodic_mover_pid}} <- Game.get_player_state(game, user_id),
          {:ok, game} <- Game.kill_player(game, user_id) do
       Periodic.stop_timer(periodic_mover_pid)
