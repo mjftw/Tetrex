@@ -136,7 +136,7 @@ defmodule Tetrex.Multiplayer.GameServer do
           if player_still_alive do
             {:ok, game}
           else
-            Game.kill_player(game, user_id)
+            {:ok, game} = kill_player(game, user_id)
           end
 
         {game, total_lines_cleared + num_lines_cleared}
@@ -373,7 +373,7 @@ defmodule Tetrex.Multiplayer.GameServer do
       if player_still_alive do
         {:ok, game}
       else
-        {:ok, game} = Game.kill_player(game, user_id)
+        {:ok, game} = kill_player(game, user_id)
         {:ok, finish_game_if_required(game)}
       end
 
@@ -392,5 +392,13 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
 
     game
+  end
+
+  defp kill_player(game, user_id) do
+    with {:ok, %{periodic_mover_pid: periodic_mover_pid}} <- Game.get_player_state(game, user_id),
+         {:ok, game} <- Game.kill_player(game, user_id) do
+      Periodic.stop_timer(periodic_mover_pid)
+      {:ok, game}
+    end
   end
 end
