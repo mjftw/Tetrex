@@ -7,10 +7,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   alias Tetrex.SinglePlayer.Game
   alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Modal
-  alias TetrexWeb.Components.Soundtrack
-
-  @game_over_audio_id "game-over-audio"
-  @theme_music_audio_id "theme-music-audio"
+  alias TetrexWeb.Components.Client.Audio
 
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
@@ -27,8 +24,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
           socket
           |> assign(user_id: user_id)
           |> assign(game_server: game_server)
-          |> assign(game_over_audio_id: @game_over_audio_id)
-          |> assign(theme_music_audio_id: @theme_music_audio_id)
           |> initial_game_assigns()
           |> pause_game_if_playing()
 
@@ -173,23 +168,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> assign(:status, status)
   end
 
-  defp play_game_over_audio(socket),
-    do:
-      socket
-      |> push_event("stop-audio", %{id: @theme_music_audio_id})
-      |> push_event("play-audio", %{id: @game_over_audio_id})
-
-  defp play_theme_audio(socket),
-    do:
-      socket
-      |> push_event("stop-audio", %{id: @game_over_audio_id})
-      |> push_event("play-audio", %{id: @theme_music_audio_id})
-
-  defp pause_theme_audio(socket),
-    do:
-      socket
-      |> push_event("pause-audio", %{id: @theme_music_audio_id})
-
   defp new_game(%{assigns: %{game_server: game_server}} = socket) do
     GameServer.new_game(game_server)
 
@@ -200,14 +178,14 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     GameServer.start_game(game_server)
 
     socket
-    |> play_theme_audio()
+    |> Audio.play_theme_audio()
   end
 
   defp pause_game(%{assigns: %{game_server: game_server}} = socket) do
     GameServer.pause_game(game_server)
 
     socket
-    |> pause_theme_audio()
+    |> Audio.pause_theme_audio()
   end
 
   defp pause_game_if_playing(%{assigns: %{status: :playing}} = socket),
@@ -221,7 +199,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
        when old_status != :game_over,
        do:
          socket
-         |> play_game_over_audio()
+         |> Audio.play_game_over_audio()
 
   defp status_change_assigns(socket, _new_status), do: socket
 end
