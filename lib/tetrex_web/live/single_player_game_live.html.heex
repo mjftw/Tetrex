@@ -1,7 +1,6 @@
 
 <div class="single-player-game" phx-window-keydown="keypress">
-  <Soundtrack.background id={@theme_music_audio_id} src="audio/tetris-main-theme.mp3" loop/>
-  <Soundtrack.effect id={@game_over_audio_id} src="audio/game-over.mp3"/>
+  <Audio.tetris_audio/>
 
   <%= case @status do %>
     <% :intro -> %>
