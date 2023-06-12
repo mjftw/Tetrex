@@ -7,6 +7,8 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias TetrexWeb.Components.{BoardComponents, Modal}
   alias TetrexWeb.Components.Client.Audio
 
+  require Logger
+
   use TetrexWeb, :live_view
 
   @impl true
@@ -47,7 +49,16 @@ defmodule TetrexWeb.MultiplayerGameLive do
               GameServer.join_game(game_server_pid, user_id)
 
               ProcessMonitor.monitor(fn _reason ->
-                GameServer.leave_game(game_server_pid, user_id)
+                case GameServer.leave_game(game_server_pid, user_id) do
+                  :ok ->
+                    nil
+
+                  {:error, :cannot_leave_game_in_progress} ->
+                    :ok = GameServer.kill_player(game_server_pid, user_id)
+
+                  {:error, error} ->
+                    Logger.error(inspect(error))
+                end
               end)
             end
 
