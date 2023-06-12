@@ -88,8 +88,9 @@ defmodule TetrexWeb.MultiplayerGameLive do
   def handle_event(
         "keypress",
         _,
-        %{assigns: %{game: %{status: :finished}}} = socket
-      ) do
+        %{assigns: %{game: %{status: status}}} = socket
+      )
+      when status in [:players_joining, :finished] do
     {:noreply, socket}
   end
 
