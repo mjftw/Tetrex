@@ -1,5 +1,6 @@
 
 <div phx-window-keydown="keypress">
+  <Audio.tetris_audio/>
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <%= case {@game.status, Map.fetch!(user_player_data, :status), num_players_in_game(@game)} do %>
     <% {:players_joining, :not_ready, num_players} when num_players < 2 -> %>
