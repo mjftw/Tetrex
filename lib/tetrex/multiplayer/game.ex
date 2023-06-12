@@ -3,7 +3,7 @@ defmodule Tetrex.Multiplayer.Game do
   alias Tetrex.Multiplayer.GameMessage
 
   @type player_status :: :not_ready | :ready | :dead
-  @type game_status :: :players_joining | :playing | :finished
+  @type game_status :: :players_joining | :playing | :finished | :exiting
   @type id :: String.t()
 
   @type t :: %__MODULE__{
@@ -161,4 +161,9 @@ defmodule Tetrex.Multiplayer.Game do
   end
 
   def finish_if_required(%__MODULE__{} = game), do: game
+
+  def set_exiting(%__MODULE__{} = game), do: %__MODULE__{game | status: :exiting}
+
+  def exiting?(%__MODULE__{status: :exiting}), do: true
+  def exiting?(%__MODULE__{}), do: false
 end

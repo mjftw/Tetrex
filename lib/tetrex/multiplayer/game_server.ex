@@ -99,9 +99,29 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_continue(:publish_state, game) do
+    # If all players have left, kill the game server after publishing state
+    game =
+      if Game.num_players(game) == 0 do
+        Game.set_exiting(game)
+      else
+        game
+      end
+
     publish_update(game)
 
-    {:noreply, game}
+    if Game.exiting?(game) do
+      {:noreply, game, {:continue, :request_termination}}
+    else
+      {:noreply, game}
+    end
+  end
+
+  @impl true
+  def handle_continue(:request_termination, %Game{game_id: game_id}) do
+    Tetrex.GameDynamicSupervisor.remove_multiplayer_game_by_pid(self(), game_id)
+
+    # Do not return, await termination
+    Process.sleep(:infinity)
   end
 
   @impl true

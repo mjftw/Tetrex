@@ -47,7 +47,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
               GameServer.join_game(game_server_pid, user_id)
 
               ProcessMonitor.monitor(fn _reason ->
-                GameServer.kill_player(game_server_pid, user_id)
+                GameServer.leave_game(game_server_pid, user_id)
               end)
             end
 
@@ -55,6 +55,14 @@ defmodule TetrexWeb.MultiplayerGameLive do
             {:noreply, assign(socket, game: initial_game_state, game_server_pid: game_server_pid)}
         end
     end
+  end
+
+  @impl true
+  def handle_info(%GameMessage{status: :exiting}, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:info, "The game has ended")
+     |> redirect_to_lobby()}
   end
 
   @impl true

@@ -108,16 +108,12 @@ defmodule TetrexWeb.LobbyLive do
   end
 
   @impl true
-  def handle_info({:removed_multiplayer_game, game_id}, socket) do
-    {
-      :noreply,
-      assign(
-        socket,
-        :multiplayer_games,
-        Enum.filter(socket.assigns.multiplayer_games, &(&1.game_id != game_id))
-      )
-    }
-  end
+  def handle_info({:removed_multiplayer_game, game_id}, socket),
+    do: {:noreply, socket |> forget_multiplayer_game(game_id)}
+
+  @impl true
+  def handle_info(%Multiplayer.GameMessage{game_id: game_id, status: :exiting}, socket),
+    do: {:noreply, socket |> forget_multiplayer_game(game_id)}
 
   @impl true
   def handle_info(%Multiplayer.GameMessage{game_id: game_id}, socket) do
@@ -144,4 +140,10 @@ defmodule TetrexWeb.LobbyLive do
 
   def in_progress_multiplayer_games(multiplayer_games),
     do: Enum.filter(multiplayer_games, &Multiplayer.Game.has_started?(&1))
+
+  defp forget_multiplayer_game(socket, game_id) do
+    updated_games = Enum.filter(socket.assigns.multiplayer_games, &(&1.game_id != game_id))
+
+    assign(socket, multiplayer_games: updated_games)
+  end
 end
