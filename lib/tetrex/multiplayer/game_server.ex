@@ -289,20 +289,24 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_call({:leave_game, user_id}, _from, game) do
-    case Game.get_player_state(game, user_id) do
-      {:ok, %{board_pid: board_pid, periodic_mover_pid: periodic_mover_pid}} ->
-        # Kill board & periodic process as no longer required
-        Process.unlink(board_pid)
-        Process.exit(board_pid, :kill)
-        Process.unlink(periodic_mover_pid)
-        Process.exit(periodic_mover_pid, :kill)
+    if Game.players_can_leave?(game) do
+      case Game.get_player_state(game, user_id) do
+        {:ok, %{board_pid: board_pid, periodic_mover_pid: periodic_mover_pid}} ->
+          # Kill board & periodic process as no longer required
+          Process.unlink(board_pid)
+          Process.exit(board_pid, :kill)
+          Process.unlink(periodic_mover_pid)
+          Process.exit(periodic_mover_pid, :kill)
 
-        game = Game.drop_player(game, user_id)
+          game = Game.drop_player(game, user_id)
 
-        {:reply, :ok, game, {:continue, :publish_state}}
+          {:reply, :ok, game, {:continue, :publish_state}}
 
-      {:error, error} ->
-        {:reply, {:error, error}, game}
+        {:error, error} ->
+          {:reply, {:error, error}, game}
+      end
+    else
+      {:reply, {:error, :cannot_leave_game_in_progress}, game}
     end
   end
 
