@@ -5,6 +5,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias Tetrex.Multiplayer.GameServer
   alias Tetrex.GameDynamicSupervisor
   alias TetrexWeb.Components.{BoardComponents, Modal}
+  alias TetrexWeb.Components.Client.Audio
 
   use TetrexWeb, :live_view
 
@@ -58,7 +59,10 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
   @impl true
   def handle_info(%GameMessage{} = game_state, socket) do
-    {:noreply, assign(socket, game: game_state)}
+    {:noreply,
+     socket
+     |> handle_status_changes(game_state)
+     |> assign(game: game_state)}
   end
 
   @impl true
@@ -177,6 +181,28 @@ defmodule TetrexWeb.MultiplayerGameLive do
       |> Enum.take_every(2)
 
   def num_players_in_game(%GameMessage{players: players}), do: Enum.count(players)
+
+  defp handle_status_changes(
+         %{assigns: %{game: old_game, user_id: user_id}} = socket,
+         %GameMessage{} = new_game
+       ) do
+    old_player_status = user_player_data!(old_game, user_id).status
+    new_player_status = user_player_data!(new_game, user_id).status
+
+    old_game_status = old_game.status
+    new_game_status = new_game.status
+
+    case {old_player_status, old_game_status, new_player_status, new_game_status} do
+      {_, :players_joining, _, :playing} ->
+        socket |> Audio.play_theme_audio()
+
+      {:ready, :playing, :dead, _} ->
+        socket |> Audio.play_game_over_audio()
+
+      _ ->
+        socket
+    end
+  end
 
   defp redirect_to_lobby(socket),
     do: push_redirect(socket, to: Routes.live_path(socket, TetrexWeb.LobbyLive))
