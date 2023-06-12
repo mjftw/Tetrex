@@ -81,6 +81,9 @@ defmodule Tetrex.Multiplayer.Game do
   def num_players(%__MODULE__{players: players}),
     do: Enum.count(players)
 
+  def num_alive_players(%__MODULE__{players: players}),
+    do: players |> Enum.count(fn {_user_id, %{status: status}} -> status != :dead end)
+
   def get_player_state(%__MODULE__{players: players}, user_id) do
     case Map.get(players, user_id) do
       nil -> {:error, :player_not_found}

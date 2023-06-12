@@ -99,9 +99,9 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_continue(:publish_state, game) do
-    # If all players have left, kill the game server after publishing state
+    # If all players have left or died, kill the game server after publishing state
     game =
-      if Game.num_players(game) == 0 do
+      if Game.num_alive_players(game) == 0 do
         Game.set_exiting(game)
       else
         game
