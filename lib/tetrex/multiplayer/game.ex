@@ -81,8 +81,11 @@ defmodule Tetrex.Multiplayer.Game do
   def num_players(%__MODULE__{players: players}),
     do: Enum.count(players)
 
+  def alive_players(%__MODULE__{players: players}),
+    do: players |> Enum.filter(fn {_user_id, player_state} -> player_alive?(player_state) end)
+
   def num_alive_players(%__MODULE__{players: players}),
-    do: players |> Enum.count(fn {_user_id, %{status: status}} -> status != :dead end)
+    do: players |> Enum.count(fn {_user_id, player_state} -> player_alive?(player_state) end)
 
   def get_player_state(%__MODULE__{players: players}, user_id) do
     case Map.get(players, user_id) do
@@ -142,6 +145,10 @@ defmodule Tetrex.Multiplayer.Game do
 
   defp player_ready?(player_state) do
     player_state.status in [:ready, :dead]
+  end
+
+  defp player_alive?(player_state) do
+    player_state.status != :dead
   end
 
   defp update_player_state(%__MODULE__{players: players} = game, user_id, update_fn) do

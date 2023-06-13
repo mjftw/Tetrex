@@ -418,6 +418,14 @@ defmodule Tetrex.Multiplayer.GameServer do
         {:ok, game}
       end
 
+    # Send a blocking row to a random alive player per line cleared
+    game
+    |> Game.alive_players()
+    |> Stream.map(fn {player_user_id, _} -> player_user_id end)
+    |> Stream.filter(fn player_user_id -> player_user_id != user_id end)
+    |> Enum.take_random(num_lines_cleared)
+    |> Enum.map(&send_blocking_row_to_player(game, &1))
+
     game
   end
 
@@ -440,6 +448,17 @@ defmodule Tetrex.Multiplayer.GameServer do
          {:ok, game} <- Game.kill_player(game, user_id) do
       Periodic.stop_timer(periodic_mover_pid)
       {:ok, game}
+    end
+  end
+
+  defp send_blocking_row_to_player(game, user_id) do
+    case Game.get_player_state(game, user_id) do
+      {:ok, %{board_pid: board_pid}} ->
+        BoardServer.add_blocking_row(board_pid)
+        :ok
+
+      {:error, error} ->
+        {:error, error}
     end
   end
 end
