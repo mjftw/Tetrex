@@ -4,6 +4,8 @@ defmodule Tetrex.Multiplayer.GameServer do
   alias Tetrex.Multiplayer.Game
   use GenServer
 
+  @send_blocking_row_probability 0.5
+
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], [])
   end
@@ -419,11 +421,13 @@ defmodule Tetrex.Multiplayer.GameServer do
       end
 
     # Send a blocking row to a random alive player per line cleared
+    # Probability of sending a row is == @send_blocking_row_probability
     game
     |> Game.alive_players()
     |> Stream.map(fn {player_user_id, _} -> player_user_id end)
     |> Stream.filter(fn player_user_id -> player_user_id != user_id end)
     |> Enum.take_random(num_lines_cleared)
+    |> Enum.filter(fn _ -> random_bool(@send_blocking_row_probability) end)
     |> Enum.map(&send_blocking_row_to_player(game, &1))
 
     game
@@ -460,5 +464,9 @@ defmodule Tetrex.Multiplayer.GameServer do
       {:error, error} ->
         {:error, error}
     end
+  end
+
+  defp random_bool(true_probability) do
+    :rand.uniform(100) <= true_probability * 100
   end
 end
