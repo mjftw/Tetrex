@@ -219,6 +219,9 @@ defmodule TetrexWeb.MultiplayerGameLive do
       {:ready, :playing, :dead, _} ->
         socket |> Audio.play_game_over_audio()
 
+      {_, :playing, :ready, :finished} ->
+        socket |> Audio.pause_theme_audio()
+
       _ ->
         socket
     end
