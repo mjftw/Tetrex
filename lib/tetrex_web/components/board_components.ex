@@ -36,6 +36,14 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
+  def multiplayer_game(assigns) do
+    ~H"""
+      <div class="multiplayer-game" style={"--background-color: " <> if assigns[:is_dead], do: "grey", else: "antiquewhite"}>
+        <%= render_slot(@inner_block) %>
+      </div>
+    """
+  end
+
   defp sparsegrid_fixed(assigns) do
     ~H"""
       <div class="sparsegrid" style={"--num-columns: #{@width}"}>
