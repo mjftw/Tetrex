@@ -14,10 +14,20 @@ defmodule TetrexWeb.SignupLive do
 
   @impl true
   def handle_event("set-username", %{"signup" => %{"username" => username}}, socket) do
-    UserStore.put_user(socket.assigns.current_user_id, username)
+    if !valid_username?(username) do
+      {:noreply,
+       socket
+       |> put_flash(:error, "Looks like that name is invalid - maybe try something else?")}
+    else
+      UserStore.put_user(socket.assigns.current_user_id, username)
 
-    {:noreply,
-     socket
-     |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
+      {:noreply,
+       socket
+       |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
+    end
+  end
+
+  defp valid_username?(username) do
+    String.length(username) > 0
   end
 end
