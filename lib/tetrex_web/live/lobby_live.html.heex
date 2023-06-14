@@ -11,8 +11,8 @@
 <div>
     <h2>Users in lobby</h2>
     <ul>
-        <%= for {user_id, _} <- @users do %>
-            <li> <%= if user_id == @user_id do "You" else user_id end %> </li>
+        <%= for {_user_id, %{user: %User{id: user_id, username: username}}} <- @users do %>
+            <li> <%= if user_id == @current_user_id do "You" else username end %> </li>
         <% end %>
     </ul>
 </div>

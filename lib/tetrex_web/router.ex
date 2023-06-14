@@ -9,6 +9,7 @@ defmodule TetrexWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug TetrexWeb.Plugs.UserSession
+    plug TetrexWeb.Plugs.RequireUsername
   end
 
   pipeline :api do
@@ -19,6 +20,7 @@ defmodule TetrexWeb.Router do
     scope "/", TetrexWeb do
       pipe_through :browser
 
+      live "/signup", SignupLive
       live "/single-player-game", SinglePlayerGameLive
       live "/multiplayer-game/:game_id", MultiplayerGameLive
       live "/", LobbyLive

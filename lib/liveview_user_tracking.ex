@@ -13,7 +13,7 @@ defmodule LiveViewUserTracking do
           # The topic to publish/subscribe to presence updates on
           topic: "room:lobby",
           # The key in the socket assigns to read current user from
-          socket_current_user_assign_key: :current_user,
+          socket_current_user_id_assign_key: :current_user,
           # The key in the socket assigns to write store the present users list
           socket_users_assign_key: :users
 
@@ -27,22 +27,31 @@ defmodule LiveViewUserTracking do
       end
     ```
   """
+  alias Tetrex.Users.UserStore
+  alias Tetrex.Users.User
+
   @spec __using__(any) :: {:__block__, [], [{:=, [], [...]} | {:__block__, [...], [...]}, ...]}
   defmacro __using__(opts) do
     quote location: :keep, bind_quoted: [opts: opts] do
       presence_module = Keyword.fetch!(opts, :presence)
       presence_topic = Keyword.fetch!(opts, :topic)
-      presence_current_user_assign_key = Keyword.fetch!(opts, :socket_current_user_assign_key)
+
+      presence_current_user_id_assign_key =
+        Keyword.fetch!(opts, :socket_current_user_id_assign_key)
+
       presence_users_assign_key = Keyword.fetch!(opts, :socket_users_assign_key)
 
       def mount_presence_init(socket) do
         if connected?(socket) do
+          current_user_id = socket.assigns[unquote(presence_current_user_id_assign_key)]
+
           {:ok, _} =
             unquote(presence_module).track(
               self(),
               unquote(presence_topic),
-              socket.assigns[unquote(presence_current_user_assign_key)],
+              current_user_id,
               %{
+                user: UserStore.get_user!(current_user_id),
                 joined_at: inspect(System.system_time(:second))
               }
             )

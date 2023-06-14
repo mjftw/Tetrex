@@ -12,6 +12,8 @@ defmodule Tetrex.Application do
       ProcessMonitor,
       # Start a dynamic supervisor to start games under
       Tetrex.GameDynamicSupervisor,
+      # Start the UserStore store
+      Tetrex.Users.UserStore,
       # Start the Telemetry supervisor
       TetrexWeb.Telemetry,
       # Start the PubSub system
