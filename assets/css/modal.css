@@ -9,3 +9,18 @@
     align-items: center;
     justify-content: center;
 }
+
+.modal-content {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    justify-content: center;
+    flex-direction: column;
+    background-color: aliceblue;
+    border-style: double;
+    border-width: 5px;
+    border-color: black;
+    width: 30%;
+    height: 20%;
+}

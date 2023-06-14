@@ -5,14 +5,14 @@
   <%= case @status do %>
     <% :intro -> %>
       <Modal.modal show>
-        <div class="game-over-box">
+        <div class="modal-content">
           <b>Ready Player 1</b>
           <button phx-click="start_game">Start</button>
         </div>
     </Modal.modal>
     <% :paused -> %>
       <Modal.modal show>
-        <div class="game-over-box">
+        <div class="modal-content">
           <b>Paused</b>
           <button phx-click="start_game">Resume</button>
           <button phx-click="quit_game">Quit game</button>
@@ -20,7 +20,7 @@
     </Modal.modal>
     <% :game_over -> %>
       <Modal.modal show>
-        <div class="game-over-box">
+        <div class="modal-content">
           <h1>Game Over</h1>
           <h2>Score: <%= @lines_cleared%></h2>
           <button phx-click="quit_game">Quit game</button>
