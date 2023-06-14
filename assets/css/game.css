@@ -144,6 +144,8 @@
 .game-over-box {
     display: flex;
     align-items: center;
+    text-align: center;
+    padding: 10px;
     justify-content: center;
     flex-direction: column;
     background-color: aliceblue;
