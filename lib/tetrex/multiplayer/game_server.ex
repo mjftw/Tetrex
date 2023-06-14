@@ -4,6 +4,8 @@ defmodule Tetrex.Multiplayer.GameServer do
   alias Tetrex.Multiplayer.Game
   use GenServer
 
+  require Logger
+
   @send_blocking_row_probability 0.5
 
   def start_link(_opts) do
@@ -422,13 +424,23 @@ defmodule Tetrex.Multiplayer.GameServer do
 
     # Send a blocking row to a random alive player per line cleared
     # Probability of sending a row is == @send_blocking_row_probability
-    game
-    |> Game.alive_players()
-    |> Stream.map(fn {player_user_id, _} -> player_user_id end)
-    |> Stream.filter(fn player_user_id -> player_user_id != user_id end)
-    |> Enum.take_random(num_lines_cleared)
-    |> Enum.filter(fn _ -> random_bool(@send_blocking_row_probability) end)
-    |> Enum.map(&send_blocking_row_to_player(game, &1))
+    game =
+      game
+      |> Game.alive_players()
+      |> Stream.map(fn {player_user_id, _} -> player_user_id end)
+      |> Stream.filter(fn player_user_id -> player_user_id != user_id end)
+      |> Enum.take_random(num_lines_cleared)
+      |> Enum.filter(fn _ -> random_bool(@send_blocking_row_probability) end)
+      |> Enum.reduce(game, fn user_id, game ->
+        case send_blocking_row_to_player(game, user_id) do
+          {:ok, new_game} ->
+            new_game
+
+          {:error, error} ->
+            Logger.error(error)
+            game
+        end
+      end)
 
     game
   end
@@ -458,8 +470,10 @@ defmodule Tetrex.Multiplayer.GameServer do
   defp send_blocking_row_to_player(game, user_id) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
-        BoardServer.add_blocking_row(board_pid)
-        :ok
+        case BoardServer.add_blocking_row(board_pid) do
+          %{active_tile_fits: false} -> kill_player_stop_timer(game, user_id)
+          _ -> {:ok, game}
+        end
 
       {:error, error} ->
         {:error, error}
