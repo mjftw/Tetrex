@@ -141,3 +141,15 @@
     width: var(--tile-square-size);
     height: var(--tile-square-size);
 }
+
+.signup-form {
+    border: 1px;
+    border-style: solid;
+    border-color: darkslategrey;
+    border-radius: 0.5em;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30em;
+}

@@ -1,21 +1,19 @@
 defmodule TetrexWeb.LobbyLive do
+  alias Tetrex.Users.User
   alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
   use TetrexWeb, :live_view
 
   require Logger
 
-  @socket_presence_assign_key :users
-  @current_user_key :user_id
-
   use LiveViewUserTracking,
     presence: TetrexWeb.Presence,
     topic: "room:lobby",
-    socket_current_user_assign_key: @current_user_key,
-    socket_users_assign_key: @socket_presence_assign_key
+    socket_current_user_id_assign_key: :current_user_id,
+    socket_users_assign_key: :users
 
   @impl true
-  def mount(_params, %{"user_id" => user_id} = _session, socket) do
+  def mount(_params, %{"user_id" => current_user_id} = _session, socket) do
     {multiplayer_game_pids, multiplayer_games} =
       Enum.unzip(GameDynamicSupervisor.multiplayer_games())
 
@@ -27,10 +25,10 @@ defmodule TetrexWeb.LobbyLive do
 
     {:ok,
      socket
-     |> assign(:user_id, user_id)
+     |> assign(:current_user_id, current_user_id)
      |> assign(
        :user_has_single_player_game,
-       GameDynamicSupervisor.user_has_single_player_game?(user_id)
+       GameDynamicSupervisor.user_has_single_player_game?(current_user_id)
      )
      |> assign(:users, %{})
      |> assign(:multiplayer_games, multiplayer_games)
@@ -39,7 +37,7 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def handle_event("new-single-player-game", _value, socket) do
-    user_id = socket.assigns.user_id
+    user_id = socket.assigns.current_user_id
 
     if !GameDynamicSupervisor.user_has_single_player_game?(user_id) do
       GameDynamicSupervisor.start_single_player_game(user_id)
@@ -56,7 +54,7 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def handle_event("resume-single-player-game", _value, socket) do
-    user_id = socket.assigns.user_id
+    user_id = socket.assigns.current_user_id
 
     if GameDynamicSupervisor.user_has_single_player_game?(user_id) do
       {:noreply,
