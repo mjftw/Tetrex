@@ -4,6 +4,7 @@
     align-items: center;
     background-color: cadetblue;
     padding-bottom: 5%;
+    --background-color: antiquewhite;
 }
 
 .multiplayer-game {
@@ -32,7 +33,7 @@
     gap: 3%;
     justify-content: center;
 
-    --tile-square-size: 30px
+    --tile-square-size: 30px;
 }
 
 .playfield {
@@ -40,7 +41,7 @@
     border-width: 1px;
     border-style: solid;
     border-radius: 5px;
-    background-color: antiquewhite;
+    background-color: var(--background-color);
     height: fit-content;
 }
 
@@ -56,14 +57,14 @@
     border-color: black;
     border-width: 1px;
     border-radius: 10px;
-    background-color: antiquewhite;
+    background-color: var(--background-color);
 }
 
 .tile-box {
     text-align: center;
     height: fit-content;
     width: fit-content;
-    background-color: antiquewhite;
+    background-color: var(--background-color);
     border-style: solid;
     border-color: black;
     border-width: 1px;

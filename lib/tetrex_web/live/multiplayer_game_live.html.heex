@@ -44,35 +44,35 @@
 
     <div class="multiplayer-games-container">
         <!-- Display other users's boards -->
-        <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared}} <- even_users_player_data(@game.players, @user_id) do %>
-            <div class="multiplayer-game">
+        <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- even_users_player_data(@game.players, @user_id) do %>
+            <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
                 <div class="board">
                     <BoardComponents.playfield board={board_preview}/>
                 </div>
-            </div>
+            </BoardComponents.multiplayer_game>
         <% end %>
 
         <!-- Display current user's boards -->
-        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared} <- user_player_data do %>
-            <div class="multiplayer-game">
+        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
+            <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
                 <div class="board">
                     <BoardComponents.hold_tile_box board={board_preview}/>
                     <BoardComponents.playfield board={board_preview}/>
                     <BoardComponents.next_tile_box board={board_preview}/>
                 </div>
-            </div>
+            </BoardComponents.multiplayer_game>
         <% end %>
 
         <!-- Display other users's boards -->
-        <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared}} <- odd_users_player_data(@game.players, @user_id) do %>
-            <div class="multiplayer-game">
+        <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- odd_users_player_data(@game.players, @user_id) do %>
+            <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
                 <div class="board">
                     <BoardComponents.playfield board={board_preview}/>
                 </div>
-            </div>
+            </BoardComponents.multiplayer_game>
         <% end %>
     </div>
 </div>
