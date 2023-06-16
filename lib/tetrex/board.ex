@@ -333,6 +333,11 @@ defmodule Tetrex.Board do
   """
   @spec preview(board()) :: board_preview()
   def preview(board) do
+    # FIXME: This check is not sufficient!
+    # If a blocking row is added there may be an overlap where the tiles are pushed off the board,
+    #  but active tile still fits.
+    # Need additional check to see if this has happened, and put this info in preview.
+    # Maybe change "active_tile_fits" to "tiles_fit_on_board" instead
     case SparseGrid.overlaps?(board.active_tile, board.playfield) do
       false ->
         %{active_tile: dropped} = drop_active_no_merge(board)
