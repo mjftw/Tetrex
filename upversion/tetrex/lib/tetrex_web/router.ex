@@ -8,16 +8,25 @@ defmodule TetrexWeb.Router do
     plug :put_root_layout, html: {TetrexWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug TetrexWeb.Plugs.UserSession
+    plug TetrexWeb.Plugs.RequireUsername
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/", TetrexWeb do
-    pipe_through :browser
+  live_session :default do
+    scope "/", TetrexWeb do
+      pipe_through :browser
 
-    get "/", PageController, :home
+      live "/signup", SignupLive
+      live "/single-player-game", SinglePlayerGameLive
+      live "/multiplayer-game/:game_id", MultiplayerGameLive
+      live "/", LobbyLive
+
+      get "/home", PageController, :home
+    end
   end
 
   # Other scopes may use custom stacks.
