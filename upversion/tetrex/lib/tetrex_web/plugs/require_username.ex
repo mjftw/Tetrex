@@ -1,5 +1,5 @@
 defmodule TetrexWeb.Plugs.RequireUsername do
-  alias TetrexWeb.Router.Helpers, as: Routes
+  use TetrexWeb, :verified_routes
 
   alias Tetrex.Users.UserStore
 
@@ -10,7 +10,7 @@ defmodule TetrexWeb.Plugs.RequireUsername do
   def call(conn, _opts) do
     user_id = get_session(conn, :user_id)
 
-    signup_path = Routes.live_path(conn, TetrexWeb.SignupLive)
+    signup_path = ~p"/signup"
 
     if conn.request_path == signup_path do
       conn

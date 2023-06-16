@@ -23,7 +23,7 @@ defmodule TetrexWeb.SignupLive do
 
       {:noreply,
        socket
-       |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
+       |> push_redirect(to: ~p"/")}
     end
   end
 
