@@ -1,18 +1,51 @@
 # Tetrex
 
-To start your Phoenix server:
+Yet another Tetris game, because everyone loves Tetris!
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## How to play
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+The easiest way to play is to head on over to https://tetrex.fly.dev/
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+If you'd like to run it locally, you can do so with:
 
-## Learn more
+```sh
+mix phx.server
+```
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Or run it using Docker with:
+
+```sh
+docker compose up -f docker_dev/docker-compose.yml
+```
+
+Head on over to http://localhost:4000 and you're in!
+
+## Features
+
+Features:
+
+- It's Tetris, so all the basic Tetris stuff
+- Your game is saved automatically, so you can safely close your browser tab and come back
+
+Upcoming:
+
+- Multiplayer battles!
+
+## Developer things
+
+The version is bumped using the excellent [Versiose](https://hexdocs.pm/versioce/readme.html) package.
+
+You can do this with:
+
+```sh
+mix bump patch
+#OR
+mix bump minor
+#OR
+mix bump major
+```
+
+This will only succeed if you have no uncommitted git changes.
+It will create an update commit for you, tagging the new version.
+
+To deploy: `fly deploy`
