@@ -47,6 +47,23 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Configure version bumping
+config :versioce,
+  pre_hooks: [Tetrex.Versioce.PreHooks.GitCheckUncommitted],
+  post_hooks: [Tetrex.Versioce.PostHooks.GitCommitUpdate, Tetrex.Versioce.PostHooks.GitTag]
+
+config :versioce, :changelog,
+  datagrabber: Versioce.Changelog.DataGrabber.Git,
+  formatter: Versioce.Changelog.Formatter.Keepachangelog,
+  anchors: %{
+    added: ["Added:", "added:"],
+    changed: ["Changed:", "changed:"],
+    deprecated: ["Depreciated:", "depreciated:"],
+    removed: ["Removed:", "removed:"],
+    fixed: ["Fixed:", "fixed:"],
+    security: ["Security:", "security:"]
+  }
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
