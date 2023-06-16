@@ -8,14 +8,20 @@ defmodule Tetrex.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      # Allow monitoring processes
+      ProcessMonitor,
+      # Start a dynamic supervisor to start games under
+      Tetrex.GameDynamicSupervisor,
+      # Start the UserStore store
+      Tetrex.Users.UserStore,
       # Start the Telemetry supervisor
       TetrexWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Tetrex.PubSub},
+      # Start the Presence module
+      TetrexWeb.Presence,
       # Start the Endpoint (http/https)
       TetrexWeb.Endpoint
-      # Start a worker by calling: Tetrex.Worker.start_link(arg)
-      # {Tetrex.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
