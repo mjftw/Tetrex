@@ -1,5 +1,5 @@
 defmodule TetrexWeb.Components.Modal do
-  use TetrexWeb, :component
+  use TetrexWeb, :live_component
 
   def modal(assigns) do
     ~H"""

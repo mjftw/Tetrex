@@ -1,6 +1,6 @@
 defmodule TetrexWeb.Components.Client.Audio do
   alias TetrexWeb.Components.Soundtrack
-  use TetrexWeb, :component
+  use TetrexWeb, :live_component
 
   def tetris_audio(assigns) do
     ~H"""

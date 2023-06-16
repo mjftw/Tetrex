@@ -7,7 +7,8 @@ defmodule TetrexWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_tetrex_key",
-    signing_salt: "SVVI/8Jh"
+    signing_salt: "BRy6Zu+s",
+    same_site: "Lax"
   ]
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
@@ -20,7 +21,7 @@ defmodule TetrexWeb.Endpoint do
     at: "/",
     from: :tetrex,
     gzip: false,
-    only: ~w(assets fonts images audio favicon.ico robots.txt)
+    only: TetrexWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

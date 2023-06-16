@@ -13,7 +13,7 @@ defmodule TetrexWeb.SignupLive do
   end
 
   @impl true
-  def handle_event("set-username", %{"signup" => %{"username" => username}}, socket) do
+  def handle_event("set-username", %{"username" => username}, socket) do
     if !valid_username?(username) do
       {:noreply,
        socket
@@ -23,7 +23,7 @@ defmodule TetrexWeb.SignupLive do
 
       {:noreply,
        socket
-       |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
+       |> push_redirect(to: ~p"/")}
     end
   end
 

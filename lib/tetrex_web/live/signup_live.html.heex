@@ -3,11 +3,12 @@
     <h2>Welcome to Tetrex!</h2>
   </div>
   <div class="signup-form">
-    <%= form_for :signup, "#", [phx_submit: "set-username"], fn f -> %>
-        <%= label f, "What would you like to be called?" %>
-        <%= text_input f, :username %>
-        <%= submit "Save" %>
-    <% end %>
+    <.simple_form for={%{}} phx-submit="set-username">
+        <.input name="username" label="What would you like to be called?" value=""/>
+        <:actions>
+          <.button>Save</.button>
+        </:actions>
+    </.simple_form>
   </div>
 
 </div>
