@@ -1,5 +1,5 @@
 defmodule TetrexWeb.Components.Soundtrack do
-  use TetrexWeb, :component
+  use TetrexWeb, :live_component
 
   def background(assigns) do
     ~H"""

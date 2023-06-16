@@ -1,5 +1,5 @@
 defmodule TetrexWeb.Components.BoardComponents do
-  use TetrexWeb, :component
+  use TetrexWeb, :live_component
   alias Tetrex.SparseGrid
 
   def playfield(assigns) do

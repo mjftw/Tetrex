@@ -2,7 +2,7 @@ defmodule TetrexWeb.PageControllerTest do
   use TetrexWeb.ConnCase
 
   test "GET /", %{conn: conn} do
-    conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "Ready Player 1"
+    conn = get(conn, ~p"/")
+    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
   end
 end

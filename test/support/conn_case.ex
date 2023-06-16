@@ -19,15 +19,15 @@ defmodule TetrexWeb.ConnCase do
 
   using do
     quote do
+      # The default endpoint for testing
+      @endpoint TetrexWeb.Endpoint
+
+      use TetrexWeb, :verified_routes
+
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
       import TetrexWeb.ConnCase
-
-      alias TetrexWeb.Router.Helpers, as: Routes
-
-      # The default endpoint for testing
-      @endpoint TetrexWeb.Endpoint
     end
   end
 

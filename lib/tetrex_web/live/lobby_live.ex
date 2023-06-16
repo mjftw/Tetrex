@@ -47,7 +47,7 @@ defmodule TetrexWeb.LobbyLive do
 
       {:noreply,
        socket
-       |> push_redirect(to: Routes.live_path(socket, TetrexWeb.SinglePlayerGameLive))}
+       |> push_redirect(to: ~p"/single-player-game")}
     else
       {:noreply,
        socket
@@ -62,11 +62,11 @@ defmodule TetrexWeb.LobbyLive do
     if GameDynamicSupervisor.user_has_single_player_game?(user_id) do
       {:noreply,
        socket
-       |> push_redirect(to: Routes.live_path(socket, TetrexWeb.SinglePlayerGameLive))}
+       |> push_redirect(to: ~p"/single-player-game")}
     else
       {:noreply,
        socket
-       |> put_flash(:error, "Cannot find single player game")}
+       |> put_flash(:error, "Cannot find single player game #{1}")}
     end
   end
 
@@ -78,7 +78,7 @@ defmodule TetrexWeb.LobbyLive do
 
         {:noreply,
          socket
-         |> push_redirect(to: Routes.live_path(socket, TetrexWeb.MultiplayerGameLive, game_id))}
+         |> push_redirect(to: ~p"/multiplayer-game/#{game_id}")}
 
       {:error, error} ->
         Logger.error("Failed to create multiplayer game: #{inspect(error)}")
@@ -93,7 +93,7 @@ defmodule TetrexWeb.LobbyLive do
   def handle_event("join-multiplayer-game", %{"game-id" => game_id}, socket) do
     {:noreply,
      socket
-     |> push_redirect(to: Routes.live_path(socket, TetrexWeb.MultiplayerGameLive, game_id))}
+     |> push_redirect(to: ~p"/multiplayer-game/#{game_id}")}
   end
 
   # PubSub handlers
