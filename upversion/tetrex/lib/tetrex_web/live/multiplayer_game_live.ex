@@ -228,5 +228,5 @@ defmodule TetrexWeb.MultiplayerGameLive do
   end
 
   defp redirect_to_lobby(socket),
-    do: push_redirect(socket, to: Routes.live_path(socket, TetrexWeb.LobbyLive))
+    do: push_redirect(socket, to: ~p"/")
 end

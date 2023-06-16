@@ -13,7 +13,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
     case GameDynamicSupervisor.user_single_player_game(user_id) do
       nil ->
-        {:ok, push_redirect(socket, to: Routes.live_path(socket, TetrexWeb.LobbyLive))}
+        {:ok, push_redirect(socket, to: ~p"/")}
 
       {game_server, _game} ->
         if connected?(socket) do
@@ -56,7 +56,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     GameDynamicSupervisor.remove_single_player_game(socket.assigns.user_id)
 
     socket
-    |> push_redirect(to: Routes.live_path(socket, TetrexWeb.LobbyLive))
+    |> push_redirect(to: ~p"/")
     |> noreply()
   end
 
