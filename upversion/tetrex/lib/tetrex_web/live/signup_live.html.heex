@@ -3,7 +3,12 @@
     <h2>Welcome to Tetrex!</h2>
   </div>
   <div class="signup-form">
-
+    <.simple_form for={%{}} phx-submit="set-username">
+        <.input name="username" label="What would you like to be called?" value=""/>
+        <:actions>
+          <.button>Save</.button>
+        </:actions>
+    </.simple_form>
   </div>
 
 </div>
