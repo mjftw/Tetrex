@@ -47,7 +47,8 @@ defmodule Tetrex.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:uuid, "~> 1.1"},
       {:versioce, "~> 2.0.0"},
-      {:credo, "~> 1.7"}
+      {:credo, "~> 1.7"},
+      {:tailwind_formatter, "~> 0.3.6", only: [:dev, :test], runtime: false}
     ]
   end
 
