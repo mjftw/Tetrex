@@ -47,7 +47,8 @@ defmodule Tetrex.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:uuid, "~> 1.1"},
-      {:versioce, "~> 2.0.0"}
+      {:versioce, "~> 2.0.0"},
+      {:credo, "~> 1.7"}
     ]
   end
 
