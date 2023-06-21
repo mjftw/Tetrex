@@ -3,7 +3,23 @@
 
 const plugin = require("tailwindcss/plugin")
 const fs = require("fs")
-const path = require("path")
+const path = require("path");
+const { stringify } = require("querystring");
+
+function range(size, startAt = 0) {
+  return [...Array(size).keys()].map(i => i + startAt);
+}
+
+function gridTemplateColumnsCustomValues(max_cols) {
+  let customVals = {}
+
+  for (let i = 13; i <= max_cols; i++) {
+    const num = i.toString();
+    customVals[num] = "repeat(" + num + ", minmax(0, 1fr))";
+  }
+
+  return customVals;
+}
 
 module.exports = {
   content: [
@@ -15,7 +31,8 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
-      }
+      },
+      gridTemplateColumns: gridTemplateColumnsCustomValues(200)
     },
   },
   plugins: [
