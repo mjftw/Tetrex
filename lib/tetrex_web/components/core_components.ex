@@ -225,14 +225,57 @@ defmodule TetrexWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded-lg py-2 px-3 text-sm font-semibold leading-6",
         @class
       ]}
       {@rest}
     >
       <%= render_slot(@inner_block) %>
     </button>
+    """
+  end
+
+  attr :class, :string, default: nil
+  attr :rest, :global, include: ~w(disabled form name value)
+
+  slot :inner_block, required: true
+
+  def button_primary(assigns) do
+    ~H"""
+    <.button
+      class={
+        [
+          "bg-orange-400 text-slate-800 hover:bg-orange-300 transition-colors",
+          @class
+        ]
+        |> Enum.join(" ")
+      }
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </.button>
+    """
+  end
+
+  attr :class, :string, default: nil
+  attr :rest, :global, include: ~w(disabled form name value)
+
+  slot :inner_block, required: true
+
+  def button_secondary(assigns) do
+    ~H"""
+    <.button
+      class={
+        [
+          "bg-slate-300 transition-colors hover:bg-slate-200 text-slate-800",
+          @class
+        ]
+        |> Enum.join(" ")
+      }
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </.button>
     """
   end
 
@@ -468,7 +511,7 @@ defmodule TetrexWeb.CoreComponents do
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
       <table class="w-[40rem] mt-11 sm:w-full">
-        <thead class="text-sm text-left leading-6 text-zinc-500">
+        <thead class="text-left text-sm leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pr-6 pb-4 font-normal"><%= col[:label] %></th>
             <th class="relative p-0 pb-4"><span class="sr-only"><%= gettext("Actions") %></span></th>
