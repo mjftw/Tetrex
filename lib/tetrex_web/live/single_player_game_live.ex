@@ -6,8 +6,8 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   alias Tetrex.SinglePlayer.GameServer
   alias Tetrex.SinglePlayer.Game
   alias TetrexWeb.Components.BoardComponents
-  alias TetrexWeb.Components.Modal
   alias TetrexWeb.Components.Client.Audio
+  alias Phoenix.LiveView.JS
 
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
