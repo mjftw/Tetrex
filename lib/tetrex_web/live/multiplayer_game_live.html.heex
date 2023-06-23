@@ -2,32 +2,45 @@
 <div phx-window-keydown="keypress">
   <Audio.tetris_audio/>
   <% user_player_data = user_player_data!(@game, @user_id)%>
-  <%= case {@game.status, Map.fetch!(user_player_data, :status), num_players_in_game(@game)} do %>
-    <% {:players_joining, :not_ready, num_players} when num_players < 2 -> %>
-        <.modal_simple id="players_joining_not_ready_modal" on_cancel={show_modal("players_joining_not_ready_modal")} show>
-            <b>Waiting for more players to join...</b>
-        </.modal_simple>
-    <% {:players_joining, :not_ready, _} -> %>
+  <% user_status = Map.fetch!(user_player_data, :status) %>
+  <%= case @game.status do %>
+    <% :players_joining -> %>
         <.modal_simple id="players_joining_not_ready_modal" show>
-            <b>Waiting for all players to be ready...</b>
-            <button phx-click="player-ready" phx-value-user-id={@user_id}>I'm ready!</button>
+            <%= cond do %>
+                <% num_players_in_game(@game) < 2 -> %>
+                    <b>Waiting for more players to join...</b>
+                <% user_status == :not_ready -> %>
+                    <div class="flex flex-col items-center gap-5">
+                        <b>Waiting for all players to be ready...</b>
+                        <.button_primary phx-click="player-ready" phx-value-user-id={@user_id}>I'm ready!</.button_primary>
+                    </div>
+
+                <% true -> %>
+                    <div class="flex flex-col items-center gap-5">
+                        <b>Waiting for all players to be ready...</b>
+                        <.button_primary phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</.button_primary>
+                    </div>
+            <% end %>
         </.modal_simple>
-    <% {:players_joining, :ready, _} -> %>
-        <.modal_simple id="players_joining_ready_modal" show>
-            <b>Waiting for all players to be ready...</b>
-            <button phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</button>
-        </.modal_simple>
-    <% {:finished, :dead, _} -> %>
-        <.modal on_cancel={JS.push("exit-game")} id="finished_dead_modal" show>
-            <b>You did not win. What a surprise.</b><br/>
-            Press back button to retreat to the lobby, you failure.
-        </.modal>
-    <% {:finished, :ready, _} -> %>
-        <.modal on_cancel={JS.push("exit-game")} id="finished_ready_modal" show>
-            <b>WINNER!!</b><br/>
-            Yes, you are amazing.<br/>
-            Press back button to return to the lobby with your head held high.
-        </.modal>
+    <% :finished -> %>
+        <%= case user_status do %>
+            <% :dead -> %>
+                <.modal on_cancel={JS.push("exit-game")} id="finished_ready_modal" show>
+                    <div class="flex flex-col gap-2 items-center text-center">
+                        <b>WINNER!!</b><br/>
+                        Yes, you are amazing.<br/>
+                        Press back button to return to the lobby with your head held high.
+                    </div>
+                </.modal>
+            <% :ready -> %>
+                <.modal on_cancel={JS.push("exit-game")} id="finished_dead_modal" show>
+                    <div class="flex flex-col gap-2 items-center text-center">
+                        <b>You did not win. What a surprise.</b><br/>
+                        Press back button to retreat to the lobby, you failure.
+                    </div>
+                </.modal>
+            <% _ -> %>
+        <% end %>
     <% _ -> %>
   <% end %>
 
