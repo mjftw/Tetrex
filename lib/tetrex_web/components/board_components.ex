@@ -86,7 +86,7 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
-  slot :inner_block, required: true
+  slot(:inner_block, required: true)
 
   def single_player_game_box(assigns) do
     ~H"""
@@ -96,8 +96,8 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
-  attr :is_dead, :boolean, required: false, default: false
-  slot :inner_block, required: true
+  attr(:is_dead, :boolean, required: false, default: false)
+  slot(:inner_block, required: true)
 
   def multiplayer_game(assigns) do
     ~H"""
@@ -117,61 +117,89 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   defp tile(%{type: :red} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-red-400" />
+    <.tile_filled class="fill-red-400" />
     """
   end
 
   defp tile(%{type: :green} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-green-400" />
+    <.tile_filled class="fill-green-400" />
     """
   end
 
   defp tile(%{type: :blue} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-blue-400" />
+    <.tile_filled class="fill-blue-400" />
     """
   end
 
   defp tile(%{type: :cyan} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-cyan-400" />
+    <.tile_filled class="fill-cyan-400" />
     """
   end
 
   defp tile(%{type: :yellow} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-yellow-400" />
+    <.tile_filled class="fill-yellow-400" />
     """
   end
 
   defp tile(%{type: :purple} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-purple-400" />
+    <.tile_filled class="fill-purple-400" />
     """
   end
 
   defp tile(%{type: :orange} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-orange-400" />
+    <.tile_filled class="fill-orange-400" />
     """
   end
 
   defp tile(%{type: :drop_preview} = assigns) do
     ~H"""
-    <div class="h-7 w-7 border-2 border-solid border-slate-200 bg-none" />
+    <.tile_edged class=" stroke-0 fill-slate-500" fill-opacity="0.15"/>
     """
   end
 
   defp tile(%{type: :blocking} = assigns) do
     ~H"""
-    <div class="border-1 h-7 w-7 border-solid border-slate-800 bg-slate-700" />
+    <.tile_edged class=" stroke-slate-800 fill-slate-700" />
     """
   end
 
   defp tile(%{type: nil} = assigns) do
     ~H"""
-    <div class="h-7 w-7 bg-none" />
+    <.tile_filled class="fill-transparent" />
+    """
+  end
+
+  attr(:class, :string, default: nil)
+  attr(:rest, :global)
+
+  @doc """
+  A square SVG that is slightly overlapping the viewBox on all sides to give a filled box
+  """
+  defp tile_filled(assigns) do
+    ~H"""
+    <svg class={["h-full w-full stroke-none", @class]} viewBox="0 0 100 100" {@rest}>
+      <path d="M -10 -10 H 120 V 120 H -120 V -120"/>
+    </svg>
+    """
+  end
+
+  attr(:class, :string, default: nil)
+  attr(:rest, :global)
+
+  @doc """
+  A square SVG that is slightly within the viewBox to give a border stroke
+  """
+  defp tile_edged(assigns) do
+    ~H"""
+    <svg class={["h-full w-full stroke-2", @class]} viewBox="0 0 100 100" {@rest}>
+      <path d="M 2 2 H 96 V 96 H -96 V -96"/>
+    </svg>
     """
   end
 end
