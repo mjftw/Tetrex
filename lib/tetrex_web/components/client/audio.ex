@@ -4,8 +4,8 @@ defmodule TetrexWeb.Components.Client.Audio do
 
   def tetris_audio(assigns) do
     ~H"""
-      <Soundtrack.background id={theme_music_audio_id()} src={theme_music_audio_src()} loop/>
-      <Soundtrack.effect id={game_over_audio_id()} src={game_over_audio_src()}/>
+    <Soundtrack.background id={theme_music_audio_id()} src={theme_music_audio_src()} loop />
+    <Soundtrack.effect id={game_over_audio_id()} src={game_over_audio_src()} />
     """
   end
 
