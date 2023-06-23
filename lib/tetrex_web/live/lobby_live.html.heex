@@ -1,41 +1,51 @@
-<h1>Lobby</h1>
-
-<h3>Hello <%= @current_user.username %></h3>
-
-<%= if @user_has_single_player_game do %>
-    <button phx-click="resume-single-player-game">Resume single player game</button>
-<% else %>
-    <button phx-click="new-single-player-game">Start single player game</button>
-<% end %>
-
-<button phx-click="new-multiplayer-game">Start new multiplayer game</button>
-
 <div>
-    <h2>Users in lobby</h2>
-    <ul>
-        <%= for {_user_id, %{user: %User{id: user_id, username: username}}} <- @users, user_id != @current_user.id  do %>
-            <li> <%= username %> </li>
-        <% end %>
-    </ul>
-</div>
+    <div class="flex flex-row justify-between">
+        <span class="text-lg">Lobby</span>
+        <span class="text-lg">Current user: <%= @current_user.username %></span>
+    </div>
 
-<div>
-    <ul>
-    <h2>Joinable multiplayer games</h2>
-        <%= for game <- joinable_multiplayer_games(@multiplayer_games) do %>
-            <li>
-                <button phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join multiplayer game: <%=game.game_id%> - <%= Multiplayer.Game.num_players(game) %> player(s)</button>
-            </li>
+    <.horizontal_divider />
+
+    <div class="pt-3">
+        <h2>Users in lobby: <%= Enum.count(@users) %></h2>
+        <ul role="list" class="marker:text-sky-400 list-disc pl-5 space-y-3 text-slate-500">
+            <%= for {_user_id, %{user: %User{id: user_id, username: username}}} <- @users, user_id != @current_user.id  do %>
+                <li> <%= username %> </li>
+            <% end %>
+        </ul>
+    </div>
+
+    <.horizontal_divider />
+
+    <div class="flex flex-row justify-between">
+        <h2 class="text-xl">Single Player</h2>
+
+        <%= if @user_has_single_player_game do %>
+            <.button_primary phx-click="resume-single-player-game">Resume game</.button_primary>
+        <% else %>
+            <.button_primary phx-click="new-single-player-game">New game</.button_primary>
         <% end %>
-    </ul>
-</div>
-<div>
-    <ul>
-    <h2>Games in progress</h2>
-        <%= for game <- in_progress_multiplayer_games(@multiplayer_games) do %>
-            <li>
-                 Multiplayer game <%=game.game_id%> - <%= Multiplayer.Game.num_players(game) %> player(s)
-            </li>
+    </div>
+
+
+    <.horizontal_divider />
+
+    <div class="flex flex-row justify-between">
+        <h2 class="text-xl">Multiplayer</h2>
+        <.button_primary phx-click="new-multiplayer-game">New game</.button_primary>
+    </div>
+
+    <%!-- <.table id="multiplayer_games" rows={Enum.sort_by(joinable_multiplayer_games(@multiplayer_games), &(if Multiplayer.Game.has_started?(&1), do: 1, else: 0))}> --%>
+    <.table id="multiplayer_games" rows={@multiplayer_games}>
+        <:col :let={game} label="Game ID"><%= game.game_id %></:col>
+        <:col :let={game} label="Number of Players"><%= Multiplayer.Game.num_players(game) %></:col>
+        <:col :let={game} label="Joinable">
+
+        <%= if !Multiplayer.Game.has_started?(game) do %>
+            <.button_secondary phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join</.button_secondary>
+        <% else %>
+            Game in progress...
         <% end %>
-    </ul>
+        </:col>
+    </.table>
 </div>

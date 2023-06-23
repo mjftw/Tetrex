@@ -281,7 +281,7 @@ defmodule TetrexWeb.CoreComponents do
     <.button
       class={
         [
-          "bg-orange-400 text-slate-800 hover:bg-orange-300 transition-colors",
+          "bg-orange-300 text-slate-800 hover:bg-orange-200 transition-colors",
           @class
         ]
         |> Enum.join(" ")
@@ -664,6 +664,12 @@ defmodule TetrexWeb.CoreComponents do
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
     <span class={[@name, @class]} />
+    """
+  end
+
+  def horizontal_divider(assigns) do
+    ~H"""
+    <hr class="my-8 h-px border-0 bg-gray-200 dark:bg-gray-700" />
     """
   end
 
