@@ -4,50 +4,39 @@
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <%= case {@game.status, Map.fetch!(user_player_data, :status), num_players_in_game(@game)} do %>
     <% {:players_joining, :not_ready, num_players} when num_players < 2 -> %>
-        <Modal.modal show>
-            <div class="modal-content">
-                <b>Waiting for more players to join...</b>
-            </div>
-        </Modal.modal>
+        <.modal_simple id="players_joining_not_ready_modal" on_cancel={show_modal("players_joining_not_ready_modal")} show>
+            <b>Waiting for more players to join...</b>
+        </.modal_simple>
     <% {:players_joining, :not_ready, _} -> %>
-        <Modal.modal show>
-            <div class="modal-content">
-                <b>Waiting for all players to be ready...</b>
-                <button phx-click="player-ready" phx-value-user-id={@user_id}>I'm ready!</button>
-            </div>
-        </Modal.modal>
+        <.modal_simple id="players_joining_not_ready_modal" show>
+            <b>Waiting for all players to be ready...</b>
+            <button phx-click="player-ready" phx-value-user-id={@user_id}>I'm ready!</button>
+        </.modal_simple>
     <% {:players_joining, :ready, _} -> %>
-        <Modal.modal show>
-            <div class="modal-content">
-                <b>Waiting for all players to be ready...</b>
-                <button phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</button>
-            </div>
-        </Modal.modal>
+        <.modal_simple id="players_joining_ready_modal" show>
+            <b>Waiting for all players to be ready...</b>
+            <button phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</button>
+        </.modal_simple>
     <% {:finished, :dead, _} -> %>
-        <Modal.modal show>
-            <div class="modal-content">
-                <b>You did not win. What a surprise.</b><br/>
-                Press back button to retreat to the lobby, you failure.
-            </div>
-        </Modal.modal>
+        <.modal on_cancel={JS.push("exit-game")} id="finished_dead_modal" show>
+            <b>You did not win. What a surprise.</b><br/>
+            Press back button to retreat to the lobby, you failure.
+        </.modal>
     <% {:finished, :ready, _} -> %>
-        <Modal.modal show>
-            <div class="modal-content">
-                <b>WINNER!!</b><br/>
-                Yes, you are amazing.<br/>
-                Press back button to return to the lobby with your head held high.
-            </div>
-        </Modal.modal>
+        <.modal on_cancel={JS.push("exit-game")} id="finished_ready_modal" show>
+            <b>WINNER!!</b><br/>
+            Yes, you are amazing.<br/>
+            Press back button to return to the lobby with your head held high.
+        </.modal>
     <% _ -> %>
   <% end %>
 
-
-    <div class="multiplayer-games-container">
+    <div class="content-center flex flex-row gap-1">
         <!-- Display other users's boards -->
         <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- even_users_player_data(@game.players, @user_id) do %>
             <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
-                <div class="board">
+                <div class="flex flex-auto flex-row gap-3 content-center">
                     <BoardComponents.playfield board={board_preview}/>
                 </div>
             </BoardComponents.multiplayer_game>
@@ -57,7 +46,7 @@
         <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
             <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
-                <div class="board">
+                <div class="flex flex-auto flex-row gap-3 content-center">
                     <BoardComponents.hold_tile_box board={board_preview}/>
                     <BoardComponents.playfield board={board_preview}/>
                     <BoardComponents.next_tile_box board={board_preview}/>
@@ -69,7 +58,7 @@
         <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- odd_users_player_data(@game.players, @user_id) do %>
             <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
-                <div class="board">
+                <div class="flex flex-auto flex-row gap-3 content-center">
                     <BoardComponents.playfield board={board_preview}/>
                 </div>
             </BoardComponents.multiplayer_game>

@@ -96,12 +96,12 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
+  attr :is_dead, :boolean, required: false, default: false
+  slot :inner_block, required: true
+
   def multiplayer_game(assigns) do
     ~H"""
-    <div
-      class="multiplayer-game"
-      style={"--background-color: " <> if assigns[:is_dead], do: "grey", else: "antiquewhite"}
-    >
+    <div class={"#{if @is_dead, do: "bg-slate-400", else: " bg-teal-500 "} flex flex-col content-center border-2 border-double border-slate-400 px-3 pb-5"}>
       <%= render_slot(@inner_block) %>
     </div>
     """

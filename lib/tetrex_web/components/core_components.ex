@@ -90,6 +90,42 @@ defmodule TetrexWeb.CoreComponents do
   end
 
   @doc """
+  Renders a basic modal. Similar to modal, but the modal cannot be closed by the client.
+  """
+  attr :id, :string, required: true
+  attr :show, :boolean, default: false
+  slot :inner_block, required: true
+
+  def modal_simple(assigns) do
+    ~H"""
+    <div id={@id} phx-mounted={@show && show_modal(@id)} class="relative z-50 hidden">
+      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        class="fixed inset-0 overflow-y-auto"
+        aria-labelledby={"#{@id}-title"}
+        aria-describedby={"#{@id}-description"}
+        role="dialog"
+        aria-modal="true"
+        tabindex="0"
+      >
+        <div class="flex min-h-full items-center justify-center">
+          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
+            <.focus_wrap
+              id={"#{@id}-container"}
+              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
+            >
+              <div id={"#{@id}-content"}>
+                <%= render_slot(@inner_block) %>
+              </div>
+            </.focus_wrap>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
   Renders flash notices.
 
   ## Examples
