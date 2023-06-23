@@ -4,8 +4,9 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias Tetrex.Multiplayer.GameMessage
   alias Tetrex.Multiplayer.GameServer
   alias Tetrex.GameDynamicSupervisor
-  alias TetrexWeb.Components.{BoardComponents, Modal}
+  alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Client.Audio
+  alias Phoenix.LiveView.JS
 
   require Logger
 
@@ -174,6 +175,14 @@ defmodule TetrexWeb.MultiplayerGameLive do
     GameServer.set_player_ready(game_server_pid, user_id, true)
     {:noreply, socket}
   end
+
+  @impl true
+  def handle_event(
+        "exit-game",
+        _value,
+        socket
+      ),
+      do: {:noreply, socket |> redirect_to_lobby}
 
   @impl true
   def handle_event(
