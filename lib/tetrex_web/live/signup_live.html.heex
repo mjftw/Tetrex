@@ -1,14 +1,11 @@
 <div>
   <div>
-    <h2>Welcome to Tetrex!</h2>
+    <h2 class="text-xl pb-5">Welcome to Tetrex!</h2>
   </div>
-  <div class="signup-form">
-    <.simple_form for={%{}} phx-submit="set-username">
+    <.simple_form for={%{}} phx-submit="set-username" class="border-1 shadow-md border-solid border-slate-700 rounded-md p-3 items-center">
         <.input name="username" label="What would you like to be called?" value=""/>
         <:actions>
           <.button_primary>Save</.button_primary>
         </:actions>
     </.simple_form>
-  </div>
-
 </div>
