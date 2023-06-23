@@ -38,7 +38,9 @@ defmodule Tetrex.Periodic do
   end
 
   @impl true
-  def handle_continue(:start_timer, %{period_ms: period_ms} = state) do
+  def handle_continue(:start_timer, %{period_ms: period_ms, timer_ref: timer_ref} = state) do
+    cancel_timer(timer_ref)
+
     timer_ref = Process.send_after(self(), :send, period_ms)
 
     {:noreply, %{state | timer_ref: timer_ref}}
