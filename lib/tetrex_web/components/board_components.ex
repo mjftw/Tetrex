@@ -101,7 +101,7 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   def multiplayer_game(assigns) do
     ~H"""
-    <div class={"#{if @is_dead, do: "bg-slate-400", else: " bg-teal-500 "} flex flex-col content-center border-2 border-double border-slate-400 px-3 pb-5"}>
+    <div class={"#{if @is_dead, do: "bg-slate-400", else: " bg-teal-500 "} flex flex-col items-center border-2 border-double border-slate-400 px-3 pb-5"}>
       <%= render_slot(@inner_block) %>
     </div>
     """
