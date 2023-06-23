@@ -86,6 +86,16 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
+  slot :inner_block, required: true
+
+  def single_player_game_box(assigns) do
+    ~H"""
+    <div class="flex flex-col items-center bg-teal-500 pb-5">
+      <%= render_slot(@inner_block) %>
+    </div>
+    """
+  end
+
   def multiplayer_game(assigns) do
     ~H"""
     <div
