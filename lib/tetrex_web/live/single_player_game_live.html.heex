@@ -32,10 +32,10 @@
     <% end %>
 
     <BoardComponents.score_box score={@lines_cleared}/>
-    <div class="flex flex-auto flex-row gap-3 content-center">
-      <BoardComponents.hold_tile_box board={@board}/>
-      <BoardComponents.playfield board={@board}/>
-      <BoardComponents.next_tile_box board={@board}/>
+    <div class="grid grid-cols-10 gap-3 content-center">
+      <BoardComponents.hold_tile_box board={@board} class="col-span-2"/>
+      <BoardComponents.playfield board={@board} class="col-span-6"/>
+      <BoardComponents.next_tile_box board={@board} class="col-span-2"/>
     </div>
   </BoardComponents.single_player_game_box>
 </div>

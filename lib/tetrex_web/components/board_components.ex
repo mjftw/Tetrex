@@ -41,42 +41,47 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   attr(:title, :string, required: true)
   attr(:sparsegrid, :map, required: true)
+  attr(:class, :string, default: nil)
 
   def single_tile_box(assigns) do
     ~H"""
-    <div class={"#{box_default_styles()} p-2"}>
+    <div class={["#{box_default_styles()} p-2", @class]}>
       <%= @title %> <.single_tile sparsegrid={@sparsegrid} />
     </div>
     """
   end
 
   attr(:board, :map, required: true)
+  attr(:class, :string, default: nil)
 
   def next_tile_box(assigns) do
     ~H"""
-    <.single_tile_box title="Next" sparsegrid={@board.next_tile} />
+    <.single_tile_box title="Next" sparsegrid={@board.next_tile} class={@class} />
     """
   end
 
   attr(:board, :map, required: true)
+  attr(:class, :string, default: nil)
 
   def hold_tile_box(assigns) do
     ~H"""
-    <.single_tile_box title="Hold" sparsegrid={@board.hold_tile} />
+    <.single_tile_box title="Hold" sparsegrid={@board.hold_tile} class={@class} />
     """
   end
 
   attr(:board, :map, required: true)
+  attr(:class, :string, default: nil)
 
   def playfield(assigns) do
     ~H"""
-    <div class={box_default_styles()}>
+    <div class={[box_default_styles(), @class]}>
       <.board sparsegrid={@board.playfield} />
     </div>
     """
   end
 
   attr(:score, :integer, required: true)
+  attr(:class, :string, default: nil)
 
   def score_box(assigns) do
     ~H"""
@@ -159,13 +164,13 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   defp tile(%{type: :drop_preview} = assigns) do
     ~H"""
-    <.tile_edged class=" stroke-0 fill-slate-500" fill-opacity="0.15"/>
+    <.tile_edged class="fill-slate-500 stroke-0" fill-opacity="0.15" />
     """
   end
 
   defp tile(%{type: :blocking} = assigns) do
     ~H"""
-    <.tile_edged class=" stroke-slate-800 fill-slate-700" />
+    <.tile_edged class="fill-slate-700 stroke-slate-800" />
     """
   end
 
@@ -184,7 +189,7 @@ defmodule TetrexWeb.Components.BoardComponents do
   defp tile_filled(assigns) do
     ~H"""
     <svg class={["h-full w-full stroke-none", @class]} viewBox="0 0 100 100" {@rest}>
-      <path d="M -10 -10 H 120 V 120 H -120 V -120"/>
+      <path d="M -10 -10 H 120 V 120 H -120 V -120" />
     </svg>
     """
   end
@@ -198,7 +203,7 @@ defmodule TetrexWeb.Components.BoardComponents do
   defp tile_edged(assigns) do
     ~H"""
     <svg class={["h-full w-full stroke-2", @class]} viewBox="0 0 100 100" {@rest}>
-      <path d="M 2 2 H 96 V 96 H -96 V -96"/>
+      <path d="M 2 2 H 96 V 96 H -96 V -96" />
     </svg>
     """
   end
