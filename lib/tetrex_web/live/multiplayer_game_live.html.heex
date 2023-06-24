@@ -49,9 +49,7 @@
         <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- even_users_player_data(@game.players, @user_id) do %>
             <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
-                <div class="flex flex-auto flex-row gap-3 content-center">
-                    <BoardComponents.playfield board={board_preview}/>
-                </div>
+                <BoardComponents.playfield board={board_preview}/>
             </BoardComponents.multiplayer_game>
         <% end %>
 
@@ -59,10 +57,10 @@
         <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
             <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
-                <div class="flex flex-auto flex-row gap-3 content-center">
-                    <BoardComponents.hold_tile_box board={board_preview}/>
-                    <BoardComponents.playfield board={board_preview}/>
-                    <BoardComponents.next_tile_box board={board_preview}/>
+                <div class="grid grid-cols-10 gap-3 content-center">
+                    <BoardComponents.hold_tile_box board={board_preview} class="col-span-2"/>
+                    <BoardComponents.playfield board={board_preview} class="col-span-6"/>
+                    <BoardComponents.next_tile_box board={board_preview} class="col-span-2"/>
                 </div>
             </BoardComponents.multiplayer_game>
         <% end %>
@@ -71,9 +69,7 @@
         <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- odd_users_player_data(@game.players, @user_id) do %>
             <BoardComponents.multiplayer_game is_dead={status == :dead}>
                 <BoardComponents.score_box score={lines_cleared}/>
-                <div class="flex flex-auto flex-row gap-3 content-center">
-                    <BoardComponents.playfield board={board_preview}/>
-                </div>
+                <BoardComponents.playfield board={board_preview}/>
             </BoardComponents.multiplayer_game>
         <% end %>
     </div>
