@@ -180,6 +180,14 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> noreply()
   end
 
+  @impl true
+  def handle_event("touch", %{"action" => "tap"}, socket) do
+    GameServer.try_move_down(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
   # Helper Functions
 
   defp noreply(socket) do
