@@ -3,6 +3,8 @@ defmodule TetrexWeb.LobbyLive do
   alias Tetrex.Users.User
   alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
+  alias TetrexWeb.Components.Controls
+
   use TetrexWeb, :live_view
 
   require Logger
