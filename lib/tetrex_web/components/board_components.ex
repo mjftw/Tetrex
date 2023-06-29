@@ -42,10 +42,11 @@ defmodule TetrexWeb.Components.BoardComponents do
   attr(:title, :string, required: true)
   attr(:sparsegrid, :map, required: true)
   attr(:class, :string, default: nil)
+  attr(:rest, :global)
 
   def single_tile_box(assigns) do
     ~H"""
-    <div class={["#{box_default_styles()} p-2", @class]}>
+    <div class={["#{box_default_styles()} p-2", @class]} {@rest}>
       <%= @title %> <.single_tile sparsegrid={@sparsegrid} />
     </div>
     """
@@ -62,19 +63,21 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   attr(:board, :map, required: true)
   attr(:class, :string, default: nil)
+  attr(:rest, :global)
 
   def hold_tile_box(assigns) do
     ~H"""
-    <.single_tile_box title="Hold" sparsegrid={@board.hold_tile} class={@class} />
+    <.single_tile_box title="Hold" sparsegrid={@board.hold_tile} class={@class} {@rest} />
     """
   end
 
   attr(:board, :map, required: true)
   attr(:class, :string, default: nil)
+  attr(:rest, :global)
 
   def playfield(assigns) do
     ~H"""
-    <div class={[box_default_styles(), @class]}>
+    <div class={[box_default_styles(), @class]} {@rest}>
       <.board sparsegrid={@board.playfield} />
     </div>
     """

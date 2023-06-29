@@ -188,6 +188,13 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     |> noreply()
   end
 
+  def handle_event("hold", _value, socket) do
+    GameServer.hold(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
   # Helper Functions
 
   defp noreply(socket) do
