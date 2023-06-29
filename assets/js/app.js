@@ -53,6 +53,11 @@ Hooks.Touch = {
         };
 
     });
+
+    hammertime.on('tap', function(ev) {
+        const action = "tap"
+        phx.pushEvent(event, {action: "tap"})
+    });
   }
 }
 
