@@ -3,6 +3,12 @@
         <span class="text-lg">Lobby</span>
         <span class="text-lg">Current user: <%= @current_user.username %></span>
     </div>
+    <.horizontal_divider />
+
+    <div class="flex flex-col gap-3">
+    <span class="text-lg">Controls</span>
+    <Controls.controls class="max-w-sm" />
+    </div>
 
     <.horizontal_divider />
 
@@ -27,8 +33,8 @@
         <% end %>
     </div>
 
-
     <.horizontal_divider />
+
 
     <div class="flex flex-row justify-between">
         <h2 class="text-xl">Multiplayer</h2>
