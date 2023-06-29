@@ -6,7 +6,7 @@ defmodule TetrexWeb.Components.Client.Touch do
 
   def touch_events(assigns) do
     ~H"""
-    <span id={@id} phx-hook="Touch">
+    <span class="h-full w-full" id={@id} phx-hook="Touch">
       <%= render_slot(@inner_block) %>
     </span>
     """
