@@ -31,11 +31,13 @@
       <% _ -> %>
     <% end %>
 
-    <BoardComponents.score_box score={@lines_cleared}/>
-    <div class="grid grid-cols-10 gap-3 content-center max-w-xl">
-      <BoardComponents.hold_tile_box board={@board} class="col-span-2"/>
-      <BoardComponents.playfield board={@board} class="col-span-6"/>
-      <BoardComponents.next_tile_box board={@board} class="col-span-2"/>
-    </div>
+    <Touch.touch_events id="single-player-game">
+      <BoardComponents.score_box score={@lines_cleared}/>
+      <div class="grid grid-cols-10 gap-3 content-center max-w-xl">
+        <BoardComponents.hold_tile_box board={@board} class="col-span-2"/>
+        <BoardComponents.playfield board={@board} class="col-span-6"/>
+        <BoardComponents.next_tile_box board={@board} class="col-span-2"/>
+      </div>
+    </Touch.touch_events>
   </BoardComponents.single_player_game_box>
 </div>

@@ -23,9 +23,41 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import "./audioEventListeners"
 
+import Hammer from "./hammer.min"
+
+// TODO: Move to own file
+let Hooks = {};
+Hooks.Touch = {
+  mounted() {
+    const event = "touch";
+    const phx = this;
+
+    var hammertime = new Hammer(this.el, {});
+    hammertime.get('swipe').set({ direction: Hammer.DIRECTION_ALL});
+
+    hammertime.on('swipe', function(ev) {
+        const action = "swipe"
+        switch(ev.direction) {
+            case Hammer.DIRECTION_LEFT:
+                phx.pushEvent(event, {action: action, direction: "left"})
+            break;
+            case Hammer.DIRECTION_RIGHT:
+                phx.pushEvent(event, {action: action, direction: "right"})
+            break;
+            case Hammer.DIRECTION_UP:
+                phx.pushEvent(event, {action: action, direction: "up"})
+            break;
+            case Hammer.DIRECTION_DOWN:
+                phx.pushEvent(event, {action: action, direction: "down"})
+            break;
+        };
+
+    });
+  }
+}
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let liveSocket = new LiveSocket("/live", Socket, {hooks: Hooks, params: {_csrf_token: csrfToken}})
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
