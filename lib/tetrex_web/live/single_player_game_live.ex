@@ -7,6 +7,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   alias Tetrex.SinglePlayer.Game
   alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Client.Audio
+  alias TetrexWeb.Components.Client.Touch
   alias Phoenix.LiveView.JS
 
   @impl true
@@ -142,6 +143,38 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   @impl true
   def handle_event("keypress", %{"key" => key}, socket) do
     IO.puts("Unhandled key press: #{key}")
+
+    socket
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("touch", %{"action" => "swipe", "direction" => "left"}, socket) do
+    GameServer.try_move_left(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("touch", %{"action" => "swipe", "direction" => "right"}, socket) do
+    GameServer.try_move_right(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("touch", %{"action" => "swipe", "direction" => "up"}, socket) do
+    GameServer.rotate(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  @impl true
+  def handle_event("touch", %{"action" => "swipe", "direction" => "down"}, socket) do
+    GameServer.drop(socket.assigns.game_server)
 
     socket
     |> noreply()
