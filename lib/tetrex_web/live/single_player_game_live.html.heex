@@ -15,18 +15,20 @@
           <div class="flex flex-col items-center gap-5">
             <b>Paused</b>
               <div class="flex flex-row gap-3">
-                <.button_primary phx-click="start_game">Resume</.button_primary>
                 <.button_secondary phx-click="quit_game">Quit game</.button_secondary>
+                <.button_primary phx-click="start_game">Resume</.button_primary>
               </div>
           </div>
       </.modal>
       <% :game_over -> %>
         <.modal id="game_over_modal" on_cancel={JS.push("quit_game")} show>
-          <div class="flex flex-col items-cener gap-5">
-            <h1>Game Over</h1>
-            <h2>Score: <%= @lines_cleared%></h2>
-            <.button_primary phx-click="new_game">Play again</.button_primary>
-            <.button_secondary phx-click="quit_game">Quit game</.button_secondary>
+          <div class="flex flex-col items-center gap-5">
+            <div>Game Over</div>
+            <div>Score: <%= @lines_cleared%></div>
+            <div class="flex flex-row gap-3">
+              <.button_secondary phx-click="quit_game">Quit game</.button_secondary>
+              <.button_primary phx-click="new_game">Play again</.button_primary>
+            </div>
           </div>
       </.modal>
       <% _ -> %>
