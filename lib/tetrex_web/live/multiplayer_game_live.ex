@@ -6,6 +6,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias Tetrex.GameDynamicSupervisor
   alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Client.Audio
+  alias TetrexWeb.Components.Controls
   alias Phoenix.LiveView.JS
 
   require Logger
@@ -191,6 +192,60 @@ defmodule TetrexWeb.MultiplayerGameLive do
         %{assigns: %{game_server_pid: game_server_pid}} = socket
       ) do
     GameServer.set_player_ready(game_server_pid, user_id, false)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "hold",
+        _value,
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.hold(game_server_pid, user_id)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "rotate",
+        _value,
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.rotate(game_server_pid, user_id)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "left",
+        _value,
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.try_move_left(game_server_pid, user_id)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "right",
+        _value,
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.try_move_right(game_server_pid, user_id)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "down",
+        _value,
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.try_move_down(game_server_pid, user_id)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "drop",
+        _value,
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.drop(game_server_pid, user_id)
     {:noreply, socket}
   end
 
