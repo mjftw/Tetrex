@@ -37,8 +37,7 @@
       <BoardComponents.score_box score={@lines_cleared}/>
       <div class="grid grid-cols-10 gap-3 content-center max-w-xl">
         <BoardComponents.hold_tile_box board={@board} class="col-span-2" phx-click="hold"/>
-        <%!-- TODO: Use Touch.touch component --%>
-        <BoardComponents.playfield board={@board} class="col-span-6" id="single-player-playfield" phx-hook="Touch"/>
+        <BoardComponents.playfield board={@board} class="col-span-6" id="single-player-playfield"/>
         <BoardComponents.next_tile_box board={@board} class="col-span-2"/>
       </div>
 
