@@ -66,7 +66,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
     do:
       socket
       |> new_game()
-      |> start_game()
       |> noreply()
 
   def handle_event("hold", _value, socket) do
@@ -212,9 +211,10 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   defp new_game(%{assigns: %{game_server: game_server}} = socket) do
-    GameServer.new_game(game_server)
+    GameServer.new_game(game_server, true)
 
     socket
+    |> Audio.play_theme_audio()
   end
 
   defp start_game(%{assigns: %{game_server: game_server}} = socket) do

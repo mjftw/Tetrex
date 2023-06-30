@@ -31,8 +31,8 @@ defmodule Tetrex.SinglePlayer.GameServer do
     GenServer.cast(game_server, {:update_lines_cleared, update_fn})
   end
 
-  def new_game(game_server) do
-    GenServer.cast(game_server, :new_game)
+  def new_game(game_server, start_game \\ false) do
+    GenServer.cast(game_server, {:new_game, start_game})
   end
 
   def start_game(game_server) do
@@ -198,7 +198,10 @@ defmodule Tetrex.SinglePlayer.GameServer do
   end
 
   @impl true
-  def handle_cast(:new_game, %Game{periodic_mover_pid: periodic, board_pid: board} = game) do
+  def handle_cast(
+        {:new_game, false},
+        %Game{periodic_mover_pid: periodic, board_pid: board} = game
+      ) do
     Periodic.stop_timer(periodic)
 
     BoardServer.new(
@@ -208,7 +211,24 @@ defmodule Tetrex.SinglePlayer.GameServer do
       Enum.random(0..10_000_000)
     )
 
-    {:noreply, %Game{game | status: :intro}, {:continue, :publish_state}}
+    {:noreply, %Game{game | lines_cleared: 0, status: :intro}, {:continue, :publish_state}}
+  end
+
+  @impl true
+  def handle_cast(
+        {:new_game, true},
+        %Game{periodic_mover_pid: periodic, board_pid: board} = game
+      ) do
+    Periodic.start_timer(periodic)
+
+    BoardServer.new(
+      board,
+      @board_height,
+      @board_width,
+      Enum.random(0..10_000_000)
+    )
+
+    {:noreply, %Game{game | lines_cleared: 0, status: :playing}, {:continue, :publish_state}}
   end
 
   @impl true
