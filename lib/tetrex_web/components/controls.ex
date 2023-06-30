@@ -86,9 +86,10 @@ defmodule TetrexWeb.Components.Controls do
 
   def key(assigns) do
     ~H"""
-    <div
+    <button
       class={[
-        "rounded-md shadow-lg p-4 drop-shadow-lg ring-1 bg-slate-100 hover:translate-y-0.5  hover:drop-shadow-sm transition-all ring-slate-700  flex flex-col justify-center  items-center",
+        "rounded-md shadow-lg p-4 drop-shadow-lg ring-1 bg-slate-100 ring-slate-700 flex flex-col justify-center  items-center",
+        "phx-click-loading:translate-y-0.5 phx-click-loading:drop-shadow-sm phx-click-loading:bg-slate-200 transition-all ",
         @class
       ]}
       {@rest}
@@ -99,7 +100,7 @@ defmodule TetrexWeb.Components.Controls do
       <div>
         <span><%= @label %></span>
       </div>
-    </div>
+    </button>
     """
   end
 end
