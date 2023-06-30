@@ -62,12 +62,54 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   @impl true
-  def handle_event("keypress", %{"key" => "Enter"}, %{assigns: %{status: :game_over}} = socket),
+  def handle_event("new_game", _value, socket),
     do:
       socket
       |> new_game()
       |> start_game()
       |> noreply()
+
+  def handle_event("hold", _value, socket) do
+    GameServer.hold(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("rotate", _value, socket) do
+    GameServer.rotate(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("left", _value, socket) do
+    GameServer.try_move_left(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("right", _value, socket) do
+    GameServer.try_move_right(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("down", _value, socket) do
+    GameServer.try_move_down(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("drop", _value, socket) do
+    GameServer.drop(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
 
   @impl true
   def handle_event("keypress", _, %{assigns: %{status: :game_over}} = socket),
@@ -183,48 +225,6 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   @impl true
   def handle_event("touch", %{"action" => "tap"}, socket) do
     GameServer.try_move_down(socket.assigns.game_server)
-
-    socket
-    |> noreply()
-  end
-
-  def handle_event("hold", _value, socket) do
-    GameServer.hold(socket.assigns.game_server)
-
-    socket
-    |> noreply()
-  end
-
-  def handle_event("rotate", _value, socket) do
-    GameServer.rotate(socket.assigns.game_server)
-
-    socket
-    |> noreply()
-  end
-
-  def handle_event("left", _value, socket) do
-    GameServer.try_move_left(socket.assigns.game_server)
-
-    socket
-    |> noreply()
-  end
-
-  def handle_event("right", _value, socket) do
-    GameServer.try_move_right(socket.assigns.game_server)
-
-    socket
-    |> noreply()
-  end
-
-  def handle_event("down", _value, socket) do
-    GameServer.try_move_down(socket.assigns.game_server)
-
-    socket
-    |> noreply()
-  end
-
-  def handle_event("drop", _value, socket) do
-    GameServer.drop(socket.assigns.game_server)
 
     socket
     |> noreply()
