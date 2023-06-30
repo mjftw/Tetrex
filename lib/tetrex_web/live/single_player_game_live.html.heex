@@ -22,11 +22,12 @@
       </.modal>
       <% :game_over -> %>
         <.modal id="game_over_modal" on_cancel={JS.push("quit_game")} show>
+          <div class="flex flex-col items-cener gap-5">
             <h1>Game Over</h1>
             <h2>Score: <%= @lines_cleared%></h2>
-            <.button_primary phx-click="quit_game">Quit game</.button_primary>
-            <br/>
-            Press enter to play again
+            <.button_primary phx-click="new_game">Play again</.button_primary>
+            <.button_secondary phx-click="quit_game">Quit game</.button_secondary>
+          </div>
       </.modal>
       <% _ -> %>
     <% end %>
