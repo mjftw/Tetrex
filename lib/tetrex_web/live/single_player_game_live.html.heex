@@ -21,7 +21,7 @@
           </div>
       </.modal>
       <% :game_over -> %>
-        <.modal id="game_over_modal" on_cancel={JS.push("quit_game")} show>
+        <.modal id="game_over_modal" on_cancel={JS.push("new_game")} show>
           <div class="flex flex-col items-center gap-5">
             <div>Game Over</div>
             <div>Score: <%= @lines_cleared%></div>
