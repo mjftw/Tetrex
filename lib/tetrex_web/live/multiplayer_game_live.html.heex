@@ -1,5 +1,5 @@
 
-<div phx-window-keydown="keypress">
+<div class="relative" phx-window-keydown="keypress">
   <Audio.tetris_audio/>
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <% user_status = Map.fetch!(user_player_data, :status) %>
@@ -73,4 +73,16 @@
             </BoardComponents.multiplayer_game>
         <% end %>
     </div>
+
+  <div class="absolute inset-x-0 bottom-0 opacity-10 md:hidden">
+    <Controls.mobile_controls
+      on_hold={JS.push("hold")}
+      on_rotate={JS.push("rotate")}
+      on_left={JS.push("left")}
+      on_right={JS.push("right")}
+      on_down={JS.push("down")}
+      on_drop={JS.push("drop")}
+    />
+  </div>
 </div>
+
