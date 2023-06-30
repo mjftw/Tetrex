@@ -7,7 +7,7 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   alias Tetrex.SinglePlayer.Game
   alias TetrexWeb.Components.BoardComponents
   alias TetrexWeb.Components.Client.Audio
-  alias TetrexWeb.Components.Client.Touch
+  alias TetrexWeb.Components.Controls
   alias Phoenix.LiveView.JS
 
   @impl true
@@ -190,6 +190,41 @@ defmodule TetrexWeb.SinglePlayerGameLive do
 
   def handle_event("hold", _value, socket) do
     GameServer.hold(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("rotate", _value, socket) do
+    GameServer.rotate(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("left", _value, socket) do
+    GameServer.try_move_left(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("right", _value, socket) do
+    GameServer.try_move_right(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("down", _value, socket) do
+    GameServer.try_move_down(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  def handle_event("drop", _value, socket) do
+    GameServer.drop(socket.assigns.game_server)
 
     socket
     |> noreply()

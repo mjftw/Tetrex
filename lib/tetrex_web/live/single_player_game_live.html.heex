@@ -1,4 +1,4 @@
-<div phx-window-keydown="keypress">
+<div class="relative" phx-window-keydown="keypress">
   <BoardComponents.single_player_game_box>
     <Audio.tetris_audio/>
 
@@ -38,5 +38,17 @@
         <BoardComponents.playfield board={@board} class="col-span-6" id="single-player-playfield" phx-hook="Touch"/>
         <BoardComponents.next_tile_box board={@board} class="col-span-2"/>
       </div>
+
+
   </BoardComponents.single_player_game_box>
+    <div class="absolute inset-x-0 bottom-0 opacity-10 md:hidden">
+      <Controls.mobile_controls
+        on_hold={JS.push("hold")}
+        on_rotate={JS.push("rotate")}
+        on_left={JS.push("left")}
+        on_right={JS.push("right")}
+        on_down={JS.push("down")}
+        on_drop={JS.push("drop")}
+      />
+    </div>
 </div>
