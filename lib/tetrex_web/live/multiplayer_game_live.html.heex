@@ -46,9 +46,7 @@
 
     <div class="content-center flex flex-row gap-1">
         <!-- Display other users's boards -->
-        <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- mock_many_players(@game, 3) do %>
-            <BoardComponents.playfield board={board_preview} is_dead={status == :dead}/>
-        <% end %>
+        <BoardComponents.multiplayer_tiled_playfields player_states={mock_many_players(@game, 3)}/>
 
         <!-- Display current user's boards -->
         <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
@@ -63,9 +61,7 @@
         <% end %>
 
         <!-- Display other users's boards -->
-        <%= for {_user_id, %{board_preview: board_preview, lines_cleared: lines_cleared, status: status}} <- mock_many_players(@game, 3) do %>
-            <BoardComponents.playfield board={board_preview} is_dead={status == :dead}/>
-        <% end %>
+        <BoardComponents.multiplayer_tiled_playfields player_states={mock_many_players(@game, 3)}/>
     </div>
 
   <div class="absolute inset-x-0 bottom-0 opacity-20 md:hidden">
