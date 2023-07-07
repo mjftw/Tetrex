@@ -24,6 +24,10 @@ defmodule Tetrex.Multiplayer.Game do
   @enforce_keys [:game_id, :players, :status, :periodic_timer_period]
   defstruct [:game_id, :players, :status, :periodic_timer_period]
 
+  # Maximum players in game = 99
+  # It gets a bit hairy to render even this many!
+  @max_players 99
+
   def new(periodic_timer_period) do
     %__MODULE__{
       game_id: UUID.uuid1(),
@@ -142,6 +146,8 @@ defmodule Tetrex.Multiplayer.Game do
 
   def has_started?(%__MODULE__{status: status}) when status == :players_joining, do: false
   def has_started?(%__MODULE__{}), do: true
+
+  def is_full?(%__MODULE__{players: players}), do: Enum.count(players) > @max_players
 
   defp player_ready?(player_state) do
     player_state.status in [:ready, :dead]

@@ -45,6 +45,15 @@ defmodule TetrexWeb.MultiplayerGameLive do
              )
              |> redirect_to_lobby()}
 
+          Multiplayer.Game.is_full?(game) ->
+            {:noreply,
+             socket
+             |> put_flash(
+               :error,
+               "Cannot join game as it's full"
+             )
+             |> redirect_to_lobby()}
+
           true ->
             if connected?(socket) do
               GameServer.subscribe_updates(game_server_pid)
