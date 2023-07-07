@@ -115,6 +115,16 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
+  attr :player_states, :list, required: true
+
+  def multiplayer_tiled_playfields(assigns) do
+    ~H"""
+    <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
+      <.playfield board={board_preview} is_dead={status == :dead} />
+    <% end %>
+    """
+  end
+
   defp centre_single_tile(tile), do: SparseGrid.align(tile, :centre, {0, 0}, {3, 3})
 
   defp box_default_styles,

@@ -264,6 +264,11 @@ defmodule TetrexWeb.MultiplayerGameLive do
       |> Stream.drop(1)
       |> Enum.take_every(2)
 
+  def mock_many_players(%GameMessage{players: players}, how_many) do
+    Stream.repeatedly(fn -> Enum.random(players) end)
+    |> Enum.take(how_many)
+  end
+
   def num_players_in_game(%GameMessage{players: players}), do: Enum.count(players)
 
   defp handle_status_changes(
