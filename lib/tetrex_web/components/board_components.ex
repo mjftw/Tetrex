@@ -72,12 +72,13 @@ defmodule TetrexWeb.Components.BoardComponents do
   end
 
   attr(:board, :map, required: true)
+  attr(:is_dead, :boolean, required: false, default: false)
   attr(:class, :string, default: nil)
   attr(:rest, :global)
 
   def playfield(assigns) do
     ~H"""
-    <div class={[box_default_styles(), @class]} {@rest}>
+    <div class={[box_default_styles(), if(@is_dead, do: "bg-slate-400", else: ""), @class]} {@rest}>
       <.board sparsegrid={@board.playfield} />
     </div>
     """
@@ -104,12 +105,11 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
-  attr(:is_dead, :boolean, required: false, default: false)
   slot(:inner_block, required: true)
 
   def multiplayer_game(assigns) do
     ~H"""
-    <div class={"#{if @is_dead, do: "bg-slate-400", else: " bg-teal-500 "} flex flex-col items-center border-2 border-double border-slate-400 px-3 pb-5"}>
+    <div class="flex flex-col items-center border-2 border-double border-slate-400 bg-teal-500 px-3 pb-5">
       <%= render_slot(@inner_block) %>
     </div>
     """
