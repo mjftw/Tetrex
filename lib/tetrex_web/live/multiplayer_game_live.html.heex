@@ -44,24 +44,32 @@
     <% _ -> %>
   <% end %>
 
-    <div class="content-center flex flex-row gap-1">
+    <div class="grid grid-cols-11 gap-1 aspect-video">
+        <% mock_players = mock_many_players(@game, 10) %>
+
         <!-- Display other users's boards -->
-        <BoardComponents.multiplayer_tiled_playfields player_states={mock_many_players(@game, 3)}/>
+        <div class="col-span-3">
+            <BoardComponents.multiplayer_tiled_playfields player_states={mock_players}/>
+        </div>
 
         <!-- Display current user's boards -->
-        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
-            <BoardComponents.multiplayer_game>
-                <BoardComponents.score_box score={lines_cleared}/>
-                <div class="grid grid-cols-10 gap-3 content-center">
-                    <BoardComponents.hold_tile_box board={board_preview} class="col-span-2"/>
-                    <BoardComponents.playfield board={board_preview} class="col-span-6" is_dead={status == :dead}/>
-                    <BoardComponents.next_tile_box board={board_preview} class="col-span-2"/>
-                </div>
-            </BoardComponents.multiplayer_game>
-        <% end %>
+        <div class="col-span-5">
+            <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
+                <BoardComponents.multiplayer_game>
+                    <BoardComponents.score_box score={lines_cleared}/>
+                    <div class="grid grid-cols-10 gap-3 content-center">
+                        <BoardComponents.hold_tile_box board={board_preview} class="col-span-2"/>
+                        <BoardComponents.playfield board={board_preview} class="col-span-6" is_dead={status == :dead}/>
+                        <BoardComponents.next_tile_box board={board_preview} class="col-span-2"/>
+                    </div>
+                </BoardComponents.multiplayer_game>
+            <% end %>
+        </div>
 
         <!-- Display other users's boards -->
-        <BoardComponents.multiplayer_tiled_playfields player_states={mock_many_players(@game, 3)}/>
+        <div class="col-span-3">
+            <BoardComponents.multiplayer_tiled_playfields player_states={mock_players}/>
+        </div>
     </div>
 
   <div class="absolute inset-x-0 bottom-0 opacity-20 md:hidden">
