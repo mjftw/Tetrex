@@ -24,7 +24,7 @@
         </.modal_simple>
     <% :finished -> %>
         <%= case user_status do %>
-            <% :dead -> %>
+            <% :ready -> %>
                 <.modal on_cancel={JS.push("exit-game")} id="finished_ready_modal" show>
                     <div class="flex flex-col gap-2 items-center text-center">
                         <b>WINNER!!</b><br/>
@@ -32,11 +32,11 @@
                         Press back button to return to the lobby with your head held high.
                     </div>
                 </.modal>
-            <% :ready -> %>
+            <% :dead -> %>
                 <.modal on_cancel={JS.push("exit-game")} id="finished_dead_modal" show>
                     <div class="flex flex-col gap-2 items-center text-center">
                         <b>You did not win. What a surprise.</b><br/>
-                        Press back button to retreat to the lobby, you failure.
+                        Press back button to retreat to the lobby.
                     </div>
                 </.modal>
             <% _ -> %>
