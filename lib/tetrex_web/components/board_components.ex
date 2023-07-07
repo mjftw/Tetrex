@@ -119,9 +119,26 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   def multiplayer_tiled_playfields(assigns) do
     ~H"""
-    <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
-      <.playfield board={board_preview} is_dead={status == :dead} />
-    <% end %>
+    <% grid_cols = fn ->
+      num_players = Enum.count(@player_states)
+
+      cond do
+        num_players == 1 -> "grid-cols-1"
+        num_players <= 6 -> "grid-cols-2"
+        num_players <= 9 -> "grid-cols-3"
+        num_players <= 16 -> "grid-cols-4"
+        num_players <= 25 -> "grid-cols-5"
+        num_players <= 36 -> "grid-cols-6"
+        num_players <= 49 -> "grid-cols-7"
+        true -> "grid-cols-8"
+      end
+    end %>
+
+    <div class={["grid grid-flow-dense", grid_cols.()]}>
+      <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
+        <.playfield board={board_preview} is_dead={status == :dead} />
+      <% end %>
+    </div>
     """
   end
 
