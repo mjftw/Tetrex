@@ -42,10 +42,13 @@
         <:col :let={game} label="Number of Players"><%= Multiplayer.Game.num_players(game) %></:col>
         <:col :let={game} label="Joinable">
 
-        <%= if !Multiplayer.Game.has_started?(game) do %>
+        <%= cond  do %>
+        <%  Multiplayer.Game.has_started?(game) -> %>
+            Game in progress
+        <%  Multiplayer.Game.is_full?(game) -> %>
+            Game full
+        <%  true -> %>
             <.button_secondary phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join</.button_secondary>
-        <% else %>
-            Game in progress...
         <% end %>
         </:col>
     </.table>
