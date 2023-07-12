@@ -18,7 +18,7 @@
                 <% true -> %>
                     <div class="flex flex-col items-center gap-5">
                         <b>Waiting for all players to be ready...</b>
-                        <.button_primary phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</.button_primary>
+                        <.button_secondary phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</.button_secondary>
                     </div>
             <% end %>
         </.modal_simple>
