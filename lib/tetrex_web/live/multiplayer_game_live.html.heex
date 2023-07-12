@@ -45,11 +45,9 @@
   <% end %>
 
     <div class="grid grid-cols-11 gap-1 aspect-video">
-        <% mock_players = mock_many_players(@game, 10) %>
-
         <!-- Display other users's boards -->
         <div class="col-span-3">
-            <BoardComponents.multiplayer_tiled_playfields player_states={mock_players}/>
+            <BoardComponents.multiplayer_tiled_playfields player_states={even_users_player_data(@game.players, @user_id)}/>
         </div>
 
         <!-- Display current user's boards -->
@@ -68,7 +66,7 @@
 
         <!-- Display other users's boards -->
         <div class="col-span-3">
-            <BoardComponents.multiplayer_tiled_playfields player_states={mock_players}/>
+            <BoardComponents.multiplayer_tiled_playfields player_states={odd_users_player_data(@game.players, @user_id)}/>
         </div>
     </div>
 
