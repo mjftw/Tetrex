@@ -100,11 +100,11 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   def multiplayer_tiled_playfields(assigns) do
     ~H"""
-    <% grid_cols = fn ->
+    <% grid_props = fn ->
       num_players = Enum.count(@player_states)
 
       cond do
-        num_players == 1 -> "grid-cols-1"
+        num_players == 1 -> "grid-cols-1 w-2/3"
         num_players <= 6 -> "grid-cols-2"
         num_players <= 9 -> "grid-cols-3"
         num_players <= 16 -> "grid-cols-4"
@@ -115,10 +115,12 @@ defmodule TetrexWeb.Components.BoardComponents do
       end
     end %>
 
-    <div class={["grid grid-flow-dense", grid_cols.()]}>
-      <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
-        <.playfield board={board_preview} is_dead={status == :dead} />
-      <% end %>
+    <div class="flex h-full items-center justify-end rounded-md bg-neutral-200 px-2">
+      <div class={["grid grid-flow-dense", grid_props.()]}>
+        <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
+          <.playfield board={board_preview} is_dead={status == :dead} />
+        <% end %>
+      </div>
     </div>
     """
   end
@@ -130,6 +132,7 @@ defmodule TetrexWeb.Components.BoardComponents do
       "m-1 h-fit w-fit rounded-md border-2 border-solid border-slate-700 bg-orange-100 text-center"
 
   attr(:type, :atom, required: true)
+  attr(:rest, :global)
 
   defp tile(%{type: :red} = assigns) do
     ~H"""
