@@ -115,7 +115,7 @@ defmodule TetrexWeb.Components.BoardComponents do
       end
     end %>
 
-    <div class="flex h-full items-center justify-end">
+    <div class="flex h-full items-center justify-end rounded-md bg-neutral-200 px-2">
       <div class={["grid grid-flow-dense", grid_props.()]}>
         <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
           <.playfield board={board_preview} is_dead={status == :dead} />
