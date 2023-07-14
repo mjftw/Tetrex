@@ -54,10 +54,11 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   attr(:board, :map, required: true)
   attr(:class, :string, default: nil)
+  attr(:rest, :global)
 
   def next_tile_box(assigns) do
     ~H"""
-    <.single_tile_box title="Next" sparsegrid={@board.next_tile} class={@class} />
+    <.single_tile_box title="Next" sparsegrid={@board.next_tile} class={@class} {@rest} />
     """
   end
 
@@ -89,18 +90,8 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   def score_box(assigns) do
     ~H"""
-    <div class={"#{box_default_styles()} p-2 text-xl"}>
+    <div class={[box_default_styles(), "p-2 text-xl", @class]}>
       Score: <%= @score %>
-    </div>
-    """
-  end
-
-  slot(:inner_block, required: true)
-
-  def single_player_game_box(assigns) do
-    ~H"""
-    <div class="flex flex-col items-center bg-teal-500 pb-5">
-      <%= render_slot(@inner_block) %>
     </div>
     """
   end
