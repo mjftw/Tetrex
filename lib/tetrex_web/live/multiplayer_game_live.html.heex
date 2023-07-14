@@ -50,7 +50,7 @@
         </div>
 
         <!-- Display current user's boards -->
-        <div class="col-span-9 col-start-2 lg:col-span-5">
+        <div class="col-span-full md:col-span-9 md:col-start-2 lg:col-span-5">
             <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
                 <div class="relative flex flex-col items-center bg-teal-500 pt-3 pb-5 px-6 rounded-md w-fit">
                   <.live_component module={Audio} id="multiplayer-game-audio" class="absolute inset-x-4 w-8 md:w-10"/>
