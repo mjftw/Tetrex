@@ -1,7 +1,5 @@
 
 <div class="relative" phx-window-keydown="keypress">
-  <.live_component module={Audio} id={"#{@user_id}:multiplayer-game-audio"} />
-
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <% user_status = Map.fetch!(user_player_data, :status) %>
   <%= case @game.status do %>
@@ -54,14 +52,16 @@
         <!-- Display current user's boards -->
         <div class="col-span-5">
             <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
-                <BoardComponents.multiplayer_game>
+                <div class="relative flex flex-col items-center bg-teal-500 pt-3 pb-5 px-6 rounded-md w-fit">
+                  <.live_component module={Audio} id="multiplayer-game-audio" class="absolute inset-x-4 w-8 md:w-10"/>
+
                     <BoardComponents.score_box score={lines_cleared}/>
                     <div class="grid grid-cols-10 gap-3 content-center">
                         <BoardComponents.hold_tile_box board={board_preview} class="col-span-2"/>
                         <BoardComponents.playfield board={board_preview} class="col-span-6" is_dead={status == :dead}/>
                         <BoardComponents.next_tile_box board={board_preview} class="col-span-2"/>
                     </div>
-                </BoardComponents.multiplayer_game>
+                </div>
             <% end %>
         </div>
 

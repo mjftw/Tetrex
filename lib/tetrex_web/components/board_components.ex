@@ -96,16 +96,6 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
-  slot(:inner_block, required: true)
-
-  def multiplayer_game(assigns) do
-    ~H"""
-    <div class="flex flex-col items-center border-2 border-double border-slate-400 bg-teal-500 px-3 pb-5">
-      <%= render_slot(@inner_block) %>
-    </div>
-    """
-  end
-
   attr :player_states, :list, required: true
 
   def multiplayer_tiled_playfields(assigns) do
