@@ -1,7 +1,7 @@
 <div class="relative" phx-window-keydown="keypress">
-  <BoardComponents.single_player_game_box>
-    <Audio.tetris_audio/>
+  <.live_component module={Audio} id={"#{@user_id}:single-player-game-audio"} />
 
+  <BoardComponents.single_player_game_box>
     <%= case @status do %>
       <% :intro -> %>
         <.modal id="game_intro_modal" on_cancel={JS.push("start_game")} show>
