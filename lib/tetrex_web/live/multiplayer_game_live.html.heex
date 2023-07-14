@@ -1,7 +1,6 @@
 
 <div class="relative" phx-window-keydown="keypress">
-  <.live_component module={Audio} id={"#{@user_id}:multiplayer-game-audio"} />
-
+  <Audio.tetris_audio/>
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <% user_status = Map.fetch!(user_player_data, :status) %>
   <%= case @game.status do %>

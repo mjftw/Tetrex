@@ -1,23 +1,17 @@
 defmodule TetrexWeb.Components.Soundtrack do
   use TetrexWeb, :live_component
 
-  attr :id, :string, required: true
-  attr :src, :string, required: true
-
   def background(assigns) do
     ~H"""
-    <audio id={@id} loop>
+    <audio id={@id} muted loop>
       <source src={@src} type="audio/mpeg" />
     </audio>
     """
   end
 
-  attr :id, :string, required: true
-  attr :src, :string, required: true
-
   def effect(assigns) do
     ~H"""
-    <audio id={@id}>
+    <audio id={@id} muted>
       <source src={@src} type="audio/mpeg" />
     </audio>
     """
