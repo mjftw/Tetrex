@@ -19,13 +19,14 @@ defmodule TetrexWeb.Components.Client.Audio do
       <Soundtrack.background id={theme_music_audio_id()} src={theme_music_audio_src()} />
       <Soundtrack.effect id={game_over_audio_id()} src={game_over_audio_src()} />
 
-      <div phx-click="toggle-muted" phx-target={@myself}>
-        <%= if @muted do %>
-          <svg class="hero-speaker-x-mark" />
-        <% else %>
-          <svg class="hero-speaker-wave" />
-        <% end %>
-      </div>
+      <svg
+        phx-click="toggle-muted"
+        phx-target={@myself}
+        class={[
+          if(@muted, do: "hero-speaker-x-mark", else: "hero-speaker-wave"),
+          "aspect-square h-full w-full text-slate-800"
+        ]}
+      />
     </div>
     """
   end
