@@ -1,6 +1,7 @@
 defmodule Tetrex.Multiplayer.Game do
   alias Tetrex.BoardServer
   alias Tetrex.Multiplayer.GameMessage
+  alias Patchwork.Patch
 
   @type player_status :: :not_ready | :ready | :dead
   @type game_status :: :players_joining | :playing | :finished | :exiting
@@ -18,11 +19,12 @@ defmodule Tetrex.Multiplayer.Game do
             }
           },
           status: game_status(),
-          periodic_timer_period: non_neg_integer()
+          periodic_timer_period: non_neg_integer(),
+          last_message_published: GameMessage.t()
         }
 
   @enforce_keys [:game_id, :players, :status, :periodic_timer_period]
-  defstruct [:game_id, :players, :status, :periodic_timer_period]
+  defstruct [:game_id, :players, :status, :periodic_timer_period, last_message_published: nil]
 
   # Maximum players in game.
   # Ultimately we want to have this set to 99 players, but for now the performance is
@@ -62,6 +64,19 @@ defmodule Tetrex.Multiplayer.Game do
              }}
 
     %GameMessage{game_id: game_id, players: player_update, status: game_status}
+  end
+
+  def publish_message_patch(%__MODULE__{last_message_published: nil} = game) do
+    new_message = to_game_message(game)
+
+    {%__MODULE__{game | last_message_published: new_message}, nil}
+  end
+
+  def publish_message_patch(%__MODULE__{last_message_published: last_message} = game) do
+    new_message = to_game_message(game)
+    patch = Patchwork.Patch.diff(last_message, new_message)
+
+    {%__MODULE__{game | last_message_published: new_message}, patch}
   end
 
   def add_player(%__MODULE__{players: players} = game, user_id, board_pid, periodic_mover_pid),

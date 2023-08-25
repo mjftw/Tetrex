@@ -111,7 +111,11 @@ defmodule Tetrex.Multiplayer.GameServer do
         game
       end
 
-    publish_update(game)
+    # Publish patch if possible, otherwise publish entire state
+    case Game.publish_message_patch(game) do
+      {game, nil} -> publish_state(game)
+      {game, patch} -> publish_patch(game, patch)
+    end
 
     if Game.exiting?(game) do
       {:noreply, game, {:continue, :request_termination}}
@@ -339,11 +343,19 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
-  defp publish_update(%Game{game_id: game_id} = game) do
+  defp publish_state(%Game{game_id: game_id} = game) do
     Phoenix.PubSub.broadcast!(
       Tetrex.PubSub,
       pubsub_topic(game_id),
       Game.to_game_message(game)
+    )
+  end
+
+  defp publish_patch(%Game{game_id: game_id}, patch) do
+    Phoenix.PubSub.broadcast!(
+      Tetrex.PubSub,
+      pubsub_topic(game_id),
+      patch
     )
   end
 
