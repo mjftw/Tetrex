@@ -48,7 +48,8 @@ defmodule Tetrex.MixProject do
       {:uuid, "~> 1.1"},
       {:versioce, "~> 2.0.0"},
       {:credo, "~> 1.7"},
-      {:tailwind_formatter, "~> 0.3.6", only: [:dev, :test], runtime: false}
+      {:tailwind_formatter, "~> 0.3.6", only: [:dev, :test], runtime: false},
+      {:patchwork, git: "git@github.com:mjftw/patchwork.git", ref: "3e25990"}
     ]
   end
 

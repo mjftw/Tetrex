@@ -8,6 +8,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias TetrexWeb.Components.Client.Audio
   alias TetrexWeb.Components.Controls
   alias Phoenix.LiveView.JS
+  alias Patchwork.Patch
 
   require Logger
 
@@ -93,6 +94,35 @@ defmodule TetrexWeb.MultiplayerGameLive do
      socket
      |> handle_status_changes(game_state)
      |> assign(game: game_state)}
+  end
+
+
+  @impl true
+  def handle_info(
+        %Patch.Map{} = patch,
+        %{assigns: %{game: old_game, game_server_pid: game_server_pid}} = socket
+      ) do
+    # Attempt to apply game state patch. If fails, request latest full state.
+    game =
+      case Patch.apply(old_game, patch) do
+        {:ok, patched_game} -> patched_game
+        {:error, _} -> GameServer.get_game_message(game_server_pid)
+      end
+
+    socket =
+      case game do
+        %GameMessage{status: :exiting} ->
+          socket
+          |> put_flash(:info, "The game has ended")
+          |> redirect_to_lobby()
+
+        game ->
+          socket
+          |> handle_status_changes(game)
+          |> assign(game: game)
+      end
+
+    {:noreply, socket}
   end
 
   @impl true
