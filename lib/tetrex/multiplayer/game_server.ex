@@ -111,10 +111,11 @@ defmodule Tetrex.Multiplayer.GameServer do
         game
       end
 
+    {game, patch} = Game.publish_message_patch(game)
     # Publish patch if possible, otherwise publish entire state
-    case Game.publish_message_patch(game) do
-      {game, nil} -> publish_state(game)
-      {game, patch} -> publish_patch(game, patch)
+    case patch do
+      nil -> publish_state(game)
+      patch -> publish_patch(game, patch)
     end
 
     if Game.exiting?(game) do

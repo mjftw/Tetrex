@@ -66,17 +66,17 @@ defmodule Tetrex.Multiplayer.Game do
     %GameMessage{game_id: game_id, players: player_update, status: game_status}
   end
 
-  def publish_message_patch(%__MODULE__{last_message_published: nil} = game) do
-    new_message = to_game_message(game)
-
-    {%__MODULE__{game | last_message_published: new_message}, nil}
-  end
-
-  def publish_message_patch(%__MODULE__{last_message_published: last_message} = game) do
+  def publish_message_patch(%__MODULE__{last_message_published: last_message} = game)
+      when not is_nil(last_message) do
     new_message = to_game_message(game)
     patch = Patchwork.Patch.diff(last_message, new_message)
 
     {%__MODULE__{game | last_message_published: new_message}, patch}
+  end
+
+  def publish_message_patch(%__MODULE__{last_message_published: nil} = game) do
+    new_message = to_game_message(game)
+    {%__MODULE__{game | last_message_published: new_message}, nil}
   end
 
   def add_player(%__MODULE__{players: players} = game, user_id, board_pid, periodic_mover_pid),
