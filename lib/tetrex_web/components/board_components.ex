@@ -12,11 +12,11 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   def board(assigns) do
     ~H"""
-    <div class="grid grid-cols-10">
+    <svg class="h-full w-full" viewBox="0 0 1000 2000">
       <%= for y <- 0..19, x <- 0..9 do %>
-        <.tile type={SparseGrid.get(@sparsegrid, y, x)} />
+        <.tile x={x} y={y} size={100} type={SparseGrid.get(@sparsegrid, y, x)} />
       <% end %>
-    </div>
+    </svg>
     """
   end
 
@@ -31,11 +31,12 @@ defmodule TetrexWeb.Components.BoardComponents do
   def single_tile(assigns) do
     ~H"""
     <% sparsegrid = centre_single_tile(@sparsegrid || SparseGrid.empty()) %>
-    <div class="grid grid-cols-4">
+    <svg class="h-full w-full" viewBox="0 0 400 400">
+      s
       <%= for y <- 0..3, x <- 0..3 do %>
-        <.tile type={SparseGrid.get(sparsegrid, y, x)} />
+        <.tile x={x} y={y} size={100} type={SparseGrid.get(sparsegrid, y, x)} />
       <% end %>
-    </div>
+    </svg>
     """
   end
 
@@ -96,7 +97,7 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
-  attr :player_states, :list, required: true
+  attr(:player_states, :list, required: true)
 
   def multiplayer_tiled_playfields(assigns) do
     ~H"""
@@ -132,69 +133,75 @@ defmodule TetrexWeb.Components.BoardComponents do
       "m-1 h-fit w-fit rounded-md border-2 border-solid border-slate-700 bg-orange-100 text-center"
 
   attr(:type, :atom, required: true)
+  attr(:x, :integer, required: true)
+  attr(:y, :integer, required: true)
+  attr(:size, :integer, required: true)
   attr(:rest, :global)
 
   defp tile(%{type: :red} = assigns) do
     ~H"""
-    <.tile_filled class="fill-red-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-red-400" />
     """
   end
 
   defp tile(%{type: :green} = assigns) do
     ~H"""
-    <.tile_filled class="fill-green-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-green-400" />
     """
   end
 
   defp tile(%{type: :blue} = assigns) do
     ~H"""
-    <.tile_filled class="fill-blue-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-blue-400" />
     """
   end
 
   defp tile(%{type: :cyan} = assigns) do
     ~H"""
-    <.tile_filled class="fill-cyan-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cyan-400" />
     """
   end
 
   defp tile(%{type: :yellow} = assigns) do
     ~H"""
-    <.tile_filled class="fill-yellow-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-yellow-400" />
     """
   end
 
   defp tile(%{type: :purple} = assigns) do
     ~H"""
-    <.tile_filled class="fill-purple-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-purple-400" />
     """
   end
 
   defp tile(%{type: :orange} = assigns) do
     ~H"""
-    <.tile_filled class="fill-orange-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-orange-400" />
     """
   end
 
   defp tile(%{type: :drop_preview} = assigns) do
     ~H"""
-    <.tile_edged class="fill-slate-500 stroke-0" fill-opacity="0.15" />
+    <.tile_edged x={@x} y={@y} size={@size} class="fill-slate-500 stroke-0" fill-opacity="0.15" />
     """
   end
 
   defp tile(%{type: :blocking} = assigns) do
     ~H"""
-    <.tile_edged class="fill-slate-700 stroke-slate-800" />
+    <.tile_edged x={@x} y={@y} size={@size} class="fill-slate-700 stroke-slate-800" />
     """
   end
 
   defp tile(%{type: nil} = assigns) do
     ~H"""
-    <.tile_filled class="fill-transparent" />
+
     """
   end
 
   attr(:class, :string, default: nil)
+  attr(:x, :integer, required: true)
+  attr(:y, :integer, required: true)
+  attr(:size, :integer, required: true)
   attr(:rest, :global)
 
   @doc """
@@ -202,13 +209,22 @@ defmodule TetrexWeb.Components.BoardComponents do
   """
   defp tile_filled(assigns) do
     ~H"""
-    <svg class={["h-full w-full stroke-none", @class]} viewBox="0 0 100 100" {@rest}>
-      <path d="M -10 -10 H 120 V 120 H -120 V -120" />
-    </svg>
+    <rect
+      x={@x * @size}
+      y={@y * @size}
+      width={@size}
+      height={@size}
+      class={["stroke-none", @class]}
+      {@rest}
+    />
     """
   end
 
   attr(:class, :string, default: nil)
+  attr(:x, :integer, required: true)
+  attr(:y, :integer, required: true)
+  attr(:size, :integer, required: true)
+  attr(:border_width, :integer, default: 2)
   attr(:rest, :global)
 
   @doc """
@@ -216,9 +232,14 @@ defmodule TetrexWeb.Components.BoardComponents do
   """
   defp tile_edged(assigns) do
     ~H"""
-    <svg class={["h-full w-full stroke-2", @class]} viewBox="0 0 100 100" {@rest}>
-      <path d="M 2 2 H 96 V 96 H -96 V -96" />
-    </svg>
+    <rect
+      x={@x * @size + @border_width}
+      y={@y * @size + @border_width}
+      width={@size - 2 * @border_width}
+      height={@size - 2 * @border_width}
+      class={["stroke-2", @class]}
+      {@rest}
+    />
     """
   end
 end
