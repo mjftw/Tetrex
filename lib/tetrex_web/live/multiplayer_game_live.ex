@@ -14,6 +14,8 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
   use TetrexWeb, :live_view
 
+  @num_opponent_boards_to_show Application.compile_env(:tetrex, :num_opponent_boards_to_show)
+
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
     {:ok, assign(socket, user_id: user_id)}
@@ -290,16 +292,20 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
   def user_player_data!(%GameMessage{players: players}, user_id), do: Map.fetch!(players, user_id)
 
-  def even_users_player_data(players, current_user_id),
+  defp opponent_data_to_display(players, current_user_id),
     do:
       players
       |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
+      |> Stream.take(@num_opponent_boards_to_show)
+
+  def even_users_player_data(players, current_user_id),
+    do:
+      opponent_data_to_display(players, current_user_id)
       |> Enum.take_every(2)
 
   def odd_users_player_data(players, current_user_id),
     do:
-      players
-      |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
+      opponent_data_to_display(players, current_user_id)
       |> Stream.drop(1)
       |> Enum.take_every(2)
 
@@ -312,7 +318,6 @@ defmodule TetrexWeb.MultiplayerGameLive do
   def num_players_in_game(%GameMessage{players: players}), do: Enum.count(players)
 
   def num_alive_opponents(%GameMessage{players: players}) do
-    # TODO: Check this is calculated correctly
     num_alive_players =
       players
       |> Stream.filter(fn {_user_id, %{status: status}} -> status != :dead end)

@@ -3,6 +3,8 @@ defmodule Tetrex.Multiplayer.Game do
   alias Tetrex.Multiplayer.GameMessage
   alias Patchwork.Patch
 
+  @max_players Application.compile_env(:tetrex, :max_players_in_game)
+
   @type player_status :: :not_ready | :ready | :dead
   @type game_status :: :players_joining | :playing | :finished | :exiting
   @type id :: String.t()
@@ -25,13 +27,6 @@ defmodule Tetrex.Multiplayer.Game do
 
   @enforce_keys [:game_id, :players, :status, :periodic_timer_period]
   defstruct [:game_id, :players, :status, :periodic_timer_period, last_message_published: nil]
-
-  # Maximum players in game.
-  # Ultimately we want to have this set to 99 players, but for now the performance is
-  # really bad if you have that many players in a game! Like REALLY bad.
-  # Will need to embark on an optimisation mission before putting that many players in a game.
-  # @max_players 99
-  @max_players 9
 
   def new(periodic_timer_period) do
     %__MODULE__{
