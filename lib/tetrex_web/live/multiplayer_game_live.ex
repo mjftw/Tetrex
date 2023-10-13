@@ -298,12 +298,12 @@ defmodule TetrexWeb.MultiplayerGameLive do
       |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
       |> Stream.take(@num_opponent_boards_to_show)
 
-  def even_users_player_data(players, current_user_id),
+  def even_opponents_player_data(players, current_user_id),
     do:
       opponent_data_to_display(players, current_user_id)
       |> Enum.take_every(2)
 
-  def odd_users_player_data(players, current_user_id),
+  def odd_opponents_player_data(players, current_user_id),
     do:
       opponent_data_to_display(players, current_user_id)
       |> Stream.drop(1)

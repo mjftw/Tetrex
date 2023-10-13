@@ -46,7 +46,7 @@
     <div class="grid grid-cols-11 gap-1 aspect-video">
         <!-- Display other users's boards -->
         <div class="col-span-3 hidden lg:block">
-            <BoardComponents.multiplayer_tiled_playfields player_states={even_users_player_data(@game.players, @user_id)}/>
+            <BoardComponents.multiplayer_tiled_playfields player_states={even_opponents_player_data(@game.players, @user_id)}/>
         </div>
 
         <!-- Display current user's boards -->
@@ -70,7 +70,7 @@
 
         <!-- Display other users's boards -->
         <div class="col-span-3 hidden lg:block">
-            <BoardComponents.multiplayer_tiled_playfields player_states={odd_users_player_data(@game.players, @user_id)}/>
+            <BoardComponents.multiplayer_tiled_playfields player_states={odd_opponents_player_data(@game.players, @user_id)}/>
         </div>
     </div>
 
