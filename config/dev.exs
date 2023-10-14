@@ -3,7 +3,7 @@ import Config
 config :tetrex, :settings,
   multiplayer: [
     # Use this to simulate lots of additional players in a game
-    num_fake_players_to_add_on_start: 95,
+    num_fake_players_to_add_on_start: 500,
     # If true, the Patchwork library will be used to send state diffs
     # rather than the entire state.
     # Thought this would be a good idea... it was a terrible idea, it makes
@@ -13,7 +13,8 @@ config :tetrex, :settings,
     use_multiplayer_state_diff: false,
     # The probability of sending a blocking row to another player when a
     # line is cleared
-    send_blocking_row_probability: 1
+    send_blocking_row_probability: 1,
+    rate_limit_max_updates_per_sec: 30
   ]
 
 # For development, we disable any cache and enable

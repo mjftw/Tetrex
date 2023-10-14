@@ -17,7 +17,7 @@ config :tetrex, :settings,
     # The number of opponent boards to render. Increasing this number makes rendering more expensive,
     # and puts more load on the client browser.
     # Cannot be greater than :max_players_in_game
-    num_opponent_boards_to_show: 18
+    num_opponent_boards_to_show: 98
   ]
 
 # Configures the endpoint
