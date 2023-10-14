@@ -6,6 +6,12 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   require Logger
 
+  @num_fake_players_to_add_on_start Application.compile_env(
+                                      :tetrex,
+                                      [:settings, :num_fake_players_to_add_on_start],
+                                      0
+                                    )
+
   @send_blocking_row_probability 0.5
 
   def start_link(_opts) do
@@ -266,31 +272,12 @@ defmodule Tetrex.Multiplayer.GameServer do
   def handle_call(
         {:join_game, user_id},
         _from,
-        %Game{periodic_timer_period: periodic_timer_period} = game
+        game
       ) do
     if Game.player_in_game?(game, user_id) do
       {:reply, {:error, :already_in_game}, game}
     else
-      {:ok, board_pid} = BoardServer.start_link()
-
-      this_game_server = self()
-
-      # Must be one Periodic timer per board though as you need to reset the timer
-      #   when a player moves a piece down manually, but this must be done on
-      # a per player basis.
-      {:ok, periodic_mover_pid} =
-        Tetrex.Periodic.start_link(
-          [
-            period_ms: periodic_timer_period,
-            start: false,
-            work: fn ->
-              try_move_down(this_game_server, user_id)
-            end
-          ],
-          []
-        )
-
-      game = Game.add_player(game, user_id, board_pid, periodic_mover_pid)
+      game = do_join_game(game, user_id)
 
       {:reply, :ok, game, {:continue, :publish_state}}
     end
@@ -407,14 +394,46 @@ defmodule Tetrex.Multiplayer.GameServer do
     frames_per_gridcell / 60
   end
 
-  defp start_game(%Game{players: players} = game) do
-    players
+  defp start_game(game) do
+    dbg_num_fake_players = @num_fake_players_to_add_on_start
+
+    game =
+      if dbg_num_fake_players > 0 do
+        dbg_add_ready_players(game, dbg_num_fake_players)
+      else
+        game
+      end
+
+    game.players
     |> Stream.map(fn {_user_id, %{periodic_mover_pid: periodic_mover_pid}} ->
       Task.async(fn -> Periodic.start_timer(periodic_mover_pid) end)
     end)
     |> Enum.map(&Task.await/1)
 
     Game.start(game)
+  end
+
+  defp do_join_game(%Game{periodic_timer_period: periodic_timer_period} = game, user_id) do
+    {:ok, board_pid} = BoardServer.start_link()
+
+    this_game_server = self()
+
+    # Must be one Periodic timer per board though as you need to reset the timer
+    #   when a player moves a piece down manually, but this must be done on
+    # a per player basis.
+    {:ok, periodic_mover_pid} =
+      Tetrex.Periodic.start_link(
+        [
+          period_ms: periodic_timer_period,
+          start: false,
+          work: fn ->
+            try_move_down(this_game_server, user_id)
+          end
+        ],
+        []
+      )
+
+    Game.add_player(game, user_id, board_pid, periodic_mover_pid)
   end
 
   defp update_game_after_player_moved_down(game, user_id, board_pid, num_lines_cleared) do
@@ -495,5 +514,19 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   defp random_bool(true_probability) do
     :rand.uniform(100) <= true_probability * 100
+  end
+
+  # Note this function is only for debug use
+  defp dbg_add_ready_players(game, num_players) do
+    Enum.reduce(1..num_players, game, fn _, game ->
+      id = UUID.uuid1()
+
+      {:ok, game} =
+        game
+        |> do_join_game(id)
+        |> Game.set_player_ready(id, true)
+
+      game
+    end)
   end
 end

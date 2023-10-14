@@ -112,7 +112,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
     # Attempt to apply game state patch. If fails, request latest full state.
     game =
       case Patch.apply(old_game, patch) do
-        {:ok, patched_game} -> patched_game |> IO.inspect()
+        {:ok, patched_game} -> patched_game
         {:error, _} -> GameServer.get_game_message(game_server_pid)
       end
 

@@ -1,5 +1,7 @@
 import Config
 
+config :tetrex, :settings, num_fake_players_to_add_on_start: 30
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
