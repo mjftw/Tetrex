@@ -3,7 +3,7 @@ defmodule Tetrex.Multiplayer.Game do
   alias Tetrex.Multiplayer.GameMessage
   alias Patchwork.Patch
 
-  @max_players Application.compile_env(:tetrex, :max_players_in_game)
+  @max_players Application.compile_env(:tetrex, :settings, :max_players_in_game)
 
   @type player_status :: :not_ready | :ready | :dead
   @type game_status :: :players_joining | :playing | :finished | :exiting
@@ -43,20 +43,24 @@ defmodule Tetrex.Multiplayer.Game do
         status: game_status
       }) do
     player_update =
-      for {user_id,
-           %{
-             board_pid: board_pid,
-             lines_cleared: lines_cleared,
-             status: player_status
-           }} <- players,
-          into: %{},
-          do:
-            {user_id,
-             %{
-               board_preview: BoardServer.preview(board_pid),
-               lines_cleared: lines_cleared,
-               status: player_status
-             }}
+      players
+      |> Stream.map(fn {user_id,
+                        %{
+                          board_pid: board_pid,
+                          lines_cleared: lines_cleared,
+                          status: player_status
+                        }} ->
+        {user_id,
+         %{
+           board_preview: BoardServer.preview(board_pid),
+           lines_cleared: lines_cleared,
+           status: player_status
+         }}
+      end)
+      # Sort is required as list is iterated to display opponent boards
+      # If not sorted display ordering is not guaranteed and boards could jump around
+      # Also means a larger LiveView DOM diff, degrading browser performance
+      |> Enum.sort()
 
     %GameMessage{game_id: game_id, players: player_update, status: game_status}
   end

@@ -7,6 +7,17 @@
 # General application configuration
 import Config
 
+config :tetrex, :settings,
+  # Maximum players in game.
+  # Ultimately we want to have this set to 99 players, but for now the performance is
+  # really bad if you have that many players in a game! Like REALLY bad.
+  # Will need to embark on an optimisation mission before putting that many players in a game.
+  max_players_in_game: 99,
+  # The number of opponent boards to render. Increasing this number makes rendering more expensive,
+  # and puts more load on the client browser.
+  # Cannot be greater than :max_players_in_game
+  num_opponent_boards_to_show: 18
+
 # Configures the endpoint
 config :tetrex, TetrexWeb.Endpoint,
   url: [host: "localhost"],

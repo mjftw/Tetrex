@@ -14,7 +14,13 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
   use TetrexWeb, :live_view
 
-  @num_opponent_boards_to_show Application.compile_env(:tetrex, :num_opponent_boards_to_show)
+  @num_opponent_boards_to_show Application.compile_env(
+                                 :tetrex,
+                                 [
+                                   :settings,
+                                   :num_opponent_boards_to_show
+                                 ]
+                               )
 
   @impl true
   def mount(_params, %{"user_id" => user_id} = _session, socket) do
@@ -98,7 +104,6 @@ defmodule TetrexWeb.MultiplayerGameLive do
      |> assign(game: game_state)}
   end
 
-
   @impl true
   def handle_info(
         %Patch.Map{} = patch,
@@ -107,7 +112,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
     # Attempt to apply game state patch. If fails, request latest full state.
     game =
       case Patch.apply(old_game, patch) do
-        {:ok, patched_game} -> patched_game
+        {:ok, patched_game} -> patched_game |> IO.inspect()
         {:error, _} -> GameServer.get_game_message(game_server_pid)
       end
 
@@ -290,30 +295,29 @@ defmodule TetrexWeb.MultiplayerGameLive do
     {:noreply, socket}
   end
 
-  def user_player_data!(%GameMessage{players: players}, user_id), do: Map.fetch!(players, user_id)
+  def user_player_data!(%GameMessage{players: players}, user_id) do
+    {_id, data} = Enum.find(players, fn {id, _} -> id == user_id end)
+    data
+  end
 
-  defp opponent_data_to_display(players, current_user_id),
-    do:
-      players
-      |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
-      |> Stream.take(@num_opponent_boards_to_show)
+  defp opponent_data_to_display(players, current_user_id) do
+    players
+    |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
+    |> Stream.take(@num_opponent_boards_to_show)
+  end
 
   def even_opponents_player_data(players, current_user_id),
     do:
-      opponent_data_to_display(players, current_user_id)
+      players
+      |> opponent_data_to_display(current_user_id)
       |> Enum.take_every(2)
 
   def odd_opponents_player_data(players, current_user_id),
     do:
-      opponent_data_to_display(players, current_user_id)
+      players
+      |> opponent_data_to_display(current_user_id)
       |> Stream.drop(1)
       |> Enum.take_every(2)
-
-  # NOTE: This is purely for testing purposes and will be deleted!
-  # def mock_many_players(%GameMessage{players: players}, how_many) do
-  #   Stream.repeatedly(fn -> Enum.random(players) end)
-  #   |> Enum.take(how_many)
-  # end
 
   def num_players_in_game(%GameMessage{players: players}), do: Enum.count(players)
 
