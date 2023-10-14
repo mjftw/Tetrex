@@ -34,6 +34,15 @@ defmodule Tetrex.Multiplayer.GameServer do
                                    ],
                                    0.5
                                  )
+  @rate_limit_max_updates_per_sec Application.compile_env(
+                                    :tetrex,
+                                    [
+                                      :settings,
+                                      :multiplayer,
+                                      :rate_limit_max_updates_per_sec
+                                    ],
+                                    30
+                                  )
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], [])
@@ -61,10 +70,6 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   def kill_player(game_server, user_id) do
     GenServer.call(game_server, {:kill_player, user_id})
-  end
-
-  def move_all_games_down(game_server) do
-    GenServer.cast(game_server, :move_all_boards_down)
   end
 
   def try_move_down(game_server, user_id) do
@@ -125,14 +130,20 @@ defmodule Tetrex.Multiplayer.GameServer do
     #  It will be updated as the game progresses
     initial_push_down_period_ms = 1000
 
-    {:ok, Game.new(initial_push_down_period_ms)}
+    {:ok, Game.new(initial_push_down_period_ms), {:continue, :begin_publish_loop}}
   end
 
   @impl true
-  def handle_continue(:publish_state, game) do
-    # If all players have left or died, kill the game server after publishing state
+  def handle_continue(:begin_publish_loop, game) do
+    Process.send(self(), :publish_state_loop, [])
+    {:noreply, game}
+  end
+
+  @impl true
+  # If all players have left or died, kill the game server after publishing state
+  def handle_info(:publish_state_loop, game) do
     game =
-      if Game.num_alive_players(game) == 0 do
+      if game.status == :playing && Game.num_alive_players(game) == 0 do
         Game.set_exiting(game)
       else
         game
@@ -150,8 +161,9 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
 
     if Game.exiting?(game) do
-      {:noreply, game, {:continue, :request_termination}}
+      {:noreply, game}
     else
+      Process.send_after(self(), :publish_state_loop, div(1000, @rate_limit_max_updates_per_sec))
       {:noreply, game}
     end
   end
@@ -174,7 +186,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
         game = update_game_after_player_moved_down(game, user_id, board_pid, num_lines_cleared)
 
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
@@ -212,7 +224,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
     game = finish_game_if_required(game)
 
-    {:reply, :ok, game, {:continue, :publish_state}}
+    {:reply, :ok, game}
   end
 
   @impl true
@@ -223,7 +235,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
         game = update_game_after_player_moved_down(game, user_id, board_pid, num_lines_cleared)
 
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
@@ -235,7 +247,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
         BoardServer.try_move_left(board_pid)
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
@@ -247,7 +259,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
         BoardServer.try_move_right(board_pid)
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
@@ -259,7 +271,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
         BoardServer.hold(board_pid)
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
@@ -271,7 +283,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
         BoardServer.rotate(board_pid)
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
@@ -304,7 +316,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     else
       game = do_join_game(game, user_id)
 
-      {:reply, :ok, game, {:continue, :publish_state}}
+      {:reply, :ok, game}
     end
   end
 
@@ -321,7 +333,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
           game = Game.drop_player(game, user_id)
 
-          {:reply, :ok, game, {:continue, :publish_state}}
+          {:reply, :ok, game}
 
         {:error, error} ->
           {:reply, {:error, error}, game}
@@ -337,7 +349,7 @@ defmodule Tetrex.Multiplayer.GameServer do
       {:ok, game} ->
         game = if Game.ready_to_start?(game), do: start_game(game), else: game
 
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
@@ -349,7 +361,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     case kill_player_stop_timer(game, user_id) do
       {:ok, game} ->
         game = finish_game_if_required(game)
-        {:reply, :ok, game, {:continue, :publish_state}}
+        {:reply, :ok, game}
 
       {:error, error} ->
         {:reply, {:error, error}, game}
