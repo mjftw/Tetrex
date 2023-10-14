@@ -25,7 +25,15 @@ defmodule Tetrex.Multiplayer.GameServer do
                                 false
                               )
 
-  @send_blocking_row_probability 0.5
+  @send_blocking_row_probability Application.compile_env(
+                                   :tetrex,
+                                   [
+                                     :settings,
+                                     :multiplayer,
+                                     :send_blocking_row_probability
+                                   ],
+                                   0.5
+                                 )
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], [])
