@@ -8,9 +8,22 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @num_fake_players_to_add_on_start Application.compile_env(
                                       :tetrex,
-                                      [:settings, :num_fake_players_to_add_on_start],
+                                      [
+                                        :settings,
+                                        :multiplayer,
+                                        :num_fake_players_to_add_on_start
+                                      ],
                                       0
                                     )
+  @use_multiplayer_state_diff Application.compile_env(
+                                :tetrex,
+                                [
+                                  :settings,
+                                  :multiplayer,
+                                  :use_multiplayer_state_diff
+                                ],
+                                false
+                              )
 
   @send_blocking_row_probability 0.5
 
@@ -117,11 +130,15 @@ defmodule Tetrex.Multiplayer.GameServer do
         game
       end
 
-    {game, patch} = Game.publish_message_patch(game)
-    # Publish patch if possible, otherwise publish entire state
-    case patch do
-      nil -> publish_state(game)
-      patch -> publish_patch(game, patch)
+    if @use_multiplayer_state_diff do
+      {game, patch} = Game.publish_message_patch(game)
+      # Publish patch if possible, otherwise publish entire state
+      case patch do
+        nil -> publish_state(game)
+        patch -> publish_patch(game, patch)
+      end
+    else
+      publish_state(game)
     end
 
     if Game.exiting?(game) do

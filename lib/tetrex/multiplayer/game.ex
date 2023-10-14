@@ -3,7 +3,7 @@ defmodule Tetrex.Multiplayer.Game do
   alias Tetrex.Multiplayer.GameMessage
   alias Patchwork.Patch
 
-  @max_players Application.compile_env(:tetrex, :settings, :max_players_in_game)
+  @max_players Application.compile_env(:tetrex, [:settings, :multiplayer, :max_players_in_game])
 
   @type player_status :: :not_ready | :ready | :dead
   @type game_status :: :players_joining | :playing | :finished | :exiting
