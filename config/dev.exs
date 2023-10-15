@@ -11,8 +11,6 @@ config :tetrex, :settings,
     # so I'll just put it behind a feature flag and advise you not to use it.
     # I never claimed this game was production ready ;-)
     use_multiplayer_state_diff: false,
-    # The probability of sending a blocking row to another player when a
-    # line is cleared
     send_blocking_row_probability: 1,
     rate_limit_max_updates_per_sec: 30
   ]

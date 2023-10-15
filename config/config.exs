@@ -10,14 +10,16 @@ import Config
 config :tetrex, :settings,
   multiplayer: [
     # Maximum players in game.
-    # Ultimately we want to have this set to 99 players, but for now the performance is
-    # really bad if you have that many players in a game! Like REALLY bad.
-    # Will need to embark on an optimisation mission before putting that many players in a game.
     max_players_in_game: 99,
     # The number of opponent boards to render. Increasing this number makes rendering more expensive,
     # and puts more load on the client browser.
     # Cannot be greater than :max_players_in_game
-    num_opponent_boards_to_show: 98
+    num_opponent_boards_to_show: 98,
+    # The probability of sending a blocking row to another player when a
+    # line is cleared
+    send_blocking_row_probability: 1,
+    # How many times per second to update the browser game views
+    rate_limit_max_updates_per_sec: 20
   ]
 
 # Configures the endpoint
