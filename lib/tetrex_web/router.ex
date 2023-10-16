@@ -20,6 +20,7 @@ defmodule TetrexWeb.Router do
     scope "/", TetrexWeb do
       pipe_through :browser
 
+      live "/admin", AdminLive
       live "/signup", SignupLive
       live "/single-player-game", SinglePlayerGameLive
       live "/multiplayer-game/:game_id", MultiplayerGameLive
@@ -45,7 +46,6 @@ defmodule TetrexWeb.Router do
 
     scope "/dev" do
       pipe_through :browser
-
       live_dashboard "/dashboard", metrics: TetrexWeb.Telemetry
     end
   end

@@ -1,0 +1,25 @@
+<div>
+    <div class="flex flex-row justify-between">
+        <span class="text-lg">Admin Panel</span>
+        <span class="text-lg">Current user: <%= @current_user.username %></span>
+    </div>
+
+    <.horizontal_divider />
+
+    <div class="pt-3">
+        <h2>Users in lobby: <%= Enum.count(@users) %></h2>
+    </div>
+
+    <.horizontal_divider />
+
+    <div class="flex flex-row justify-between">
+        <h2 class="text-xl">Multiplayer</h2>
+    </div>
+
+    <%!-- <.table id="multiplayer_games" rows={Enum.sort_by(joinable_multiplayer_games(@multiplayer_games), &(if Multiplayer.Game.has_started?(&1), do: 1, else: 0))}> --%>
+    <.table id="multiplayer_games" rows={@multiplayer_games}>
+        <:col :let={game} label="Game ID"><%= game.game_id %></:col>
+        <:col :let={game} label="Number of Players"><%= Multiplayer.Game.num_players(game) %></:col>
+        <:col :let={game} label="Status"><%= game.status %></:col>
+    </.table>
+</div>
