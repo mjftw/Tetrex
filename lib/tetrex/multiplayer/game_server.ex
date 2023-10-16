@@ -122,6 +122,10 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.call(game_server, :game_message)
   end
 
+  def increase_game_level(game_server, level) do
+    GenServer.cast(game_server, {:increase_game_level, level})
+  end
+
   def pubsub_topic(game_id), do: "multiplayer-game:#{game_id}"
 
   @impl true
@@ -177,6 +181,12 @@ defmodule Tetrex.Multiplayer.GameServer do
   end
 
   @impl true
+  def handle_cast({:increase_game_level, level}, game) do
+    game = update_level_speed(game, level)
+    {:noreply, game}
+  end
+
+  @impl true
   def handle_call({:try_move_down, user_id}, _from, game) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid, periodic_mover_pid: periodic_mover_pid}} ->
@@ -218,9 +228,12 @@ defmodule Tetrex.Multiplayer.GameServer do
         {game, total_lines_cleared + num_lines_cleared}
       end)
 
-    if total_lines_cleared > 0 do
-      update_level_speed(game)
-    end
+    game =
+      if total_lines_cleared > 0 do
+        update_level_speed(game)
+      else
+        game
+      end
 
     game = finish_game_if_required(game)
 
@@ -384,15 +397,22 @@ defmodule Tetrex.Multiplayer.GameServer do
     )
   end
 
-  defp update_level_speed(%Game{players: players}) do
-    # The player with the mst lines cleared sets the game speed
+  defp update_level_speed(%Game{players: players, level: current_level} = game, min_level \\ 0) do
+    # The player with the most lines cleared sets the game speed
+    # unless the level is already higher
 
-    speed =
+    highest_level =
       players
-      |> Enum.map(fn {_user_id, %{lines_cleared: lines_cleared}} -> lines_cleared end)
+      |> Stream.map(fn {_user_id, %{lines_cleared: lines_cleared}} -> lines_cleared end)
       |> Enum.max()
       |> level()
-      |> level_speed()
+
+    new_level =
+      current_level
+      |> max(highest_level)
+      |> max(min_level)
+
+    speed = level_speed(new_level)
 
     period_ms = floor(speed * 1000)
 
@@ -400,7 +420,9 @@ defmodule Tetrex.Multiplayer.GameServer do
     |> Stream.map(fn {_user_id, %{periodic_mover_pid: periodic_mover_pid}} ->
       Task.async(fn -> Periodic.set_period(periodic_mover_pid, period_ms) end)
     end)
-    |> Enum.map(&Task.await/1)
+    |> Enum.each(&Task.await/1)
+
+    %Game{game | level: new_level}
   end
 
   defp level(lines_cleared) do
@@ -445,7 +467,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     |> Stream.map(fn {_user_id, %{periodic_mover_pid: periodic_mover_pid}} ->
       Task.async(fn -> Periodic.start_timer(periodic_mover_pid) end)
     end)
-    |> Enum.map(&Task.await/1)
+    |> Enum.each(&Task.await/1)
 
     Game.start(game)
   end
@@ -476,9 +498,12 @@ defmodule Tetrex.Multiplayer.GameServer do
   defp update_game_after_player_moved_down(game, user_id, board_pid, num_lines_cleared) do
     %{active_tile_fits: player_still_alive} = BoardServer.preview(board_pid)
 
-    if num_lines_cleared > 0 do
-      update_level_speed(game)
-    end
+    game =
+      if num_lines_cleared > 0 do
+        update_level_speed(game)
+      else
+        game
+      end
 
     {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
 
