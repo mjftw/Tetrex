@@ -22,11 +22,19 @@ defmodule Tetrex.Multiplayer.Game do
           },
           status: game_status(),
           periodic_timer_period: non_neg_integer(),
-          last_message_published: GameMessage.t()
+          last_message_published: GameMessage.t(),
+          level: non_neg_integer()
         }
 
   @enforce_keys [:game_id, :players, :status, :periodic_timer_period]
-  defstruct [:game_id, :players, :status, :periodic_timer_period, last_message_published: nil]
+  defstruct [
+    :game_id,
+    :players,
+    :status,
+    :periodic_timer_period,
+    level: 0,
+    last_message_published: nil
+  ]
 
   def new(periodic_timer_period) do
     %__MODULE__{

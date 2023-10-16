@@ -35,6 +35,14 @@ defmodule TetrexWeb.AdminLive do
      |> mount_presence_init()}
   end
 
+  @impl true
+  def handle_event("increase-level", %{"game-id" => game_id}, socket) do
+    {:ok, game_server, game} = GameDynamicSupervisor.multiplayer_game_by_id(game_id)
+
+    Multiplayer.GameServer.increase_game_level(game_server, game.level + 1)
+    {:noreply, socket}
+  end
+
   # PubSub handlers
   @impl true
   def handle_info({:created_multiplayer_game, game_server_pid}, socket) do

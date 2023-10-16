@@ -21,5 +21,9 @@
         <:col :let={game} label="Game ID"><%= game.game_id %></:col>
         <:col :let={game} label="Number of Players"><%= Multiplayer.Game.num_players(game) %></:col>
         <:col :let={game} label="Status"><%= game.status %></:col>
+        <:col :let={game} label="Level">
+          <%= game.level %>
+          <.button_secondary phx-click="increase-level" phx-value-game-id={game.game_id}>+</.button_secondary>
+        </:col>
     </.table>
 </div>
