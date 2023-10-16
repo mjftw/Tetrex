@@ -126,6 +126,10 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.cast(game_server, {:increase_game_level, level})
   end
 
+  def force_start(game_server) do
+    GenServer.cast(game_server, :force_start)
+  end
+
   def pubsub_topic(game_id), do: "multiplayer-game:#{game_id}"
 
   @impl true
@@ -184,6 +188,11 @@ defmodule Tetrex.Multiplayer.GameServer do
   def handle_cast({:increase_game_level, level}, game) do
     game = update_level_speed(game, level)
     {:noreply, game}
+  end
+
+  @impl true
+  def handle_cast(:force_start, game) do
+    {:noreply, start_game(game)}
   end
 
   @impl true

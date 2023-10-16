@@ -36,6 +36,14 @@ defmodule TetrexWeb.AdminLive do
   end
 
   @impl true
+  def handle_event("force-start", %{"game-id" => game_id}, socket) do
+    {:ok, game_server, game} = GameDynamicSupervisor.multiplayer_game_by_id(game_id)
+
+    Multiplayer.GameServer.force_start(game_server)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("increase-level", %{"game-id" => game_id}, socket) do
     {:ok, game_server, game} = GameDynamicSupervisor.multiplayer_game_by_id(game_id)
 
