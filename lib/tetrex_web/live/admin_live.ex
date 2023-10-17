@@ -1,4 +1,5 @@
 defmodule TetrexWeb.AdminLive do
+  alias Tetrex.Users.User
   alias ElixirSense.Log
   alias Tetrex.GameDynamicSupervisor
   alias Tetrex.Users.UserStore
@@ -13,6 +14,9 @@ defmodule TetrexWeb.AdminLive do
     topic: "room:lobby",
     socket_current_user_assign_key: :current_user,
     socket_users_assign_key: :users
+
+  @admin_panel_username Application.compile_env!(:tetrex, [:admin, :admin_panel_username])
+  @admin_panel_password Application.compile_env!(:tetrex, [:admin, :admin_panel_password])
 
   @impl true
   def mount(_params, %{"user_id" => current_user_id} = _session, socket) do
@@ -33,6 +37,21 @@ defmodule TetrexWeb.AdminLive do
      |> assign(:multiplayer_games, multiplayer_games)
      |> assign(:users, %{})
      |> mount_presence_init()}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    # If credentials don't match, redirect away
+    with %{assigns: %{current_user: %User{username: @admin_panel_username}}} <- socket,
+         %{"pwd" => @admin_panel_password} <- params do
+      {:noreply, socket}
+    else
+      _ ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "This is not the page you are looking for")
+         |> push_redirect(to: ~p"/")}
+    end
   end
 
   @impl true
