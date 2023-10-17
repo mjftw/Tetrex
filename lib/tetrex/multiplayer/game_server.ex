@@ -76,10 +76,6 @@ defmodule Tetrex.Multiplayer.GameServer do
     GenServer.call(game_server, {:try_move_down, user_id})
   end
 
-  def try_move_all_down(game_server) do
-    GenServer.call(game_server, :try_move_all_down)
-  end
-
   def drop(game_server, user_id) do
     GenServer.call(game_server, {:drop, user_id})
   end
@@ -210,43 +206,6 @@ defmodule Tetrex.Multiplayer.GameServer do
       {:error, error} ->
         {:reply, {:error, error}, game}
     end
-  end
-
-  @impl true
-  def handle_call(:try_move_all_down, _from, %Game{players: players} = game) do
-    {game, total_lines_cleared} =
-      players
-      |> Stream.map(fn {user_id, %{board_pid: board_pid}} -> {user_id, board_pid} end)
-      |> Stream.map(fn {user_id, board_pid} ->
-        Task.async(fn -> {user_id, BoardServer.try_move_down(board_pid)} end)
-      end)
-      |> Stream.map(&Task.await/1)
-      |> Enum.reduce({game, 0}, fn {user_id,
-                                    {_status, %{active_tile_fits: player_still_alive},
-                                     num_lines_cleared}},
-                                   {game, total_lines_cleared} ->
-        {:ok, game} = Game.increment_player_lines_cleared(game, user_id, num_lines_cleared)
-
-        {:ok, game} =
-          if player_still_alive do
-            {:ok, game}
-          else
-            kill_player_stop_timer(game, user_id)
-          end
-
-        {game, total_lines_cleared + num_lines_cleared}
-      end)
-
-    game =
-      if total_lines_cleared > 0 do
-        update_level_speed(game)
-      else
-        game
-      end
-
-    game = finish_game_if_required(game)
-
-    {:reply, :ok, game}
   end
 
   @impl true
