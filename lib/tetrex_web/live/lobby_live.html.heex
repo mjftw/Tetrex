@@ -8,10 +8,14 @@
     <.horizontal_divider />
 
     <div class="pt-3">
-        <h2>Users in lobby: <%= Enum.count(@users) %></h2>
+        <% num_users = Enum.count(@users) %>
+        <h2>Users in lobby: <%= num_users %></h2>
         <ul role="list" class="marker:text-sky-400 list-disc pl-5 space-y-3 text-slate-500">
-            <%= for {_user_id, %{user: %User{id: user_id, username: username}}} <- @users, user_id != @current_user.id  do %>
+            <%= for {_user_id, %{user: %User{id: user_id, username: username}}} <- Enum.take(@users, 9), user_id != @current_user.id  do %>
                 <li> <%= username %> </li>
+            <% end %>
+            <%= if num_users > 9 do %>
+                <li> ... </li>
             <% end %>
         </ul>
     </div>
@@ -41,15 +45,14 @@
         <:col :let={game} label="Game ID"><%= game.game_id %></:col>
         <:col :let={game} label="Number of Players"><%= Multiplayer.Game.num_players(game) %></:col>
         <:col :let={game} label="Joinable">
-
-        <%= cond  do %>
-        <%  Multiplayer.Game.has_started?(game) -> %>
-            Game in progress
-        <%  Multiplayer.Game.is_full?(game) -> %>
-            Game full
-        <%  true -> %>
-            <.button_secondary phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join</.button_secondary>
-        <% end %>
+            <%= cond  do %>
+            <%  Multiplayer.Game.has_started?(game) -> %>
+                Game in progress
+            <%  Multiplayer.Game.is_full?(game) -> %>
+                Game full
+            <%  true -> %>
+                <.button_secondary phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join</.button_secondary>
+            <% end %>
         </:col>
     </.table>
 </div>
