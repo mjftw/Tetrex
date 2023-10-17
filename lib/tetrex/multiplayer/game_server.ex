@@ -151,7 +151,7 @@ defmodule Tetrex.Multiplayer.GameServer do
   # If all players have left or died, kill the game server after publishing state
   def handle_info(:publish_state_loop, game) do
     game =
-      if game.status == :playing && Game.num_alive_players(game) == 0 do
+      if !Game.new?(game) && Game.num_alive_players(game) == 0 do
         Game.set_exiting(game)
       else
         game
@@ -556,7 +556,7 @@ defmodule Tetrex.Multiplayer.GameServer do
       |> Stream.map(fn {_user_id, %{periodic_mover_pid: periodic_mover_pid}} ->
         Task.async(fn -> Periodic.stop_timer(periodic_mover_pid) end)
       end)
-      |> Enum.map(&Task.await/1)
+      |> Enum.each(&Task.await/1)
     end
 
     game

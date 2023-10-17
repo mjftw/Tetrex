@@ -6,7 +6,7 @@ defmodule Tetrex.Multiplayer.Game do
   @max_players Application.compile_env(:tetrex, [:settings, :multiplayer, :max_players_in_game])
 
   @type player_status :: :not_ready | :ready | :dead
-  @type game_status :: :players_joining | :playing | :finished | :exiting
+  @type(game_status :: :new, :players_joining | :playing | :finished | :exiting)
   @type id :: String.t()
 
   @type t :: %__MODULE__{
@@ -40,7 +40,7 @@ defmodule Tetrex.Multiplayer.Game do
     %__MODULE__{
       game_id: UUID.uuid1(),
       players: %{},
-      status: :players_joining,
+      status: :new,
       periodic_timer_period: periodic_timer_period
     }
   end
@@ -89,7 +89,8 @@ defmodule Tetrex.Multiplayer.Game do
   def add_player(%__MODULE__{players: players} = game, user_id, board_pid, periodic_mover_pid),
     do: %__MODULE__{
       game
-      | players:
+      | status: :players_joining,
+        players:
           Map.put(players, user_id, %{
             board_pid: board_pid,
             periodic_mover_pid: periodic_mover_pid,
@@ -169,7 +170,7 @@ defmodule Tetrex.Multiplayer.Game do
 
   def players_can_leave?(%__MODULE__{}), do: false
 
-  def has_started?(%__MODULE__{status: status}) when status == :players_joining, do: false
+  def has_started?(%__MODULE__{status: status}) when status in [:new, :players_joining], do: false
   def has_started?(%__MODULE__{}), do: true
 
   def is_full?(%__MODULE__{players: players}), do: Enum.count(players) > @max_players
@@ -210,6 +211,9 @@ defmodule Tetrex.Multiplayer.Game do
   def finish_if_required(%__MODULE__{} = game), do: game
 
   def set_exiting(%__MODULE__{} = game), do: %__MODULE__{game | status: :exiting}
+
+  def new?(%__MODULE__{status: :new}), do: true
+  def new?(%__MODULE__{}), do: false
 
   def exiting?(%__MODULE__{status: :exiting}), do: true
   def exiting?(%__MODULE__{}), do: false
