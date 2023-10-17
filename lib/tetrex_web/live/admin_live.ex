@@ -15,8 +15,8 @@ defmodule TetrexWeb.AdminLive do
     socket_current_user_assign_key: :current_user,
     socket_users_assign_key: :users
 
-  def admin_panel_username, do: Application.fetch_env!(:tetrex, [:admin, :admin_panel_username])
-  def admin_panel_password, do: Application.fetch_env!(:tetrex, [:admin, :admin_panel_password])
+  def admin_panel_username, do: Application.fetch_env!(:tetrex, :admin_panel_username)
+  def admin_panel_password, do: Application.fetch_env!(:tetrex, :admin_panel_password)
 
   @impl true
   def mount(_params, %{"user_id" => current_user_id} = _session, socket) do

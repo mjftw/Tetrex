@@ -87,8 +87,6 @@ if config_env() == :prod do
   # Check `Plug.SSL` for all available options in `force_ssl`.
 else
   config :tetrex,
-    admin_panel_username: System.get_env("ADMIN_PANEL_USERNAME", "admin")
-
-  config :tetrex,
+    admin_panel_username: System.get_env("ADMIN_PANEL_USERNAME", "admin"),
     admin_panel_password: System.get_env("ADMIN_PANEL_PASSWORD", "password")
 end
