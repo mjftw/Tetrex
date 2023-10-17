@@ -12,7 +12,3 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
-
-config :tetrex, :admin,
-  admin_panel_username: System.fetch_env!("ADMIN_PANEL_USERNAME"),
-  admin_panel_password: System.fetch_env!("ADMIN_PANEL_PASSWORD")

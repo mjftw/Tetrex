@@ -21,6 +21,12 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
+  config :tetrex,
+    admin_panel_username: System.fetch_env!("ADMIN_PANEL_USERNAME")
+
+  config :tetrex,
+    admin_panel_password: System.fetch_env!("ADMIN_PANEL_PASSWORD")
+
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want
@@ -79,4 +85,10 @@ if config_env() == :prod do
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
+else
+  config :tetrex,
+    admin_panel_username: System.get_env("ADMIN_PANEL_USERNAME", "admin")
+
+  config :tetrex,
+    admin_panel_password: System.get_env("ADMIN_PANEL_PASSWORD", "password")
 end

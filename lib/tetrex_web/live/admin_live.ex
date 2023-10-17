@@ -15,8 +15,8 @@ defmodule TetrexWeb.AdminLive do
     socket_current_user_assign_key: :current_user,
     socket_users_assign_key: :users
 
-  @admin_panel_username Application.compile_env!(:tetrex, [:admin, :admin_panel_username])
-  @admin_panel_password Application.compile_env!(:tetrex, [:admin, :admin_panel_password])
+  def admin_panel_username, do: Application.fetch_env!(:tetrex, [:admin, :admin_panel_username])
+  def admin_panel_password, do: Application.fetch_env!(:tetrex, [:admin, :admin_panel_password])
 
   @impl true
   def mount(_params, %{"user_id" => current_user_id} = _session, socket) do
@@ -41,9 +41,12 @@ defmodule TetrexWeb.AdminLive do
 
   @impl true
   def handle_params(params, _uri, socket) do
+    username = admin_panel_username()
+    password = admin_panel_password()
+
     # If credentials don't match, redirect away
-    with %{assigns: %{current_user: %User{username: @admin_panel_username}}} <- socket,
-         %{"pwd" => @admin_panel_password} <- params do
+    with %{assigns: %{current_user: %User{username: ^username}}} <- socket,
+         %{"pwd" => ^password} <- params do
       {:noreply, socket}
     else
       _ ->

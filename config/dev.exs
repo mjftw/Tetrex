@@ -15,10 +15,6 @@ config :tetrex, :settings,
     rate_limit_max_updates_per_sec: 30
   ]
 
-config :tetrex, :admin,
-  admin_panel_username: System.get_env("ADMIN_PANEL_USERNAME", "admin"),
-  admin_panel_password: System.get_env("ADMIN_PANEL_PASSWORD", "password")
-
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
