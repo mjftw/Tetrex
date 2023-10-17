@@ -22,6 +22,10 @@ config :tetrex, :settings,
     rate_limit_max_updates_per_sec: 20
   ]
 
+config :tetrex, :admin,
+  admin_panel_username: System.get_env("ADMIN_PANEL_USERNAME", "admin"),
+  admin_panel_password: System.get_env("ADMIN_PANEL_PASSWORD", "password")
+
 # Configures the endpoint
 config :tetrex, TetrexWeb.Endpoint,
   url: [host: "localhost"],
