@@ -2,8 +2,8 @@
 <div class="relative" phx-window-keydown="keypress">
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <% user_status = Map.fetch!(user_player_data, :status) %>
-  <%= case @game.status do %>
-    <% :players_joining -> %>
+  <%= case {@game.status, user_status} do %>
+    <% {:players_joining, _} -> %>
         <.modal_simple id="players_joining_not_ready_modal" show>
             <%= cond do %>
                 <% num_players_in_game(@game) < 2 -> %>
@@ -21,25 +21,21 @@
                     </div>
             <% end %>
         </.modal_simple>
-    <% :finished -> %>
-        <%= case user_status do %>
-            <% :ready -> %>
-                <.modal on_cancel={JS.push("exit-game")} id="finished_ready_modal" show>
-                    <div class="flex flex-col gap-2 items-center text-center">
-                        <b>WINNER!!</b><br/>
-                        Yes, you are amazing.<br/>
-                        Press back button to return to the lobby with your head held high.
-                    </div>
-                </.modal>
-            <% :dead -> %>
-                <.modal on_cancel={JS.push("exit-game")} id="finished_dead_modal" show>
-                    <div class="flex flex-col gap-2 items-center text-center">
-                        <b>You did not win - better luck next time</b><br/>
-                        Press back button to retreat to the lobby.
-                    </div>
-                </.modal>
-            <% _ -> %>
-        <% end %>
+    <% {_, :dead} -> %>
+        <.modal on_cancel={JS.push("exit-game")} id="finished_dead_modal" show>
+            <div class="flex flex-col gap-2 items-center text-center">
+                <b>You did not win - better luck next time</b><br/>
+                Press back button to retreat to the lobby.
+            </div>
+        </.modal>
+    <% {:finished, :ready} -> %>
+        <.modal on_cancel={JS.push("exit-game")} id="finished_ready_modal" show>
+            <div class="flex flex-col gap-2 items-center text-center">
+                <b>WINNER!!</b><br/>
+                Yes, you are amazing.<br/>
+                Press back button to return to the lobby with your head held high.
+            </div>
+        </.modal>
     <% _ -> %>
   <% end %>
 
