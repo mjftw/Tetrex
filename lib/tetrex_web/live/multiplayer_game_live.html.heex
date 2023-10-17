@@ -22,20 +22,22 @@
             <% end %>
         </.modal_simple>
     <% {_, :dead} -> %>
-        <.modal on_cancel={JS.push("exit-game")} id="finished_dead_modal" show>
+        <.modal_simple  id="finished_dead_modal" show>
             <div class="flex flex-col gap-2 items-center text-center">
                 <b>You did not win - better luck next time</b><br/>
                 Press back button to retreat to the lobby.
+                <.button_secondary phx-click="exit-game">Exit game</.button_secondary>
             </div>
-        </.modal>
+        </.modal_simple>
     <% {:finished, :ready} -> %>
-        <.modal on_cancel={JS.push("exit-game")} id="finished_ready_modal" show>
+        <.modal_simple id="finished_ready_modal" show>
             <div class="flex flex-col gap-2 items-center text-center">
                 <b>WINNER!!</b><br/>
                 Yes, you are amazing.<br/>
                 Press back button to return to the lobby with your head held high.
+                <.button_secondary phx-click="exit-game">Exit game</.button_secondary>
             </div>
-        </.modal>
+        </.modal_simple>
     <% _ -> %>
   <% end %>
 
