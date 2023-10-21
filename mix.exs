@@ -50,6 +50,7 @@ defmodule Tetrex.MixProject do
       {:credo, "~> 1.7"},
       {:tailwind_formatter, "~> 0.3.6", only: [:dev, :test], runtime: false},
       {:orion, git: "git@github.com:LivewareProblems/Orion.git", ref: "b7f8277"},
+      {:rexbug, ">= 2.0.0-rc1"},
       {:patchwork, git: "https://github.com/mjftw/patchwork.git", ref: "3e25990"}
     ]
   end
