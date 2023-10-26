@@ -31,6 +31,10 @@ Upcoming:
 
 - Multiplayer battles!
 
+## Documentation
+
+You can find a huge diagram explaining how everything works in great detail on [this Miro board](https://miro.com/app/board/uXjVMCAiwn8=/?share_link_id=465426947222).
+
 ## Developer things
 
 The version is bumped using the excellent [Versiose](https://hexdocs.pm/versioce/readme.html) package.
