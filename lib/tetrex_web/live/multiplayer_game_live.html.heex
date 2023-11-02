@@ -1,4 +1,5 @@
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+<img src="images/logo.svg" alt="Logo" width="500" height="600"/>
 <div class="relative" phx-window-keydown="keypress">
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <% user_status = Map.fetch!(user_player_data, :status) %>
