@@ -1,13 +1,9 @@
 <div>
     <img src="images/logo.svg" alt="Logo" width="500" height="600"/>
     <div class="flex flex-row justify-between">
-        <span class="text-lg">Lobby</span>
-        <span class="text-lg">Current user: <%= @current_user.username %></span>
+        <span class="text-xl">Lobby</span>
+        <span class="text-xl">Current user: <%= @current_user.username %></span>
     </div>
-    <.horizontal_divider />
-
-    <.horizontal_divider />
-
     <div class="pt-3">
         <% num_users = Enum.count(@users) %>
         <h2>Users in lobby: <%= num_users %></h2>
@@ -19,6 +15,22 @@
                 <li> ... </li>
             <% end %>
         </ul>
+    </div>
+
+    <.horizontal_divider />
+
+    <div>
+        <span class="text-md"> Desktop Instructions: </span>
+        <p class="text-sm">  - Use the arrow keys to move your tetromino.  </p>
+        <p class="text-sm">  - The space bar rotates pieces.  </p>
+        <p class="text-sm">  - Shift or the "h" key will hold/swap a tetromino.  </p>
+        <p class="text-sm">  - Escape key will quit a game.  </p>
+    </div>
+
+    <.horizontal_divider />
+
+    <div>
+        <span class="text-xl"> Select a game to join: </span>
     </div>
 
     <.horizontal_divider />
