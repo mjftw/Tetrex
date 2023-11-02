@@ -5,6 +5,10 @@ defmodule CarsCommerceTetrisWeb.Components.Controls do
 
   def controls(assigns) do
     ~H"""
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <div class={["grid grid-cols-7 gap-3 aspect-[5/4]", @class]}>
       <.key label="hold" class="col-span-2 col-start-1 row-span-2 row-start-1">
         <:icon><span class="text-xl">h</span></:icon>
