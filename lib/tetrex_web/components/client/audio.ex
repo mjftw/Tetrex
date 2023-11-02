@@ -66,7 +66,7 @@ defmodule TetrexWeb.Components.Client.Audio do
       socket
       |> push_event("pause-audio", %{id: theme_music_audio_id()})
 
-  defp theme_music_audio_src, do: "audio/tetris-main-theme.mp3"
+  defp theme_music_audio_src, do: "audio/life_is_a_highway.mp3"
   defp theme_music_audio_id, do: "theme-music-audio"
   defp game_over_audio_src, do: "audio/game-over.mp3"
   defp game_over_audio_id, do: "game-over-audio"

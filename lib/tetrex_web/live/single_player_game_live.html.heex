@@ -1,5 +1,7 @@
 <div class="flex justify-center">
   <div class="relative flex flex-col items-center bg-teal-500 pt-3 pb-5 px-6 rounded-md w-fit" phx-window-keydown="keypress">
+    <img src="images/logo.svg" alt="Logo" />
+
     <.live_component module={Audio} id="single-player-game-audio" class="absolute inset-x-4 w-8 md:w-10"/>
 
       <%= case @status do %>
