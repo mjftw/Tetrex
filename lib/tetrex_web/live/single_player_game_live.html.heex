@@ -9,6 +9,11 @@
         <% :intro -> %>
           <.modal id="game_intro_modal" on_cancel={JS.push("start_game")} show>
             <div class="flex flex-col items-center gap-5">
+              <b class="text-md"> Desktop Instructions: </b>
+              <p class="text-sm">  - Use the arrow keys to move your tetromino.  </p>
+              <p class="text-sm">  - The space bar rotates pieces.  </p>
+              <p class="text-sm">  - Shift or the "h" key will hold/swap a tetromino.  </p>
+              <p class="text-sm">  - Escape key will quit a game.  </p>
               <b>Ready Player 1</b>
               <.button_primary phx-click="start_game">Start</.button_primary>
             </div>
