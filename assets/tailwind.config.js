@@ -17,10 +17,20 @@ module.exports = {
     "../lib/*_web/**/*.*ex"
   ],
   theme: {
+    colors: {
+        cars_red:"#ea7603",
+        cars_green: "#a74dce",
+        cars_blue: "#2a0a3d",
+        cars_cyan: "#0093c5",
+        cars_yellow: "#2ab79c",
+        cars_purple: "#c09bec",
+        cars_orange: "#a74dce",
+    },
     extend: {
       colors: {
         brand: "#FD4F00",
-      }    },
+      }
+    },
   },
   plugins: [
     require("@tailwindcss/forms"),

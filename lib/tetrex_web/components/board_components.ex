@@ -140,55 +140,55 @@ defmodule CarsCommerceTetrisWeb.Components.BoardComponents do
 
   defp tile(%{type: :red} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-red-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_red" />
     """
   end
 
   defp tile(%{type: :green} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-green-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_green" />
     """
   end
 
   defp tile(%{type: :blue} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-blue-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_blue" />
     """
   end
 
   defp tile(%{type: :cyan} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-cyan-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_cyan" />
     """
   end
 
   defp tile(%{type: :yellow} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-yellow-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_yellow" />
     """
   end
 
   defp tile(%{type: :purple} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-purple-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_purple" />
     """
   end
 
   defp tile(%{type: :orange} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-orange-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_orange" />
     """
   end
 
   defp tile(%{type: :drop_preview} = assigns) do
     ~H"""
-    <.tile_edged x={@x} y={@y} size={@size} class="fill-slate-500 stroke-0" fill-opacity="0.15" />
+    <.tile_edged x={@x} y={@y} size={@size} class="fill-cars_slate stroke-0" fill-opacity="0.15" />
     """
   end
 
   defp tile(%{type: :blocking} = assigns) do
     ~H"""
-    <.tile_edged x={@x} y={@y} size={@size} class="fill-slate-700 stroke-slate-800" />
+    <.tile_edged x={@x} y={@y} size={@size} class="fill-cars_slate stroke-slate-800" />
     """
   end
 
