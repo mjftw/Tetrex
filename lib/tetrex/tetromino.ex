@@ -1,10 +1,10 @@
-defmodule Tetrex.Tetromino do
+defmodule CarsCommerceTetris.Tetromino do
   @moduledoc """
   Official Tetromino shapes, names, and colours.
   As described on the Tetris wiki: https://tetris.wiki/Tetromino
   """
 
-  alias Tetrex.SparseGrid
+  alias CarsCommerceTetris.SparseGrid
 
   @type colour :: :red | :green | :blue | :cyan | :yellow | :purple | :grey
   @type name :: :i | :o | :t | :s | :z | :j | :l

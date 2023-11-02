@@ -7,7 +7,7 @@
 # General application configuration
 import Config
 
-config :tetrex, :settings,
+config :cars_commerce_tetris, :settings,
   multiplayer: [
     # Maximum players in game.
     max_players_in_game: 99,
@@ -23,13 +23,13 @@ config :tetrex, :settings,
   ]
 
 # Configures the endpoint
-config :tetrex, TetrexWeb.Endpoint,
+config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
-    formats: [html: TetrexWeb.ErrorHTML, json: TetrexWeb.ErrorJSON],
+    formats: [html: CarsCommerceTetrisWeb.ErrorHTML, json: CarsCommerceTetrisWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Tetrex.PubSub,
+  pubsub_server: CarsCommerceTetris.PubSub,
   live_view: [signing_salt: "BCIQ6//6"]
 
 # Configure esbuild (the version is required)
@@ -64,8 +64,11 @@ config :phoenix, :json_library, Jason
 
 # Configure version bumping
 config :versioce,
-  pre_hooks: [Tetrex.Versioce.PreHooks.GitCheckUncommitted],
-  post_hooks: [Tetrex.Versioce.PostHooks.GitCommitUpdate, Tetrex.Versioce.PostHooks.GitTag]
+  pre_hooks: [CarsCommerceTetris.Versioce.PreHooks.GitCheckUncommitted],
+  post_hooks: [
+    CarsCommerceTetris.Versioce.PostHooks.GitCommitUpdate,
+    CarsCommerceTetris.Versioce.PostHooks.GitTag
+  ]
 
 config :versioce, :changelog,
   datagrabber: Versioce.Changelog.DataGrabber.Git,

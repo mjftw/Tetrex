@@ -1,6 +1,6 @@
-defmodule TetrexWeb.SignupLive do
-  alias Tetrex.Users.UserStore
-  use TetrexWeb, :live_view
+defmodule CarsCommerceTetrisWeb.SignupLive do
+  alias CarsCommerceTetris.Users.UserStore
+  use CarsCommerceTetrisWeb, :live_view
 
   require Logger
 

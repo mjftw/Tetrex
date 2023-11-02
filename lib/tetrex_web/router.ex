@@ -1,15 +1,15 @@
-defmodule TetrexWeb.Router do
-  use TetrexWeb, :router
+defmodule CarsCommerceTetrisWeb.Router do
+  use CarsCommerceTetrisWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, html: {TetrexWeb.Layouts, :root}
+    plug :put_root_layout, html: {CarsCommerceTetrisWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug TetrexWeb.Plugs.UserSession
-    plug TetrexWeb.Plugs.RequireUsername
+    plug CarsCommerceTetrisWeb.Plugs.UserSession
+    plug CarsCommerceTetrisWeb.Plugs.RequireUsername
   end
 
   pipeline :api do
@@ -17,7 +17,7 @@ defmodule TetrexWeb.Router do
   end
 
   live_session :default do
-    scope "/", TetrexWeb do
+    scope "/", CarsCommerceTetrisWeb do
       pipe_through :browser
 
       live "/admin", AdminLive
@@ -31,12 +31,12 @@ defmodule TetrexWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", TetrexWeb do
+  # scope "/api", CarsCommerceTetrisWeb do
   #   pipe_through :api
   # end
 
   # Enable LiveDashboard in development
-  if Application.compile_env(:tetrex, :dev_routes) do
+  if Application.compile_env(:cars_commerce_tetris, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
     # it behind authentication and allow only admins to access it.
     # If your application does not have an admins-only section yet,
@@ -46,7 +46,7 @@ defmodule TetrexWeb.Router do
 
     scope "/dev" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: TetrexWeb.Telemetry
+      live_dashboard "/dashboard", metrics: CarsCommerceTetrisWeb.Telemetry
     end
   end
 end

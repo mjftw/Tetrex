@@ -1,4 +1,4 @@
-defmodule Tetrex.Versioce.PostHooks.GitCommitUpdate do
+defmodule CarsCommerceTetris.Versioce.PostHooks.GitCommitUpdate do
   use Versioce.PostHook
 
   def run(version) do

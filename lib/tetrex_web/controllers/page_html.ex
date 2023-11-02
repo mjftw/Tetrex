@@ -1,5 +1,5 @@
-defmodule TetrexWeb.PageHTML do
-  use TetrexWeb, :html
+defmodule CarsCommerceTetrisWeb.PageHTML do
+  use CarsCommerceTetrisWeb, :html
 
   embed_templates "page_html/*"
 end

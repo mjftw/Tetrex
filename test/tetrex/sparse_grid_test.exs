@@ -1,6 +1,6 @@
 defmodule SparseGrid.Test do
   use ExUnit.Case
-  alias Tetrex.SparseGrid
+  alias CarsCommerceTetris.SparseGrid
   doctest SparseGrid
 
   test "new/1 can create a grid from 2d list of tuples" do

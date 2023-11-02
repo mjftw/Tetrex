@@ -1,9 +1,13 @@
-defmodule Tetrex.Multiplayer.Game do
-  alias Tetrex.BoardServer
-  alias Tetrex.Multiplayer.GameMessage
+defmodule CarsCommerceTetris.Multiplayer.Game do
+  alias CarsCommerceTetris.BoardServer
+  alias CarsCommerceTetris.Multiplayer.GameMessage
   alias Patchwork.Patch
 
-  @max_players Application.compile_env(:tetrex, [:settings, :multiplayer, :max_players_in_game])
+  @max_players Application.compile_env(:cars_commerce_tetris, [
+                 :settings,
+                 :multiplayer,
+                 :max_players_in_game
+               ])
 
   @type player_status :: :not_ready | :ready | :dead
   @type(game_status :: :new, :players_joining | :playing | :finished | :exiting)

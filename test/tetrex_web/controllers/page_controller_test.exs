@@ -1,5 +1,5 @@
-defmodule TetrexWeb.PageControllerTest do
-  use TetrexWeb.ConnCase
+defmodule CarsCommerceTetrisWeb.PageControllerTest do
+  use CarsCommerceTetrisWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")

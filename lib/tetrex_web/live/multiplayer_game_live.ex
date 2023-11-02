@@ -1,21 +1,21 @@
-defmodule TetrexWeb.MultiplayerGameLive do
-  alias Tetrex.Multiplayer
-  alias Tetrex.SinglePlayer.GameServer
-  alias Tetrex.Multiplayer.GameMessage
-  alias Tetrex.Multiplayer.GameServer
-  alias Tetrex.GameDynamicSupervisor
-  alias TetrexWeb.Components.BoardComponents
-  alias TetrexWeb.Components.Client.Audio
-  alias TetrexWeb.Components.Controls
+defmodule CarsCommerceTetrisWeb.MultiplayerGameLive do
+  alias CarsCommerceTetris.Multiplayer
+  alias CarsCommerceTetris.SinglePlayer.GameServer
+  alias CarsCommerceTetris.Multiplayer.GameMessage
+  alias CarsCommerceTetris.Multiplayer.GameServer
+  alias CarsCommerceTetris.GameDynamicSupervisor
+  alias CarsCommerceTetrisWeb.Components.BoardComponents
+  alias CarsCommerceTetrisWeb.Components.Client.Audio
+  alias CarsCommerceTetrisWeb.Components.Controls
   alias Phoenix.LiveView.JS
   alias Patchwork.Patch
 
   require Logger
 
-  use TetrexWeb, :live_view
+  use CarsCommerceTetrisWeb, :live_view
 
   @num_opponent_boards_to_show Application.compile_env(
-                                 :tetrex,
+                                 :cars_commerce_tetris,
                                  [
                                    :settings,
                                    :multiplayer,

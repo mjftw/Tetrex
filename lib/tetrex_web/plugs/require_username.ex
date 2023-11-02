@@ -1,7 +1,7 @@
-defmodule TetrexWeb.Plugs.RequireUsername do
-  use TetrexWeb, :verified_routes
+defmodule CarsCommerceTetrisWeb.Plugs.RequireUsername do
+  use CarsCommerceTetrisWeb, :verified_routes
 
-  alias Tetrex.Users.UserStore
+  alias CarsCommerceTetris.Users.UserStore
 
   import Plug.Conn
 

@@ -1,4 +1,4 @@
-defmodule Tetrex.SinglePlayer.Game do
+defmodule CarsCommerceTetris.SinglePlayer.Game do
   @type t :: %__MODULE__{
           user_id: String.t(),
           lines_cleared: non_neg_integer(),

@@ -1,12 +1,12 @@
-# fly.toml file generated for tetrex on 2023-02-20T13:11:11Z
+# fly.toml file generated for cars_commerce_tetris on 2023-02-20T13:11:11Z
 
-app = "tetrex"
+app = "cars_commerce_tetris"
 kill_signal = "SIGTERM"
 kill_timeout = 5
 processes = []
 
 [env]
-  PHX_HOST = "tetrex.fly.dev"
+  PHX_HOST = "cars_commerce_tetris.fly.dev"
   PORT = "8080"
 
 [experimental]

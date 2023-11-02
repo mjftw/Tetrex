@@ -1,9 +1,9 @@
-defmodule Tetrex.Tetromino.Test do
+defmodule CarsCommerceTetris.Tetromino.Test do
   use ExUnit.Case
 
-  alias Tetrex.Tetromino
+  alias CarsCommerceTetris.Tetromino
 
-  doctest Tetrex.SparseGrid
+  doctest CarsCommerceTetris.SparseGrid
 
   test "draw_randoms/2 should draw the same list given the same seed" do
     draw1 = Tetromino.draw_randoms(100, -2232)

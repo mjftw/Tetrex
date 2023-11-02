@@ -21,13 +21,13 @@ defmodule LiveViewUserTracking do
         def mount(_params, %{"user_id" => user_id} = _session, socket) do
           {:ok,
           socket
-          |> assign(:current_user, %Tetrex.Users.User{id: user_id, username: "James"})
+          |> assign(:current_user, %CarsCommerceTetris.Users.User{id: user_id, username: "James"})
           |> mount_presence_init()}
         end
       end
     ```
   """
-  alias Tetrex.Users.User
+  alias CarsCommerceTetris.Users.User
 
   @spec __using__(any) :: {:__block__, [], [{:=, [], [...]} | {:__block__, [...], [...]}, ...]}
   defmacro __using__(opts) do
@@ -55,7 +55,7 @@ defmodule LiveViewUserTracking do
               }
             )
 
-          Phoenix.PubSub.subscribe(Tetrex.PubSub, unquote(presence_topic))
+          Phoenix.PubSub.subscribe(CarsCommerceTetris.PubSub, unquote(presence_topic))
         end
 
         handle_presence_joins(socket, unquote(presence_module).list(unquote(presence_topic)))

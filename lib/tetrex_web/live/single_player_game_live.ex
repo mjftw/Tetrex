@@ -1,13 +1,13 @@
-defmodule TetrexWeb.SinglePlayerGameLive do
-  use TetrexWeb, :live_view
+defmodule CarsCommerceTetrisWeb.SinglePlayerGameLive do
+  use CarsCommerceTetrisWeb, :live_view
 
-  alias Tetrex.GameDynamicSupervisor
-  alias Tetrex.SinglePlayer.GameMessage
-  alias Tetrex.SinglePlayer.GameServer
-  alias Tetrex.SinglePlayer.Game
-  alias TetrexWeb.Components.BoardComponents
-  alias TetrexWeb.Components.Client.Audio
-  alias TetrexWeb.Components.Controls
+  alias CarsCommerceTetris.GameDynamicSupervisor
+  alias CarsCommerceTetris.SinglePlayer.GameMessage
+  alias CarsCommerceTetris.SinglePlayer.GameServer
+  alias CarsCommerceTetris.SinglePlayer.Game
+  alias CarsCommerceTetrisWeb.Components.BoardComponents
+  alias CarsCommerceTetrisWeb.Components.Client.Audio
+  alias CarsCommerceTetrisWeb.Components.Controls
   alias Phoenix.LiveView.JS
 
   @impl true

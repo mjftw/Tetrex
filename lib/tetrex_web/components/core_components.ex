@@ -1,4 +1,4 @@
-defmodule TetrexWeb.CoreComponents do
+defmodule CarsCommerceTetrisWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
 
@@ -17,7 +17,7 @@ defmodule TetrexWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import TetrexWeb.Gettext
+  import CarsCommerceTetrisWeb.Gettext
 
   @doc """
   Renders a modal.
@@ -740,9 +740,9 @@ defmodule TetrexWeb.CoreComponents do
     # with our gettext backend as first argument. Translations are
     # available in the errors.po file (as we use the "errors" domain).
     if count = opts[:count] do
-      Gettext.dngettext(TetrexWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(CarsCommerceTetrisWeb.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(TetrexWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(CarsCommerceTetrisWeb.Gettext, "errors", msg, opts)
     end
   end
 

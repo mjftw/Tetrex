@@ -1,13 +1,13 @@
-defmodule Tetrex.Multiplayer.GameServer do
-  alias Tetrex.Periodic
-  alias Tetrex.BoardServer
-  alias Tetrex.Multiplayer.Game
+defmodule CarsCommerceTetris.Multiplayer.GameServer do
+  alias CarsCommerceTetris.Periodic
+  alias CarsCommerceTetris.BoardServer
+  alias CarsCommerceTetris.Multiplayer.Game
   use GenServer
 
   require Logger
 
   @num_fake_players_to_add_on_start Application.compile_env(
-                                      :tetrex,
+                                      :cars_commerce_tetris,
                                       [
                                         :settings,
                                         :multiplayer,
@@ -16,7 +16,7 @@ defmodule Tetrex.Multiplayer.GameServer do
                                       0
                                     )
   @use_multiplayer_state_diff Application.compile_env(
-                                :tetrex,
+                                :cars_commerce_tetris,
                                 [
                                   :settings,
                                   :multiplayer,
@@ -26,7 +26,7 @@ defmodule Tetrex.Multiplayer.GameServer do
                               )
 
   @send_blocking_row_probability Application.compile_env(
-                                   :tetrex,
+                                   :cars_commerce_tetris,
                                    [
                                      :settings,
                                      :multiplayer,
@@ -35,7 +35,7 @@ defmodule Tetrex.Multiplayer.GameServer do
                                    0.5
                                  )
   @rate_limit_max_updates_per_sec Application.compile_env(
-                                    :tetrex,
+                                    :cars_commerce_tetris,
                                     [
                                       :settings,
                                       :multiplayer,
@@ -100,7 +100,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     game_id = get_game_id(game_server)
 
     Phoenix.PubSub.subscribe(
-      Tetrex.PubSub,
+      CarsCommerceTetris.PubSub,
       pubsub_topic(game_id)
     )
   end
@@ -109,7 +109,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     game_id = get_game_id(game_server)
 
     Phoenix.PubSub.unsubscribe(
-      Tetrex.PubSub,
+      CarsCommerceTetris.PubSub,
       pubsub_topic(game_id)
     )
   end
@@ -174,7 +174,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   @impl true
   def handle_continue(:request_termination, %Game{game_id: game_id}) do
-    Tetrex.GameDynamicSupervisor.remove_multiplayer_game_by_pid(self(), game_id)
+    CarsCommerceTetris.GameDynamicSupervisor.remove_multiplayer_game_by_pid(self(), game_id)
 
     # Do not return, await termination
     Process.sleep(:infinity)
@@ -351,7 +351,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   defp publish_state(%Game{game_id: game_id} = game) do
     Phoenix.PubSub.broadcast!(
-      Tetrex.PubSub,
+      CarsCommerceTetris.PubSub,
       pubsub_topic(game_id),
       Game.to_game_message(game)
     )
@@ -359,7 +359,7 @@ defmodule Tetrex.Multiplayer.GameServer do
 
   defp publish_patch(%Game{game_id: game_id}, patch) do
     Phoenix.PubSub.broadcast!(
-      Tetrex.PubSub,
+      CarsCommerceTetris.PubSub,
       pubsub_topic(game_id),
       patch
     )
@@ -449,7 +449,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     #   when a player moves a piece down manually, but this must be done on
     # a per player basis.
     {:ok, periodic_mover_pid} =
-      Tetrex.Periodic.start_link(
+      CarsCommerceTetris.Periodic.start_link(
         [
           period_ms: periodic_timer_period,
           start: false,

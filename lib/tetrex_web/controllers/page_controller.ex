@@ -1,5 +1,5 @@
-defmodule TetrexWeb.PageController do
-  use TetrexWeb, :controller
+defmodule CarsCommerceTetrisWeb.PageController do
+  use CarsCommerceTetrisWeb, :controller
 
   def home(conn, _params) do
     # The home page is often custom made,

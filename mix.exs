@@ -1,9 +1,9 @@
-defmodule Tetrex.MixProject do
+defmodule CarsCommerceTetris.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :tetrex,
+      app: :cars_commerce_tetris,
       version: "0.18.6",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -18,7 +18,7 @@ defmodule Tetrex.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Tetrex.Application, []},
+      mod: {CarsCommerceTetris.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

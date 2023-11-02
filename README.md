@@ -1,10 +1,10 @@
-# Tetrex
+# CarsCommerceTetris
 
 Yet another Tetris game, because everyone loves Tetris!
 
 ## How to play
 
-The easiest way to play is to head on over to https://tetrex.fly.dev/
+The easiest way to play is to head on over to https://cars_commerce_tetris.fly.dev/
 
 If you'd like to run it locally, you can do so with:
 

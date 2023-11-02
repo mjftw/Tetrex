@@ -1,4 +1,4 @@
-defmodule Tetrex.Versioce.PostHooks.GitTag do
+defmodule CarsCommerceTetris.Versioce.PostHooks.GitTag do
   use Versioce.PostHook
 
   def run(version) do

@@ -1,4 +1,4 @@
-defmodule TetrexWeb.ErrorJSON do
+defmodule CarsCommerceTetrisWeb.ErrorJSON do
   # If you want to customize a particular status code,
   # you may add your own clauses, such as:
   #

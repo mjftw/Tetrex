@@ -1,4 +1,4 @@
-defmodule Tetrex.Periodic do
+defmodule CarsCommerceTetris.Periodic do
   use GenServer
 
   # Client API

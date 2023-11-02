@@ -1,6 +1,6 @@
-defmodule Tetrex.Board do
-  alias Tetrex.SparseGrid
-  alias Tetrex.Tetromino
+defmodule CarsCommerceTetris.Board do
+  alias CarsCommerceTetris.SparseGrid
+  alias CarsCommerceTetris.Tetromino
 
   @type placement_error :: :collision | :out_of_bounds
   @type movement_result :: :moved | placement_error()
@@ -233,11 +233,20 @@ defmodule Tetrex.Board do
     # Keep attempting to rotate until it works, or every rotation has been tried and failed
     result =
       with {:error, _} <-
-             try_move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise90)),
+             try_move_active_if_legal(
+               board,
+               &CarsCommerceTetris.SparseGrid.rotate(&1, :clockwise90)
+             ),
            {:error, _} <-
-             try_move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise180)),
+             try_move_active_if_legal(
+               board,
+               &CarsCommerceTetris.SparseGrid.rotate(&1, :clockwise180)
+             ),
            {:error, _} <-
-             try_move_active_if_legal(board, &Tetrex.SparseGrid.rotate(&1, :clockwise270)),
+             try_move_active_if_legal(
+               board,
+               &CarsCommerceTetris.SparseGrid.rotate(&1, :clockwise270)
+             ),
            do: :could_not_rotate
 
     case result do

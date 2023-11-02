@@ -1,5 +1,5 @@
-defmodule TetrexWeb.Components.Controls do
-  use TetrexWeb, :html
+defmodule CarsCommerceTetrisWeb.Components.Controls do
+  use CarsCommerceTetrisWeb, :html
 
   attr :class, :string, default: nil
 

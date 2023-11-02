@@ -1,5 +1,5 @@
-defmodule TetrexWeb.Layouts do
-  use TetrexWeb, :html
+defmodule CarsCommerceTetrisWeb.Layouts do
+  use CarsCommerceTetrisWeb, :html
 
   embed_templates "layouts/*"
 end

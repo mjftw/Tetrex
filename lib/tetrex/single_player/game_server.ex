@@ -1,9 +1,9 @@
-defmodule Tetrex.SinglePlayer.GameServer do
+defmodule CarsCommerceTetris.SinglePlayer.GameServer do
   use GenServer
-  alias Tetrex.Periodic
-  alias Tetrex.BoardServer
-  alias Tetrex.SinglePlayer.Game
-  alias Tetrex.SinglePlayer.GameMessage
+  alias CarsCommerceTetris.Periodic
+  alias CarsCommerceTetris.BoardServer
+  alias CarsCommerceTetris.SinglePlayer.Game
+  alias CarsCommerceTetris.SinglePlayer.GameMessage
 
   @board_height 20
   @board_width 10
@@ -72,7 +72,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
   def subscribe_updates(game_server),
     do:
       Phoenix.PubSub.subscribe(
-        Tetrex.PubSub,
+        CarsCommerceTetris.PubSub,
         game_server
         |> game_user_id()
         |> pubsub_topic()
@@ -86,7 +86,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
 
     # Create a periodic task to move the piece down
     {:ok, periodic_mover_pid} =
-      Tetrex.Periodic.start_link(
+      CarsCommerceTetris.Periodic.start_link(
         [
           period_ms: 1000,
           start: false,
@@ -124,7 +124,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
       board_preview: board_preview
     }
 
-    Phoenix.PubSub.broadcast!(Tetrex.PubSub, pubsub_topic(user_id), game_update)
+    Phoenix.PubSub.broadcast!(CarsCommerceTetris.PubSub, pubsub_topic(user_id), game_update)
 
     {:noreply, game}
   end
@@ -134,7 +134,7 @@ defmodule Tetrex.SinglePlayer.GameServer do
     this_game_server = self()
 
     # Set the periodic task to move the piece down
-    Tetrex.Periodic.set_work(periodic_mover_pid, fn ->
+    CarsCommerceTetris.Periodic.set_work(periodic_mover_pid, fn ->
       try_move_down(this_game_server)
     end)
 
