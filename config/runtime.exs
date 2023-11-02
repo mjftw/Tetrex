@@ -22,23 +22,12 @@ end
 
 if config_env() == :prod do
   config :cars_commerce_tetris,
-    admin_panel_username: System.fetch_env!("ADMIN_PANEL_USERNAME")
+    admin_panel_username: "admin"
 
   config :cars_commerce_tetris,
-    admin_panel_password: System.fetch_env!("ADMIN_PANEL_PASSWORD")
+    admin_panel_password: "password"
 
-  # The secret key base is used to sign/encrypt cookies and other secrets.
-  # A default value is used in config/dev.exs and config/test.exs but you
-  # want to use a different value for prod and you most likely don't want
-  # to check this value into version control, so we use an environment
-  # variable instead.
-  secret_key_base =
-    System.get_env("SECRET_KEY_BASE") ||
-      raise """
-      environment variable SECRET_KEY_BASE is missing.
-      You can generate one by calling: mix phx.gen.secret
-      """
-
+  secret_key_base = "g1eakvGzXLk2G1kOUJpEbilfr6dPdymxi3q4wnrgen2+if7cN2u3gAaSsEPc2BND"
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
