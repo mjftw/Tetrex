@@ -3,8 +3,3 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
-
-:root {
-  touch-action: pan-x pan-y;
-  height: 100% 
-}
