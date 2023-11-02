@@ -182,6 +182,14 @@ defmodule CarsCommerceTetrisWeb.SinglePlayerGameLive do
   end
 
   @impl true
+  def handle_event("keypress", %{"key" => "Shift"}, socket) do
+    GameServer.hold(socket.assigns.game_server)
+
+    socket
+    |> noreply()
+  end
+
+  @impl true
   def handle_event("keypress", %{"key" => key}, socket) do
     IO.puts("Unhandled key press: #{key}")
 

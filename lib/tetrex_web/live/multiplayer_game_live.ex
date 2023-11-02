@@ -171,7 +171,18 @@ defmodule CarsCommerceTetrisWeb.MultiplayerGameLive do
   @impl true
   def handle_event(
         "keypress",
-        %{"key" => "h"},
+        %{"key" => "Shift"},
+        %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
+      ) do
+    GameServer.hold(game_server_pid, user_id)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "keypress",
+        %{"key" => ""},
         %{assigns: %{user_id: user_id, game_server_pid: game_server_pid}} = socket
       ) do
     GameServer.hold(game_server_pid, user_id)
