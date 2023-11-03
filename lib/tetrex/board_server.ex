@@ -1,6 +1,6 @@
-defmodule CarsCommerceTetris.BoardServer do
+defmodule CarsCommercePuzzleAdventure.BoardServer do
   use GenServer
-  alias CarsCommerceTetris.Board
+  alias CarsCommercePuzzleAdventure.Board
 
   @type init_args :: [height: non_neg_integer(), width: non_neg_integer(), random_seed: integer()]
 
@@ -73,7 +73,7 @@ defmodule CarsCommerceTetris.BoardServer do
 
   @impl true
   @spec init(init_args()) ::
-          {:ok, %CarsCommerceTetris.Board{}}
+          {:ok, %CarsCommercePuzzleAdventure.Board{}}
   def init(opts) do
     {:ok,
      Board.new(

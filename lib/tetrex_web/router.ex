@@ -1,15 +1,15 @@
-defmodule CarsCommerceTetrisWeb.Router do
-  use CarsCommerceTetrisWeb, :router
+defmodule CarsCommercePuzzleAdventureWeb.Router do
+  use CarsCommercePuzzleAdventureWeb, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
-    plug :put_root_layout, html: {CarsCommerceTetrisWeb.Layouts, :root}
+    plug :put_root_layout, html: {CarsCommercePuzzleAdventureWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug CarsCommerceTetrisWeb.Plugs.UserSession
-    plug CarsCommerceTetrisWeb.Plugs.RequireUsername
+    plug CarsCommercePuzzleAdventureWeb.Plugs.UserSession
+    plug CarsCommercePuzzleAdventureWeb.Plugs.RequireUsername
   end
 
   pipeline :api do
@@ -17,7 +17,7 @@ defmodule CarsCommerceTetrisWeb.Router do
   end
 
   live_session :default do
-    scope "/", CarsCommerceTetrisWeb do
+    scope "/", CarsCommercePuzzleAdventureWeb do
       pipe_through :browser
 
       live "/admin", AdminLive
@@ -31,12 +31,12 @@ defmodule CarsCommerceTetrisWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", CarsCommerceTetrisWeb do
+  # scope "/api", CarsCommercePuzzleAdventureWeb do
   #   pipe_through :api
   # end
 
   # Enable LiveDashboard in development
-  if Application.compile_env(:cars_commerce_tetris, :dev_routes) do
+  if Application.compile_env(:cars_commerce_puzzle_adventure, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
     # it behind authentication and allow only admins to access it.
     # If your application does not have an admins-only section yet,
@@ -46,7 +46,7 @@ defmodule CarsCommerceTetrisWeb.Router do
 
     scope "/dev" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: CarsCommerceTetrisWeb.Telemetry
+      live_dashboard "/dashboard", metrics: CarsCommercePuzzleAdventureWeb.Telemetry
     end
   end
 end

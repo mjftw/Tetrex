@@ -1,12 +1,12 @@
-defmodule CarsCommerceTetrisWeb.ErrorHTML do
-  use CarsCommerceTetrisWeb, :html
+defmodule CarsCommercePuzzleAdventureWeb.ErrorHTML do
+  use CarsCommercePuzzleAdventureWeb, :html
 
   # If you want to customize your error pages,
   # uncomment the embed_templates/1 call below
   # and add pages to the error directory:
   #
-  #   * lib/cars_commerce_tetris_web/controllers/error_html/404.html.heex
-  #   * lib/cars_commerce_tetris_web/controllers/error_html/500.html.heex
+  #   * lib/cars_commerce_puzzle_adventure_web/controllers/error_html/404.html.heex
+  #   * lib/cars_commerce_puzzle_adventure_web/controllers/error_html/500.html.heex
   #
   # embed_templates "error_html/*"
 

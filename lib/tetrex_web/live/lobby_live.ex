@@ -1,15 +1,15 @@
-defmodule CarsCommerceTetrisWeb.LobbyLive do
-  alias CarsCommerceTetris.Users.UserStore
-  alias CarsCommerceTetris.Users.User
-  alias CarsCommerceTetris.Multiplayer
-  alias CarsCommerceTetris.GameDynamicSupervisor
+defmodule CarsCommercePuzzleAdventureWeb.LobbyLive do
+  alias CarsCommercePuzzleAdventure.Users.UserStore
+  alias CarsCommercePuzzleAdventure.Users.User
+  alias CarsCommercePuzzleAdventure.Multiplayer
+  alias CarsCommercePuzzleAdventure.GameDynamicSupervisor
 
-  use CarsCommerceTetrisWeb, :live_view
+  use CarsCommercePuzzleAdventureWeb, :live_view
 
   require Logger
 
   use LiveViewUserTracking,
-    presence: CarsCommerceTetrisWeb.Presence,
+    presence: CarsCommercePuzzleAdventureWeb.Presence,
     topic: "room:lobby",
     socket_current_user_assign_key: :current_user,
     socket_users_assign_key: :users

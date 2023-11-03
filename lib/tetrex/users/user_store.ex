@@ -1,5 +1,5 @@
-defmodule CarsCommerceTetris.Users.UserStore do
-  alias CarsCommerceTetris.Users.User
+defmodule CarsCommercePuzzleAdventure.Users.UserStore do
+  alias CarsCommercePuzzleAdventure.Users.User
   use Agent
 
   def start_link(_opts) do

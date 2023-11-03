@@ -1,5 +1,5 @@
-defmodule CarsCommerceTetrisWeb.Presence do
+defmodule CarsCommercePuzzleAdventureWeb.Presence do
   use Phoenix.Presence,
-    otp_app: :cars_commerce_tetris,
-    pubsub_server: CarsCommerceTetris.PubSub
+    otp_app: :cars_commerce_puzzle_adventure,
+    pubsub_server: CarsCommercePuzzleAdventure.PubSub
 end

@@ -1,5 +1,5 @@
-defmodule CarsCommerceTetrisWeb.PageController do
-  use CarsCommerceTetrisWeb, :controller
+defmodule CarsCommercePuzzleAdventureWeb.PageController do
+  use CarsCommercePuzzleAdventureWeb, :controller
 
   def home(conn, _params) do
     # The home page is often custom made,

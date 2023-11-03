@@ -1,13 +1,13 @@
-defmodule CarsCommerceTetris.Multiplayer.GameServer do
-  alias CarsCommerceTetris.Periodic
-  alias CarsCommerceTetris.BoardServer
-  alias CarsCommerceTetris.Multiplayer.Game
+defmodule CarsCommercePuzzleAdventure.Multiplayer.GameServer do
+  alias CarsCommercePuzzleAdventure.Periodic
+  alias CarsCommercePuzzleAdventure.BoardServer
+  alias CarsCommercePuzzleAdventure.Multiplayer.Game
   use GenServer
 
   require Logger
 
   @num_fake_players_to_add_on_start Application.compile_env(
-                                      :cars_commerce_tetris,
+                                      :cars_commerce_puzzle_adventure,
                                       [
                                         :settings,
                                         :multiplayer,
@@ -16,7 +16,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
                                       0
                                     )
   @use_multiplayer_state_diff Application.compile_env(
-                                :cars_commerce_tetris,
+                                :cars_commerce_puzzle_adventure,
                                 [
                                   :settings,
                                   :multiplayer,
@@ -26,7 +26,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
                               )
 
   @send_blocking_row_probability Application.compile_env(
-                                   :cars_commerce_tetris,
+                                   :cars_commerce_puzzle_adventure,
                                    [
                                      :settings,
                                      :multiplayer,
@@ -35,7 +35,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
                                    0.5
                                  )
   @rate_limit_max_updates_per_sec Application.compile_env(
-                                    :cars_commerce_tetris,
+                                    :cars_commerce_puzzle_adventure,
                                     [
                                       :settings,
                                       :multiplayer,
@@ -100,7 +100,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
     game_id = get_game_id(game_server)
 
     Phoenix.PubSub.subscribe(
-      CarsCommerceTetris.PubSub,
+      CarsCommercePuzzleAdventure.PubSub,
       pubsub_topic(game_id)
     )
   end
@@ -109,7 +109,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
     game_id = get_game_id(game_server)
 
     Phoenix.PubSub.unsubscribe(
-      CarsCommerceTetris.PubSub,
+      CarsCommercePuzzleAdventure.PubSub,
       pubsub_topic(game_id)
     )
   end
@@ -174,7 +174,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
 
   @impl true
   def handle_continue(:request_termination, %Game{game_id: game_id}) do
-    CarsCommerceTetris.GameDynamicSupervisor.remove_multiplayer_game_by_pid(self(), game_id)
+    CarsCommercePuzzleAdventure.GameDynamicSupervisor.remove_multiplayer_game_by_pid(self(), game_id)
 
     # Do not return, await termination
     Process.sleep(:infinity)
@@ -351,7 +351,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
 
   defp publish_state(%Game{game_id: game_id} = game) do
     Phoenix.PubSub.broadcast!(
-      CarsCommerceTetris.PubSub,
+      CarsCommercePuzzleAdventure.PubSub,
       pubsub_topic(game_id),
       Game.to_game_message(game)
     )
@@ -359,7 +359,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
 
   defp publish_patch(%Game{game_id: game_id}, patch) do
     Phoenix.PubSub.broadcast!(
-      CarsCommerceTetris.PubSub,
+      CarsCommercePuzzleAdventure.PubSub,
       pubsub_topic(game_id),
       patch
     )
@@ -398,7 +398,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
   end
 
   defp level_speed(level) do
-    # For explanation see: https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
+    # For explanation see: https://puzzle_adventure.fandom.com/wiki/PuzzleAdventure_(NES,_Nintendo)
     frames_per_gridcell =
       case level do
         0 -> 48
@@ -449,7 +449,7 @@ defmodule CarsCommerceTetris.Multiplayer.GameServer do
     #   when a player moves a piece down manually, but this must be done on
     # a per player basis.
     {:ok, periodic_mover_pid} =
-      CarsCommerceTetris.Periodic.start_link(
+      CarsCommercePuzzleAdventure.Periodic.start_link(
         [
           period_ms: periodic_timer_period,
           start: false,

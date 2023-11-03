@@ -1,21 +1,21 @@
-defmodule CarsCommerceTetrisWeb.MultiplayerGameLive do
-  alias CarsCommerceTetris.Multiplayer
-  alias CarsCommerceTetris.SinglePlayer.GameServer
-  alias CarsCommerceTetris.Multiplayer.GameMessage
-  alias CarsCommerceTetris.Multiplayer.GameServer
-  alias CarsCommerceTetris.GameDynamicSupervisor
-  alias CarsCommerceTetrisWeb.Components.BoardComponents
-  alias CarsCommerceTetrisWeb.Components.Client.Audio
-  alias CarsCommerceTetrisWeb.Components.Controls
+defmodule CarsCommercePuzzleAdventureWeb.MultiplayerGameLive do
+  alias CarsCommercePuzzleAdventure.Multiplayer
+  alias CarsCommercePuzzleAdventure.SinglePlayer.GameServer
+  alias CarsCommercePuzzleAdventure.Multiplayer.GameMessage
+  alias CarsCommercePuzzleAdventure.Multiplayer.GameServer
+  alias CarsCommercePuzzleAdventure.GameDynamicSupervisor
+  alias CarsCommercePuzzleAdventureWeb.Components.BoardComponents
+  alias CarsCommercePuzzleAdventureWeb.Components.Client.Audio
+  alias CarsCommercePuzzleAdventureWeb.Components.Controls
   alias Phoenix.LiveView.JS
   alias Patchwork.Patch
 
   require Logger
 
-  use CarsCommerceTetrisWeb, :live_view
+  use CarsCommercePuzzleAdventureWeb, :live_view
 
   @num_opponent_boards_to_show Application.compile_env(
-                                 :cars_commerce_tetris,
+                                 :cars_commerce_puzzle_adventure,
                                  [
                                    :settings,
                                    :multiplayer,

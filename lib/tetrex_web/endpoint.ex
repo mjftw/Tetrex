@@ -1,12 +1,12 @@
-defmodule CarsCommerceTetrisWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :cars_commerce_tetris
+defmodule CarsCommercePuzzleAdventureWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :cars_commerce_puzzle_adventure
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_cars_commerce_tetris_key",
+    key: "_cars_commerce_puzzle_adventure_key",
     signing_salt: "BRy6Zu+s",
     same_site: "Lax"
   ]
@@ -19,9 +19,9 @@ defmodule CarsCommerceTetrisWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :cars_commerce_tetris,
+    from: :cars_commerce_puzzle_adventure,
     gzip: false,
-    only: CarsCommerceTetrisWeb.static_paths()
+    only: CarsCommercePuzzleAdventureWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -46,5 +46,5 @@ defmodule CarsCommerceTetrisWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug CarsCommerceTetrisWeb.Router
+  plug CarsCommercePuzzleAdventureWeb.Router
 end

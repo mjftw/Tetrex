@@ -1,9 +1,9 @@
-defmodule CarsCommerceTetris.Multiplayer.Game do
-  alias CarsCommerceTetris.BoardServer
-  alias CarsCommerceTetris.Multiplayer.GameMessage
+defmodule CarsCommercePuzzleAdventure.Multiplayer.Game do
+  alias CarsCommercePuzzleAdventure.BoardServer
+  alias CarsCommercePuzzleAdventure.Multiplayer.GameMessage
   alias Patchwork.Patch
 
-  @max_players Application.compile_env(:cars_commerce_tetris, [
+  @max_players Application.compile_env(:cars_commerce_puzzle_adventure, [
                  :settings,
                  :multiplayer,
                  :max_players_in_game

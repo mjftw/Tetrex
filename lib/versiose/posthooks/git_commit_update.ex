@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetris.Versioce.PostHooks.GitCommitUpdate do
+defmodule CarsCommercePuzzleAdventure.Versioce.PostHooks.GitCommitUpdate do
   use Versioce.PostHook
 
   def run(version) do

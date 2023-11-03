@@ -24,7 +24,7 @@ doc
 **/*.ez
 
 # Ignore package tarball (built via "mix hex.build").
-**/cars_commerce_tetris-*.tar
+**/cars_commerce_puzzle_adventure-*.tar
 
 # Ignore assets that are produced by build tools.
 priv/static/assets

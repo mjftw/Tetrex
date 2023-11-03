@@ -1,5 +1,5 @@
-defmodule CarsCommerceTetrisWeb.Layouts do
-  use CarsCommerceTetrisWeb, :html
+defmodule CarsCommercePuzzleAdventureWeb.Layouts do
+  use CarsCommercePuzzleAdventureWeb, :html
 
   embed_templates "layouts/*"
 end

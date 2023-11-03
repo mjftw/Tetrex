@@ -12,26 +12,26 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/cars_commerce_tetris start
+#     PHX_SERVER=true bin/cars_commerce_puzzle_adventure start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint, server: true
+  config :cars_commerce_puzzle_adventure, CarsCommercePuzzleAdventureWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
-  config :cars_commerce_tetris,
+  config :cars_commerce_puzzle_adventure,
     admin_panel_username: "admin"
 
-  config :cars_commerce_tetris,
+  config :cars_commerce_puzzle_adventure,
     admin_panel_password: "password"
 
   secret_key_base = "g1eakvGzXLk2G1kOUJpEbilfr6dPdymxi3q4wnrgen2+if7cN2u3gAaSsEPc2BND"
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
-  config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
+  config :cars_commerce_puzzle_adventure, CarsCommercePuzzleAdventureWeb.Endpoint,
     http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: System.get_env("PORT") || 4000, compress: true],
     url: [host: "localhost", port: System.get_env("PORT") || 4000],
     check_origin: ["//*.fly.dev", "//localhost"],
@@ -54,7 +54,7 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
+  #     config :cars_commerce_puzzle_adventure, CarsCommercePuzzleAdventureWeb.Endpoint,
   #       https: [
   #         ...,
   #         port: 443,
@@ -76,12 +76,12 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your endpoint, ensuring
   # no data is ever sent via http, always redirecting to https:
   #
-  #     config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
+  #     config :cars_commerce_puzzle_adventure, CarsCommercePuzzleAdventureWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
 else
-  config :cars_commerce_tetris,
+  config :cars_commerce_puzzle_adventure,
     admin_panel_username: System.get_env("ADMIN_PANEL_USERNAME", "admin"),
     admin_panel_password: System.get_env("ADMIN_PANEL_PASSWORD", "password")
 end

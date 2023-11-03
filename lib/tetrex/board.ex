@@ -1,6 +1,6 @@
-defmodule CarsCommerceTetris.Board do
-  alias CarsCommerceTetris.SparseGrid
-  alias CarsCommerceTetris.Tetromino
+defmodule CarsCommercePuzzleAdventure.Board do
+  alias CarsCommercePuzzleAdventure.SparseGrid
+  alias CarsCommercePuzzleAdventure.Tetromino
 
   @type placement_error :: :collision | :out_of_bounds
   @type movement_result :: :moved | placement_error()
@@ -235,17 +235,17 @@ defmodule CarsCommerceTetris.Board do
       with {:error, _} <-
              try_move_active_if_legal(
                board,
-               &CarsCommerceTetris.SparseGrid.rotate(&1, :clockwise90)
+               &CarsCommercePuzzleAdventure.SparseGrid.rotate(&1, :clockwise90)
              ),
            {:error, _} <-
              try_move_active_if_legal(
                board,
-               &CarsCommerceTetris.SparseGrid.rotate(&1, :clockwise180)
+               &CarsCommercePuzzleAdventure.SparseGrid.rotate(&1, :clockwise180)
              ),
            {:error, _} <-
              try_move_active_if_legal(
                board,
-               &CarsCommerceTetris.SparseGrid.rotate(&1, :clockwise270)
+               &CarsCommercePuzzleAdventure.SparseGrid.rotate(&1, :clockwise270)
              ),
            do: :could_not_rotate
 

@@ -1,13 +1,13 @@
-defmodule CarsCommerceTetrisWeb.SinglePlayerGameLive do
-  use CarsCommerceTetrisWeb, :live_view
+defmodule CarsCommercePuzzleAdventureWeb.SinglePlayerGameLive do
+  use CarsCommercePuzzleAdventureWeb, :live_view
 
-  alias CarsCommerceTetris.GameDynamicSupervisor
-  alias CarsCommerceTetris.SinglePlayer.GameMessage
-  alias CarsCommerceTetris.SinglePlayer.GameServer
-  alias CarsCommerceTetris.SinglePlayer.Game
-  alias CarsCommerceTetrisWeb.Components.BoardComponents
-  alias CarsCommerceTetrisWeb.Components.Client.Audio
-  alias CarsCommerceTetrisWeb.Components.Controls
+  alias CarsCommercePuzzleAdventure.GameDynamicSupervisor
+  alias CarsCommercePuzzleAdventure.SinglePlayer.GameMessage
+  alias CarsCommercePuzzleAdventure.SinglePlayer.GameServer
+  alias CarsCommercePuzzleAdventure.SinglePlayer.Game
+  alias CarsCommercePuzzleAdventureWeb.Components.BoardComponents
+  alias CarsCommercePuzzleAdventureWeb.Components.Client.Audio
+  alias CarsCommercePuzzleAdventureWeb.Components.Controls
   alias Phoenix.LiveView.JS
 
   @impl true

@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetrisWeb.Telemetry do
+defmodule CarsCommercePuzzleAdventureWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -63,7 +63,7 @@ defmodule CarsCommerceTetrisWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {CarsCommerceTetrisWeb, :count_users, []}
+      # {CarsCommercePuzzleAdventureWeb, :count_users, []}
     ]
   end
 end

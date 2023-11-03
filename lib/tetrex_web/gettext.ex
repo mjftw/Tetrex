@@ -1,11 +1,11 @@
-defmodule CarsCommerceTetrisWeb.Gettext do
+defmodule CarsCommercePuzzleAdventureWeb.Gettext do
   @moduledoc """
   A module providing Internationalization with a gettext-based API.
 
   By using [Gettext](https://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:
 
-      import CarsCommerceTetrisWeb.Gettext
+      import CarsCommercePuzzleAdventureWeb.Gettext
 
       # Simple translation
       gettext("Here is the string to translate")
@@ -20,5 +20,5 @@ defmodule CarsCommerceTetrisWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :cars_commerce_tetris
+  use Gettext, otp_app: :cars_commerce_puzzle_adventure
 end

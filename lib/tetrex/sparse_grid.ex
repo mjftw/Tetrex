@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetris.SparseGrid do
+defmodule CarsCommercePuzzleAdventure.SparseGrid do
   @moduledoc """
   Data structure for holding a 2d grid of grid.
   Not every coordinate must have a value, in this sense the grid is sparse.
@@ -44,8 +44,8 @@ defmodule CarsCommerceTetris.SparseGrid do
   Create a new empty SparseGrid
   E.g.
   ```
-  iex> CarsCommerceTetris.SparseGrid.new()
-  %CarsCommerceTetris.SparseGrid{values: %{}}
+  iex> CarsCommercePuzzleAdventure.SparseGrid.new()
+  %CarsCommercePuzzleAdventure.SparseGrid{values: %{}}
   ```
   """
   @spec new() :: sparse_grid()
@@ -59,12 +59,12 @@ defmodule CarsCommerceTetris.SparseGrid do
 
   E.g.
   ```
-  iex> CarsCommerceTetris.SparseGrid.new([
+  iex> CarsCommercePuzzleAdventure.SparseGrid.new([
   ...>   [:blue, nil],
   ...>   [:blue, nil],
   ...>   [:blue, :blue],
   ...> ])
-  %CarsCommerceTetris.SparseGrid{values: %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue}}
+  %CarsCommercePuzzleAdventure.SparseGrid{values: %{{0, 0} => :blue, {1, 0} => :blue, {2, 0} => :blue, {2, 1} => :blue}}
   ```
   """
   @spec new([[any() | nil]]) :: sparse_grid()
@@ -345,7 +345,7 @@ defmodule CarsCommerceTetris.SparseGrid do
     {min_y, min_x} = top_left
     {max_y, max_x} = bottom_right
 
-    CarsCommerceTetris.IterUtils.all(
+    CarsCommercePuzzleAdventure.IterUtils.all(
       &Map.has_key?(grid.values, &1),
       {min_y, min_x},
       &next_coordinate_generator(&1, min_x, {max_y, max_x})
@@ -418,7 +418,7 @@ defmodule CarsCommerceTetris.SparseGrid do
   defp rotate_coordinate({y, x}, :clockwise270), do: {-x, y}
 end
 
-defimpl Inspect, for: CarsCommerceTetris.SparseGrid do
+defimpl Inspect, for: CarsCommercePuzzleAdventure.SparseGrid do
   def inspect(grid, _opts) when grid.values == %{}, do: "<Empty SparseGrid>"
 
   def inspect(grid, _opts) do
@@ -436,7 +436,7 @@ defimpl Inspect, for: CarsCommerceTetris.SparseGrid do
     %{
       topleft: {tl_y, tl_x},
       bottomright: {br_y, br_x}
-    } = CarsCommerceTetris.SparseGrid.corners(grid)
+    } = CarsCommercePuzzleAdventure.SparseGrid.corners(grid)
 
     col_indices =
       tl_x..br_x

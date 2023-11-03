@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetris.Periodic do
+defmodule CarsCommercePuzzleAdventure.Periodic do
   use GenServer
 
   # Client API

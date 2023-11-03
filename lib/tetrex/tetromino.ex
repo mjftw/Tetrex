@@ -1,10 +1,10 @@
-defmodule CarsCommerceTetris.Tetromino do
+defmodule CarsCommercePuzzleAdventure.Tetromino do
   @moduledoc """
   Official Tetromino shapes, names, and colours.
-  As described on the Tetris wiki: https://tetris.wiki/Tetromino
+  As described on the PuzzleAdventure wiki: https://puzzle_adventure.wiki/Tetromino
   """
 
-  alias CarsCommerceTetris.SparseGrid
+  alias CarsCommercePuzzleAdventure.SparseGrid
 
   @type colour :: :red | :green | :blue | :cyan | :yellow | :purple | :grey
   @type name :: :two_vertical | :two_by_two | :single | :two_horizontal | :commerce
@@ -61,7 +61,7 @@ defmodule CarsCommerceTetris.Tetromino do
   def fetch!(name), do: Map.fetch!(@tetrominos, name)
 
   # Would prefer to draw tiles from an infinite lazy stream rather than computing eagerly.
-  # When playing Tetris Battles we want both players to draw the same sequence of tiles to make the
+  # When playing PuzzleAdventure Battles we want both players to draw the same sequence of tiles to make the
   #  game fair.
   # There is an issue with this though, since Erlang uses a global random number generator,
   #  if both games are drawing tiles using the same random number generator, they will draw

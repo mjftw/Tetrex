@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetris.Users.User do
+defmodule CarsCommercePuzzleAdventure.Users.User do
   @type t :: %__MODULE__{id: String.t(), username: String.t()}
 
   @enforce_keys [:id, :username]

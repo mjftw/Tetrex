@@ -1,6 +1,6 @@
 import Config
 
-config :cars_commerce_tetris, :settings,
+config :cars_commerce_puzzle_adventure, :settings,
   multiplayer: [
     # Use this to simulate lots of additional players in a game
     num_fake_players_to_add_on_start: 500,
@@ -21,7 +21,7 @@ config :cars_commerce_tetris, :settings,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
+config :cars_commerce_puzzle_adventure, CarsCommercePuzzleAdventureWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -58,17 +58,17 @@ config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
+config :cars_commerce_puzzle_adventure, CarsCommercePuzzleAdventureWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/cars_commerce_tetris_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/cars_commerce_puzzle_adventure_web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :cars_commerce_tetris, dev_routes: true
+config :cars_commerce_puzzle_adventure, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

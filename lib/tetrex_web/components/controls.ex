@@ -1,5 +1,5 @@
-defmodule CarsCommerceTetrisWeb.Components.Controls do
-  use CarsCommerceTetrisWeb, :html
+defmodule CarsCommercePuzzleAdventureWeb.Components.Controls do
+  use CarsCommercePuzzleAdventureWeb, :html
 
   attr :class, :string, default: nil
 

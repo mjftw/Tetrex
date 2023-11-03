@@ -1,5 +1,5 @@
-defmodule CarsCommerceTetrisWeb.Components.Soundtrack do
-  use CarsCommerceTetrisWeb, :live_component
+defmodule CarsCommercePuzzleAdventureWeb.Components.Soundtrack do
+  use CarsCommercePuzzleAdventureWeb, :live_component
 
   attr :id, :string, required: true
   attr :src, :string, required: true

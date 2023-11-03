@@ -1,12 +1,12 @@
-defmodule CarsCommerceTetrisWeb do
+defmodule CarsCommercePuzzleAdventureWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use CarsCommerceTetrisWeb, :controller
-      use CarsCommerceTetrisWeb, :html
+      use CarsCommercePuzzleAdventureWeb, :controller
+      use CarsCommercePuzzleAdventureWeb, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -40,10 +40,10 @@ defmodule CarsCommerceTetrisWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: CarsCommerceTetrisWeb.Layouts]
+        layouts: [html: CarsCommercePuzzleAdventureWeb.Layouts]
 
       import Plug.Conn
-      import CarsCommerceTetrisWeb.Gettext
+      import CarsCommercePuzzleAdventureWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -52,7 +52,7 @@ defmodule CarsCommerceTetrisWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {CarsCommerceTetrisWeb.Layouts, :app}
+        layout: {CarsCommercePuzzleAdventureWeb.Layouts, :app}
 
       unquote(html_helpers())
     end
@@ -84,8 +84,8 @@ defmodule CarsCommerceTetrisWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      import CarsCommerceTetrisWeb.CoreComponents
-      import CarsCommerceTetrisWeb.Gettext
+      import CarsCommercePuzzleAdventureWeb.CoreComponents
+      import CarsCommercePuzzleAdventureWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
@@ -98,9 +98,9 @@ defmodule CarsCommerceTetrisWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: CarsCommerceTetrisWeb.Endpoint,
-        router: CarsCommerceTetrisWeb.Router,
-        statics: CarsCommerceTetrisWeb.static_paths()
+        endpoint: CarsCommercePuzzleAdventureWeb.Endpoint,
+        router: CarsCommercePuzzleAdventureWeb.Router,
+        statics: CarsCommercePuzzleAdventureWeb.static_paths()
     end
   end
 

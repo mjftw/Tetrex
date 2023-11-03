@@ -1,25 +1,25 @@
-defmodule CarsCommerceTetrisWeb.AdminLive do
-  alias CarsCommerceTetris.Users.User
+defmodule CarsCommercePuzzleAdventureWeb.AdminLive do
+  alias CarsCommercePuzzleAdventure.Users.User
   alias ElixirSense.Log
-  alias CarsCommerceTetris.GameDynamicSupervisor
-  alias CarsCommerceTetris.Users.UserStore
-  alias CarsCommerceTetris.Multiplayer
+  alias CarsCommercePuzzleAdventure.GameDynamicSupervisor
+  alias CarsCommercePuzzleAdventure.Users.UserStore
+  alias CarsCommercePuzzleAdventure.Multiplayer
 
-  use CarsCommerceTetrisWeb, :live_view
+  use CarsCommercePuzzleAdventureWeb, :live_view
 
   require Logger
 
   use LiveViewUserTracking,
-    presence: CarsCommerceTetrisWeb.Presence,
+    presence: CarsCommercePuzzleAdventureWeb.Presence,
     topic: "room:lobby",
     socket_current_user_assign_key: :current_user,
     socket_users_assign_key: :users
 
   def admin_panel_username,
-    do: Application.fetch_env!(:cars_commerce_tetris, :admin_panel_username)
+    do: Application.fetch_env!(:cars_commerce_puzzle_adventure, :admin_panel_username)
 
   def admin_panel_password,
-    do: Application.fetch_env!(:cars_commerce_tetris, :admin_panel_password)
+    do: Application.fetch_env!(:cars_commerce_puzzle_adventure, :admin_panel_password)
 
   @impl true
   def mount(_params, %{"user_id" => current_user_id} = _session, socket) do

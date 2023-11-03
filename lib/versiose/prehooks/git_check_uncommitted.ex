@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetris.Versioce.PreHooks.GitCheckUncommitted do
+defmodule CarsCommercePuzzleAdventure.Versioce.PreHooks.GitCheckUncommitted do
   use Versioce.PreHook
 
   def run(params) do

@@ -1,9 +1,9 @@
-defmodule CarsCommerceTetris.GameDynamicSupervisor do
+defmodule CarsCommercePuzzleAdventure.GameDynamicSupervisor do
   # Automatically defines child_spec/1
   use DynamicSupervisor
   alias Phoenix.PubSub
-  alias CarsCommerceTetris.SinglePlayer
-  alias CarsCommerceTetris.Multiplayer
+  alias CarsCommercePuzzleAdventure.SinglePlayer
+  alias CarsCommercePuzzleAdventure.Multiplayer
 
   def start_link(init_arg) do
     DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
@@ -13,7 +13,7 @@ defmodule CarsCommerceTetris.GameDynamicSupervisor do
 
   def subscribe_multiplayer_game_updates() do
     Phoenix.PubSub.subscribe(
-      CarsCommerceTetris.PubSub,
+      CarsCommercePuzzleAdventure.PubSub,
       multiplayer_pubsub_topic()
     )
   end
@@ -40,7 +40,7 @@ defmodule CarsCommerceTetris.GameDynamicSupervisor do
   def single_player_games() do
     DynamicSupervisor.which_children(__MODULE__)
     |> Stream.filter(
-      &match?({_, _pid, :worker, [CarsCommerceTetris.SinglePlayer.GameServer]}, &1)
+      &match?({_, _pid, :worker, [CarsCommercePuzzleAdventure.SinglePlayer.GameServer]}, &1)
     )
     |> Stream.map(fn {_, pid, _, _} -> pid end)
     |> Stream.map(&Task.async(fn -> {&1, SinglePlayer.GameServer.game(&1)} end))
@@ -86,7 +86,7 @@ defmodule CarsCommerceTetris.GameDynamicSupervisor do
 
   def multiplayer_games() do
     DynamicSupervisor.which_children(__MODULE__)
-    |> Stream.filter(&match?({_, _pid, :worker, [CarsCommerceTetris.Multiplayer.GameServer]}, &1))
+    |> Stream.filter(&match?({_, _pid, :worker, [CarsCommercePuzzleAdventure.Multiplayer.GameServer]}, &1))
     |> Stream.map(fn {_, pid, _, _} -> pid end)
     |> Stream.map(&Task.async(fn -> {&1, Multiplayer.GameServer.game(&1)} end))
     |> Enum.map(&Task.await/1)
@@ -118,7 +118,7 @@ defmodule CarsCommerceTetris.GameDynamicSupervisor do
   defp publish_create_multiplayer_game(multiplayer_game_pid),
     do:
       PubSub.broadcast!(
-        CarsCommerceTetris.PubSub,
+        CarsCommercePuzzleAdventure.PubSub,
         multiplayer_pubsub_topic(),
         {:created_multiplayer_game, multiplayer_game_pid}
       )
@@ -126,7 +126,7 @@ defmodule CarsCommerceTetris.GameDynamicSupervisor do
   defp publish_remove_multiplayer_game(game_id),
     do:
       PubSub.broadcast!(
-        CarsCommerceTetris.PubSub,
+        CarsCommercePuzzleAdventure.PubSub,
         multiplayer_pubsub_topic(),
         {:removed_multiplayer_game, game_id}
       )

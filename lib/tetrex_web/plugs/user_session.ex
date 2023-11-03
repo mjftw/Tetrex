@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetrisWeb.Plugs.UserSession do
+defmodule CarsCommercePuzzleAdventureWeb.Plugs.UserSession do
   import Plug.Conn
 
   def init(opts), do: opts

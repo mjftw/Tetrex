@@ -1,7 +1,7 @@
-defmodule CarsCommerceTetrisWeb.Components.Client.Audio do
-  alias CarsCommerceTetrisWeb.Components.Soundtrack
+defmodule CarsCommercePuzzleAdventureWeb.Components.Client.Audio do
+  alias CarsCommercePuzzleAdventureWeb.Components.Soundtrack
 
-  use CarsCommerceTetrisWeb, :live_component
+  use CarsCommercePuzzleAdventureWeb, :live_component
 
   @impl true
   def mount(socket) do

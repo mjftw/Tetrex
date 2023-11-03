@@ -1,20 +1,20 @@
-defmodule CarsCommerceTetris.Board.Test do
+defmodule CarsCommercePuzzleAdventure.Board.Test do
   use ExUnit.Case
 
-  alias CarsCommerceTetris.Board
+  alias CarsCommercePuzzleAdventure.Board
 
   test "new/3 creates a the same board given the same seed" do
-    board1 = CarsCommerceTetris.Board.new(20, 10, 3_141_592_654)
-    board2 = CarsCommerceTetris.Board.new(20, 10, 3_141_592_654)
+    board1 = CarsCommercePuzzleAdventure.Board.new(20, 10, 3_141_592_654)
+    board2 = CarsCommercePuzzleAdventure.Board.new(20, 10, 3_141_592_654)
 
     assert board1 == board2
   end
 
   test "new/3 creates places the first active tile at the top center of the playfield" do
-    board = CarsCommerceTetris.Board.new(20, 10, 0)
+    board = CarsCommercePuzzleAdventure.Board.new(20, 10, 0)
 
     expected =
-      CarsCommerceTetris.SparseGrid.align(
+      CarsCommercePuzzleAdventure.SparseGrid.align(
         board.active_tile,
         :top_centre,
         {0, 0},
@@ -27,7 +27,7 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_if_legal/2 applies the transform function when legal" do
     board = Board.new(20, 10, 0)
 
-    transform = &CarsCommerceTetris.SparseGrid.move(&1, {1, 0})
+    transform = &CarsCommercePuzzleAdventure.SparseGrid.move(&1, {1, 0})
 
     {:ok, moved} = Board.try_move_active_if_legal(board, transform)
 
@@ -35,9 +35,9 @@ defmodule CarsCommerceTetris.Board.Test do
   end
 
   test "try_move_active_if_legal/2 gives out_of_bounds error when moving off playfield" do
-    board = %{Board.new(20, 10, 0) | active_tile: CarsCommerceTetris.SparseGrid.new([[:a]])}
+    board = %{Board.new(20, 10, 0) | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[:a]])}
 
-    transform = &CarsCommerceTetris.SparseGrid.move(&1, {-1, 0})
+    transform = &CarsCommercePuzzleAdventure.SparseGrid.move(&1, {-1, 0})
 
     assert Board.try_move_active_if_legal(board, transform) == {:error, :out_of_bounds}
   end
@@ -46,7 +46,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(6, 3, 0)
       | playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:b, :b, :b],
             [:b, :b, :b],
@@ -57,7 +57,7 @@ defmodule CarsCommerceTetris.Board.Test do
     }
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [],
         [],
@@ -66,7 +66,7 @@ defmodule CarsCommerceTetris.Board.Test do
         [:b, :b]
       ])
 
-    {%CarsCommerceTetris.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
+    {%CarsCommercePuzzleAdventure.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
 
     assert playfield == expected
   end
@@ -75,7 +75,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(7, 3, 0)
       | playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:a],
             [:x, :x, :x],
             [nil, nil, :c],
@@ -87,7 +87,7 @@ defmodule CarsCommerceTetris.Board.Test do
     }
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [],
         [],
@@ -97,7 +97,7 @@ defmodule CarsCommerceTetris.Board.Test do
         [:b, :b]
       ])
 
-    {%CarsCommerceTetris.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
+    {%CarsCommercePuzzleAdventure.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
 
     assert playfield == expected
   end
@@ -106,7 +106,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(5, 3, 0)
       | playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:x, :x, :x],
             [:a],
             [nil, nil, :c],
@@ -116,7 +116,7 @@ defmodule CarsCommerceTetris.Board.Test do
     }
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [:a],
         [nil, nil, :c],
@@ -124,7 +124,7 @@ defmodule CarsCommerceTetris.Board.Test do
         [:b, :b]
       ])
 
-    {%CarsCommerceTetris.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
+    {%CarsCommercePuzzleAdventure.Board{playfield: playfield}, _} = Board.clear_completed_rows(board)
 
     assert playfield == expected
   end
@@ -133,7 +133,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(7, 3, 0)
       | playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:x, :x, :x],
             [:a],
             [:x, :x, :x],
@@ -152,9 +152,9 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_if_legal/2 gives collision error when over a filled space in the playfield" do
     board = %{
       Board.new(5, 1, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[:a]]),
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[:a]]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:b],
             [:b],
@@ -163,7 +163,7 @@ defmodule CarsCommerceTetris.Board.Test do
           ])
     }
 
-    transform = &CarsCommerceTetris.SparseGrid.move(&1, {1, 0})
+    transform = &CarsCommercePuzzleAdventure.SparseGrid.move(&1, {1, 0})
 
     assert Board.try_move_active_if_legal(board, transform) == {:error, :collision}
   end
@@ -171,9 +171,9 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_down/1 should move the active tile down 1 when legal" do
     board = %{
       Board.new(4, 2, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[:a]]),
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[:a]]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
@@ -184,7 +184,7 @@ defmodule CarsCommerceTetris.Board.Test do
     {_, moved, _} = Board.try_move_active_down(board)
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [:a]
       ])
@@ -196,16 +196,16 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(4, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [nil, :a]
           ]),
         next_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:n]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [nil, :b],
@@ -217,8 +217,8 @@ defmodule CarsCommerceTetris.Board.Test do
     {_, moved, _} = Board.try_move_active_down(board)
 
     expected = %{
-      active_tile: board.next_tile |> CarsCommerceTetris.SparseGrid.move(:right, 1),
-      next_tile: CarsCommerceTetris.Tetromino.fetch!(:two_vertical),
+      active_tile: board.next_tile |> CarsCommercePuzzleAdventure.SparseGrid.move(:right, 1),
+      next_tile: CarsCommercePuzzleAdventure.Tetromino.fetch!(:two_vertical),
       upcoming_tile_names: [:two_by_two, :two_horizontal]
     }
 
@@ -229,12 +229,12 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(4, 2, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [:b],
@@ -245,7 +245,7 @@ defmodule CarsCommerceTetris.Board.Test do
     {_, moved, _} = Board.try_move_active_down(board)
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [:a],
         [:b],
@@ -259,12 +259,12 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(4, 2, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [:b],
@@ -281,14 +281,14 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(4, 2, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
             [:a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
@@ -299,7 +299,7 @@ defmodule CarsCommerceTetris.Board.Test do
     {_, moved, _} = Board.try_move_active_down(board)
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [],
         [],
@@ -313,14 +313,14 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(4, 2, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
             [:a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
@@ -337,7 +337,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(5, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:a],
             [:a, :a],
@@ -345,7 +345,7 @@ defmodule CarsCommerceTetris.Board.Test do
             []
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [nil, nil, :b],
             [nil, nil, :b],
@@ -357,7 +357,7 @@ defmodule CarsCommerceTetris.Board.Test do
     {_, moved, _} = Board.try_move_active_down(board)
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [],
         [],
@@ -372,7 +372,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(5, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:a],
             [:a, :a],
@@ -380,7 +380,7 @@ defmodule CarsCommerceTetris.Board.Test do
             []
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [nil, nil, :b],
             [nil, nil, :b],
@@ -398,13 +398,13 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(6, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:a],
             [:a, :a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [nil, nil, :b],
             [nil, nil, :b],
@@ -415,7 +415,7 @@ defmodule CarsCommerceTetris.Board.Test do
     }
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [nil, nil, :b],
         [:a, :a, :b],
@@ -433,7 +433,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(6, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [:a],
             [:a, :a],
@@ -441,7 +441,7 @@ defmodule CarsCommerceTetris.Board.Test do
             []
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
@@ -452,7 +452,7 @@ defmodule CarsCommerceTetris.Board.Test do
     }
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [],
         [],
@@ -469,13 +469,13 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_left/1 should move the active tile left by one if legal" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, :a, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, :a, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, nil]])
     }
 
     {_, moved} = Board.try_move_active_left(board)
 
-    expected = CarsCommerceTetris.SparseGrid.new([[:a]])
+    expected = CarsCommercePuzzleAdventure.SparseGrid.new([[:a]])
 
     assert moved.active_tile == expected
   end
@@ -483,8 +483,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_left/1 should not move the active tile left blocked" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, :a, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[:b, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, :a, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[:b, nil, nil]])
     }
 
     {_, not_moved} = Board.try_move_active_left(board)
@@ -495,8 +495,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_left/1 should give a :out_of_bounds status if active tile left if on edge of playfield" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[:a, nil, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[:a, nil, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, nil]])
     }
 
     {status, _} = Board.try_move_active_left(board)
@@ -507,8 +507,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_left/1 should give a :collision status if active tile left if blocked" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, :a, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[:b, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, :a, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[:b, nil, nil]])
     }
 
     {status, _} = Board.try_move_active_left(board)
@@ -519,8 +519,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_left/1 should not move the active tile left on edge of playfield" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[:a, nil, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[:a, nil, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, nil]])
     }
 
     {_, not_moved} = Board.try_move_active_left(board)
@@ -531,13 +531,13 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_right/1 should move the active tile right by one if legal" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, :a, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, :a, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, nil]])
     }
 
     {_, moved} = Board.try_move_active_right(board)
 
-    expected = CarsCommerceTetris.SparseGrid.new([[nil, nil, :a]])
+    expected = CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, :a]])
 
     assert moved.active_tile == expected
   end
@@ -545,8 +545,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_right/1 should not move the active tile right if blocked" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, :a, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, :b]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, :a, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, :b]])
     }
 
     {_, not_moved} = Board.try_move_active_right(board)
@@ -557,8 +557,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_right/1 should not move the active tile right if on edge of playfield" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, nil, :a]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, :a]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, nil]])
     }
 
     {_, not_moved} = Board.try_move_active_right(board)
@@ -569,8 +569,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_right/1 should give an :collision status if blocked" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, :a, nil]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, :b]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, :a, nil]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, :b]])
     }
 
     {status, _} = Board.try_move_active_right(board)
@@ -581,8 +581,8 @@ defmodule CarsCommerceTetris.Board.Test do
   test "try_move_active_right/1 should give a :out_of_bounds status if on edge of playfield" do
     board = %{
       Board.new(1, 3, 0)
-      | active_tile: CarsCommerceTetris.SparseGrid.new([[nil, nil, :a]]),
-        playfield: CarsCommerceTetris.SparseGrid.new([[nil, nil, nil]])
+      | active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, :a]]),
+        playfield: CarsCommercePuzzleAdventure.SparseGrid.new([[nil, nil, nil]])
     }
 
     {status, _} = Board.try_move_active_right(board)
@@ -594,7 +594,7 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(3, 3, 0)
       | hold_tile: nil,
-        active_tile: CarsCommerceTetris.SparseGrid.new([[:a]])
+        active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[:a]])
     }
 
     new_board = Board.hold_active(board)
@@ -606,8 +606,8 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(3, 3, 0)
       | hold_tile: nil,
-        active_tile: CarsCommerceTetris.SparseGrid.new([[:a]]),
-        next_tile: CarsCommerceTetris.Tetromino.fetch!(:single),
+        active_tile: CarsCommercePuzzleAdventure.SparseGrid.new([[:a]]),
+        next_tile: CarsCommercePuzzleAdventure.Tetromino.fetch!(:single),
         upcoming_tile_names: [:two_vertical, :two_by_two, :two_horizontal]
     }
 
@@ -618,7 +618,7 @@ defmodule CarsCommerceTetris.Board.Test do
 
     expected = %{
       active_tile: board.next_tile,
-      next_tile: CarsCommerceTetris.Tetromino.fetch!(:two_vertical),
+      next_tile: CarsCommercePuzzleAdventure.Tetromino.fetch!(:two_vertical),
       upcoming_tile_names: [:two_by_two, :two_horizontal]
     }
 
@@ -629,16 +629,16 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(10, 10, 0)
       | hold_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:h],
             [:h],
             [:h, :h]
           ]),
         active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:a, :a, :a, :a]
           ]),
-        next_tile: CarsCommerceTetris.Tetromino.fetch!(:single),
+        next_tile: CarsCommercePuzzleAdventure.Tetromino.fetch!(:single),
         upcoming_tile_names: [:two_vertical, :two_by_two, :two_horizontal]
     }
 
@@ -650,7 +650,7 @@ defmodule CarsCommerceTetris.Board.Test do
     expected = %{
       # Hold tile aligned with top centre of where active_tile was
       active_tile:
-        CarsCommerceTetris.SparseGrid.new([
+        CarsCommercePuzzleAdventure.SparseGrid.new([
           [nil, :h],
           [nil, :h],
           [nil, :h, :h]
@@ -666,17 +666,17 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(3, 3, 0)
       | hold_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:h, :h, :h]
           ]),
         active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [nil, :a, nil],
             [nil, nil, nil]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:p, :p, :p],
             [:p, nil, :p],
             [:p, :p, :p]
@@ -690,13 +690,13 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(3, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [nil, :a, :a],
             [nil, nil, nil]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [nil, nil, nil],
             [nil, nil, nil]
@@ -706,20 +706,20 @@ defmodule CarsCommerceTetris.Board.Test do
     rotated = Board.rotate_active(board)
 
     assert rotated.active_tile ==
-             CarsCommerceTetris.SparseGrid.rotate(board.active_tile, :clockwise90)
+             CarsCommercePuzzleAdventure.SparseGrid.rotate(board.active_tile, :clockwise90)
   end
 
   test "rotate_active/1 should rotate the active tile 180 degrees when collision at 90" do
     board = %{
       Board.new(3, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [nil, :a, :a],
             [nil, nil, nil]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [nil, nil, nil],
             [nil, :b, nil]
@@ -729,20 +729,20 @@ defmodule CarsCommerceTetris.Board.Test do
     rotated = Board.rotate_active(board)
 
     assert rotated.active_tile ==
-             CarsCommerceTetris.SparseGrid.rotate(board.active_tile, :clockwise180)
+             CarsCommercePuzzleAdventure.SparseGrid.rotate(board.active_tile, :clockwise180)
   end
 
   test "rotate_active/1 should rotate the active tile 270 degrees when collision at 90 & 180" do
     board = %{
       Board.new(3, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [nil, :a, :a],
             [nil, nil, nil]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [:b, nil, nil],
             [nil, :b, nil]
@@ -752,20 +752,20 @@ defmodule CarsCommerceTetris.Board.Test do
     rotated = Board.rotate_active(board)
 
     assert rotated.active_tile ==
-             CarsCommerceTetris.SparseGrid.rotate(board.active_tile, :clockwise270)
+             CarsCommercePuzzleAdventure.SparseGrid.rotate(board.active_tile, :clockwise270)
   end
 
   test "rotate_active/1 should not rotate the active tile when collision at 90, 180, & 270" do
     board = %{
       Board.new(3, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [nil, :a, :a],
             [nil, nil, nil]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, :b, nil],
             [:b, nil, nil],
             [nil, :b, nil]
@@ -781,11 +781,11 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(6, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
@@ -796,7 +796,7 @@ defmodule CarsCommerceTetris.Board.Test do
     }
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [],
         [nil, :a, nil],
@@ -814,11 +814,11 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(6, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [nil, :a, nil],
@@ -829,7 +829,7 @@ defmodule CarsCommerceTetris.Board.Test do
     }
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [],
         [],
         [],
@@ -847,11 +847,11 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(5, 3, 0)
       | active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [nil, :a, nil],
@@ -869,21 +869,21 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(3, 3, 0)
       | hold_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:h]
           ]),
         next_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:n]
           ]),
         active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, :a, nil],
             [nil, :a, nil],
             [nil, nil, nil]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [:p, nil, :p],
             [:p, :p, :p]
@@ -898,7 +898,7 @@ defmodule CarsCommerceTetris.Board.Test do
       playfield_height: board.playfield_height,
       playfield_width: board.playfield_width,
       playfield:
-        CarsCommerceTetris.SparseGrid.new([
+        CarsCommercePuzzleAdventure.SparseGrid.new([
           [nil, :a, nil],
           [:p, :a, :p],
           [:p, :p, :p]
@@ -913,20 +913,20 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(6, 3, 0)
       | hold_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:h]
           ]),
         next_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:n]
           ]),
         active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, :a, nil],
             [nil, :a, :a]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [],
             [],
             [],
@@ -939,7 +939,7 @@ defmodule CarsCommerceTetris.Board.Test do
     %{playfield: previewed} = Board.preview(board)
 
     expected =
-      CarsCommerceTetris.SparseGrid.new([
+      CarsCommercePuzzleAdventure.SparseGrid.new([
         [nil, :a, nil],
         [nil, :a, :a],
         [nil, :drop_preview, nil],
@@ -955,21 +955,21 @@ defmodule CarsCommerceTetris.Board.Test do
     board = %{
       Board.new(3, 3, 0)
       | hold_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:h]
           ]),
         next_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [:n]
           ]),
         active_tile:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, :a, :b],
             [nil, :c, nil],
             [nil, :d, nil]
           ]),
         playfield:
-          CarsCommerceTetris.SparseGrid.new([
+          CarsCommercePuzzleAdventure.SparseGrid.new([
             [nil, nil, nil],
             [:p, nil, :p],
             [:p, :p, :p]
@@ -984,7 +984,7 @@ defmodule CarsCommerceTetris.Board.Test do
       playfield_height: board.playfield_height,
       playfield_width: board.playfield_width,
       playfield:
-        CarsCommerceTetris.SparseGrid.new([
+        CarsCommercePuzzleAdventure.SparseGrid.new([
           [nil, :c, nil],
           [:p, :d, :p],
           [:p, :p, :p]

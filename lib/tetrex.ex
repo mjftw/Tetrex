@@ -1,6 +1,6 @@
-defmodule CarsCommerceTetris do
+defmodule CarsCommercePuzzleAdventure do
   @moduledoc """
-  CarsCommerceTetris keeps the contexts that define your domain
+  CarsCommercePuzzleAdventure keeps the contexts that define your domain
   and business logic.
 
   Contexts are also responsible for managing your data, regardless

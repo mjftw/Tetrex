@@ -1,10 +1,10 @@
-# CarsCommerceTetris
+# CarsCommercePuzzleAdventure
 
-Yet another Tetris game, because everyone loves Tetris!
+Yet another PuzzleAdventure game, because everyone loves PuzzleAdventure!
 
 ## How to play
 
-The easiest way to play is to head on over to https://cars_commerce_tetris.fly.dev/
+The easiest way to play is to head on over to https://cars_commerce_puzzle_adventure.fly.dev/
 
 If you'd like to run it locally, you can do so with:
 
@@ -24,7 +24,7 @@ Head on over to http://localhost:4000 and you're in!
 
 Features:
 
-- It's Tetris, so all the basic Tetris stuff
+- It's PuzzleAdventure, so all the basic PuzzleAdventure stuff
 - Your game is saved automatically, so you can safely close your browser tab and come back
 
 Upcoming:

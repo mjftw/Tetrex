@@ -1,6 +1,6 @@
-defmodule CarsCommerceTetrisWeb.Components.BoardComponents do
-  use CarsCommerceTetrisWeb, :html
-  alias CarsCommerceTetris.SparseGrid
+defmodule CarsCommercePuzzleAdventureWeb.Components.BoardComponents do
+  use CarsCommercePuzzleAdventureWeb, :html
+  alias CarsCommercePuzzleAdventure.SparseGrid
 
   @doc """
   Board component. Assumes board size is 10x20.

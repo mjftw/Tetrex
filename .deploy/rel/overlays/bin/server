@@ -1,3 +1,3 @@
 #!/bin/sh
 cd -P -- "$(dirname -- "$0")"
-PHX_SERVER=true exec ./cars_commerce_tetris start
+PHX_SERVER=true exec ./cars_commerce_puzzle_adventure start

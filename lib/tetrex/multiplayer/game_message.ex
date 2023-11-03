@@ -1,6 +1,6 @@
-defmodule CarsCommerceTetris.Multiplayer.GameMessage do
-  alias CarsCommerceTetris.Multiplayer.Game
-  alias CarsCommerceTetris.Board
+defmodule CarsCommercePuzzleAdventure.Multiplayer.GameMessage do
+  alias CarsCommercePuzzleAdventure.Multiplayer.Game
+  alias CarsCommercePuzzleAdventure.Board
 
   @type id :: String.t()
 

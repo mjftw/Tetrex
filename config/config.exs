@@ -7,7 +7,7 @@
 # General application configuration
 import Config
 
-config :cars_commerce_tetris, :settings,
+config :cars_commerce_puzzle_adventure, :settings,
   multiplayer: [
     # Maximum players in game.
     max_players_in_game: 99,
@@ -23,13 +23,13 @@ config :cars_commerce_tetris, :settings,
   ]
 
 # Configures the endpoint
-config :cars_commerce_tetris, CarsCommerceTetrisWeb.Endpoint,
+config :cars_commerce_puzzle_adventure, CarsCommercePuzzleAdventureWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
-    formats: [html: CarsCommerceTetrisWeb.ErrorHTML, json: CarsCommerceTetrisWeb.ErrorJSON],
+    formats: [html: CarsCommercePuzzleAdventureWeb.ErrorHTML, json: CarsCommercePuzzleAdventureWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: CarsCommerceTetris.PubSub,
+  pubsub_server: CarsCommercePuzzleAdventure.PubSub,
   live_view: [signing_salt: "BCIQ6//6"]
 
 # Configure esbuild (the version is required)
@@ -64,10 +64,10 @@ config :phoenix, :json_library, Jason
 
 # Configure version bumping
 config :versioce,
-  pre_hooks: [CarsCommerceTetris.Versioce.PreHooks.GitCheckUncommitted],
+  pre_hooks: [CarsCommercePuzzleAdventure.Versioce.PreHooks.GitCheckUncommitted],
   post_hooks: [
-    CarsCommerceTetris.Versioce.PostHooks.GitCommitUpdate,
-    CarsCommerceTetris.Versioce.PostHooks.GitTag
+    CarsCommercePuzzleAdventure.Versioce.PostHooks.GitCommitUpdate,
+    CarsCommercePuzzleAdventure.Versioce.PostHooks.GitTag
   ]
 
 config :versioce, :changelog,

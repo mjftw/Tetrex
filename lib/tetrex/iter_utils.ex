@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetris.IterUtils do
+defmodule CarsCommercePuzzleAdventure.IterUtils do
   @type t :: any()
   @doc """
   Helper utility that will repeatedly call the `predicate` function with the current index so long

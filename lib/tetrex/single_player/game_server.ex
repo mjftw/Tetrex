@@ -1,9 +1,9 @@
-defmodule CarsCommerceTetris.SinglePlayer.GameServer do
+defmodule CarsCommercePuzzleAdventure.SinglePlayer.GameServer do
   use GenServer
-  alias CarsCommerceTetris.Periodic
-  alias CarsCommerceTetris.BoardServer
-  alias CarsCommerceTetris.SinglePlayer.Game
-  alias CarsCommerceTetris.SinglePlayer.GameMessage
+  alias CarsCommercePuzzleAdventure.Periodic
+  alias CarsCommercePuzzleAdventure.BoardServer
+  alias CarsCommercePuzzleAdventure.SinglePlayer.Game
+  alias CarsCommercePuzzleAdventure.SinglePlayer.GameMessage
 
   @board_height 20
   @board_width 10
@@ -72,7 +72,7 @@ defmodule CarsCommerceTetris.SinglePlayer.GameServer do
   def subscribe_updates(game_server),
     do:
       Phoenix.PubSub.subscribe(
-        CarsCommerceTetris.PubSub,
+        CarsCommercePuzzleAdventure.PubSub,
         game_server
         |> game_user_id()
         |> pubsub_topic()
@@ -86,7 +86,7 @@ defmodule CarsCommerceTetris.SinglePlayer.GameServer do
 
     # Create a periodic task to move the piece down
     {:ok, periodic_mover_pid} =
-      CarsCommerceTetris.Periodic.start_link(
+      CarsCommercePuzzleAdventure.Periodic.start_link(
         [
           period_ms: 1000,
           start: false,
@@ -124,7 +124,7 @@ defmodule CarsCommerceTetris.SinglePlayer.GameServer do
       board_preview: board_preview
     }
 
-    Phoenix.PubSub.broadcast!(CarsCommerceTetris.PubSub, pubsub_topic(user_id), game_update)
+    Phoenix.PubSub.broadcast!(CarsCommercePuzzleAdventure.PubSub, pubsub_topic(user_id), game_update)
 
     {:noreply, game}
   end
@@ -134,7 +134,7 @@ defmodule CarsCommerceTetris.SinglePlayer.GameServer do
     this_game_server = self()
 
     # Set the periodic task to move the piece down
-    CarsCommerceTetris.Periodic.set_work(periodic_mover_pid, fn ->
+    CarsCommercePuzzleAdventure.Periodic.set_work(periodic_mover_pid, fn ->
       try_move_down(this_game_server)
     end)
 
@@ -286,7 +286,7 @@ defmodule CarsCommerceTetris.SinglePlayer.GameServer do
   end
 
   defp level_speed(level) do
-    # For explanation see: https://tetris.fandom.com/wiki/Tetris_(NES,_Nintendo)
+    # For explanation see: https://puzzle_adventure.fandom.com/wiki/PuzzleAdventure_(NES,_Nintendo)
     frames_per_gridcell =
       case level do
         0 -> 48

@@ -1,4 +1,4 @@
-defmodule CarsCommerceTetris.Application do
+defmodule CarsCommercePuzzleAdventure.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -11,22 +11,22 @@ defmodule CarsCommerceTetris.Application do
       # Allow monitoring processes
       ProcessMonitor,
       # Start a dynamic supervisor to start games under
-      CarsCommerceTetris.GameDynamicSupervisor,
+      CarsCommercePuzzleAdventure.GameDynamicSupervisor,
       # Start the UserStore store
-      CarsCommerceTetris.Users.UserStore,
+      CarsCommercePuzzleAdventure.Users.UserStore,
       # Start the Telemetry supervisor
-      CarsCommerceTetrisWeb.Telemetry,
+      CarsCommercePuzzleAdventureWeb.Telemetry,
       # Start the PubSub system
-      {Phoenix.PubSub, name: CarsCommerceTetris.PubSub},
+      {Phoenix.PubSub, name: CarsCommercePuzzleAdventure.PubSub},
       # Start the Presence module
-      CarsCommerceTetrisWeb.Presence,
+      CarsCommercePuzzleAdventureWeb.Presence,
       # Start the Endpoint (http/https)
-      CarsCommerceTetrisWeb.Endpoint
+      CarsCommercePuzzleAdventureWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: CarsCommerceTetris.Supervisor]
+    opts = [strategy: :one_for_one, name: CarsCommercePuzzleAdventure.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
@@ -34,7 +34,7 @@ defmodule CarsCommerceTetris.Application do
   # whenever the application is updated.
   @impl true
   def config_change(changed, _new, removed) do
-    CarsCommerceTetrisWeb.Endpoint.config_change(changed, removed)
+    CarsCommercePuzzleAdventureWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

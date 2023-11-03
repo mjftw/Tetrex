@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for cars-commerce-tetris on 2023-11-02T13:47:25-04:00
+# fly.toml app configuration file generated for cars-commerce-puzzle_adventure on 2023-11-02T13:47:25-04:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "cars-commerce-tetris"
+app = "cars-commerce-puzzle_adventure"
 primary_region = "mia"
 kill_signal = "SIGTERM"
 kill_timeout = "5s"
@@ -15,7 +15,7 @@ kill_timeout = "5s"
   dockerfile = ".deploy/Dockerfile"
 
 [env]
-  PHX_HOST = "cars_commerce_tetris.fly.dev"
+  PHX_HOST = "cars_commerce_puzzle_adventure.fly.dev"
   PORT = "8080"
 
 [[services]]
