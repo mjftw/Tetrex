@@ -7,10 +7,11 @@
     <% {:players_joining, _} -> %>
         <.modal_simple id="players_joining_not_ready_modal" show>
             <b class="text-md"> Desktop Instructions: </b>
-            <p class="text-sm">  - Use the arrow keys to move your tetromino.  </p>
-            <p class="text-sm">  - The space bar rotates pieces.  </p>
-            <p class="text-sm">  - Shift or the "h" key will hold/swap a tetromino.  </p>
-            <p class="text-sm">  - Escape key will quit a game.  </p>
+              <p class="text-sm">  - Use the left/right/down arrow keys to move your tetromino.  </p>
+              <p class="text-sm">  - Use the up arrow key to rotate your tetromino.  </p>
+              <p class="text-sm">  - The space bar drops tetrominos to the bottom of the screen.  </p>
+              <p class="text-sm">  - Shift or the "h" key holds/swaps a tetromino.  </p>
+              <p class="text-sm">  - Escape key opens menu.  </p>
             <br/>
             <%= cond do %>
                 <% num_players_in_game(@game) < 2 -> %>

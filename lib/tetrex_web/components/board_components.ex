@@ -152,13 +152,13 @@ defmodule CarsCommerceTetrisWeb.Components.BoardComponents do
 
   defp tile(%{type: :blue} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-blue-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_blue" />
     """
   end
 
   defp tile(%{type: :cyan} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-cyan-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_cyan" />
     """
   end
 
@@ -170,13 +170,13 @@ defmodule CarsCommerceTetrisWeb.Components.BoardComponents do
 
   defp tile(%{type: :purple} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-purple-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_purple" />
     """
   end
 
   defp tile(%{type: :orange} = assigns) do
     ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-orange-400" />
+    <.tile_filled x={@x} y={@y} size={@size} class="fill-cars_orange" />
     """
   end
 

@@ -20,7 +20,15 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
-      }    },
+        cars_red:"#ea7603",
+        cars_green: "#a74dce",
+        cars_blue: "#0093c5",
+        cars_cyan: "#c09bec",
+        cars_yellow: "#2ab79c",
+        cars_purple: "#a74dce",
+        cars_orange: "#ea7605",
+      }    
+    },
   },
   plugins: [
     require("@tailwindcss/forms"),

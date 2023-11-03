@@ -30,8 +30,10 @@ defmodule CarsCommerceTetris.Tetromino do
       ]),
     commerce:
       SparseGrid.new([
-        [:red, :red, nil],
-        [nil, :red, :red]
+        [nil, :cyan, nil, nil],
+        [nil, :cyan, :purple, :purple],
+        [:blue, :blue, :purple, :purple],
+        [nil, :orange, nil, nil]
       ]),
     # j:
     #   SparseGrid.new([
@@ -77,7 +79,13 @@ defmodule CarsCommerceTetris.Tetromino do
   def draw_randoms(number, random_seed) do
     :rand.seed(:exsss, random_seed)
 
-    names = Map.keys(@tetrominos)
+    names =
+      @tetrominos
+      |> Map.keys()
+      |> List.delete(:commerce)
+      |> List.duplicate(2)
+      |> List.flatten()
+      |> List.insert_at(0, :commerce)
 
     Stream.repeatedly(fn -> Enum.random(names) end)
     |> Stream.take(number)
