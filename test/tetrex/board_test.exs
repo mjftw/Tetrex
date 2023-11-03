@@ -211,15 +211,15 @@ defmodule CarsCommerceTetris.Board.Test do
             [nil, :b],
             [nil, :b]
           ]),
-        upcoming_tile_names: [:i, :o, :s]
+        upcoming_tile_names: [:two_vertical, :two_by_two, :two_horizontal]
     }
 
     {_, moved, _} = Board.try_move_active_down(board)
 
     expected = %{
       active_tile: board.next_tile |> CarsCommerceTetris.SparseGrid.move(:right, 1),
-      next_tile: CarsCommerceTetris.Tetromino.fetch!(:i),
-      upcoming_tile_names: [:o, :s]
+      next_tile: CarsCommerceTetris.Tetromino.fetch!(:two_vertical),
+      upcoming_tile_names: [:two_by_two, :two_horizontal]
     }
 
     assert Map.take(moved, [:active_tile, :next_tile, :upcoming_tile_names]) == expected
@@ -607,8 +607,8 @@ defmodule CarsCommerceTetris.Board.Test do
       Board.new(3, 3, 0)
       | hold_tile: nil,
         active_tile: CarsCommerceTetris.SparseGrid.new([[:a]]),
-        next_tile: CarsCommerceTetris.Tetromino.fetch!(:t),
-        upcoming_tile_names: [:i, :o, :s]
+        next_tile: CarsCommerceTetris.Tetromino.fetch!(:single),
+        upcoming_tile_names: [:two_vertical, :two_by_two, :two_horizontal]
     }
 
     result =
@@ -618,8 +618,8 @@ defmodule CarsCommerceTetris.Board.Test do
 
     expected = %{
       active_tile: board.next_tile,
-      next_tile: CarsCommerceTetris.Tetromino.fetch!(:i),
-      upcoming_tile_names: [:o, :s]
+      next_tile: CarsCommerceTetris.Tetromino.fetch!(:two_vertical),
+      upcoming_tile_names: [:two_by_two, :two_horizontal]
     }
 
     assert result == expected
@@ -638,8 +638,8 @@ defmodule CarsCommerceTetris.Board.Test do
           CarsCommerceTetris.SparseGrid.new([
             [:a, :a, :a, :a]
           ]),
-        next_tile: CarsCommerceTetris.Tetromino.fetch!(:t),
-        upcoming_tile_names: [:i, :o, :s]
+        next_tile: CarsCommerceTetris.Tetromino.fetch!(:single),
+        upcoming_tile_names: [:two_vertical, :two_by_two, :two_horizontal]
     }
 
     result =

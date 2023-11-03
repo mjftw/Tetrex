@@ -7,46 +7,42 @@ defmodule CarsCommerceTetris.Tetromino do
   alias CarsCommerceTetris.SparseGrid
 
   @type colour :: :red | :green | :blue | :cyan | :yellow | :purple | :grey
-  @type name :: :i | :o | :t | :s | :z | :j | :l
+  @type name :: :two_vertical | :two_by_two | :single | :two_horizontal | :commerce
 
   @tetrominos %{
-    i:
+    two_vertical:
       SparseGrid.new([
-        [:cyan],
-        [:cyan],
         [:cyan],
         [:cyan]
       ]),
-    o:
+    two_by_two:
       SparseGrid.new([
-        [:yellow, :yellow],
-        [:yellow, :yellow]
+        [:purple, :purple],
+        [:purple, :purple]
       ]),
-    t:
+    single:
       SparseGrid.new([
-        [nil, :purple, nil],
-        [:purple, :purple, :purple]
+        [:orange]
       ]),
-    s:
+    two_horizontal:
       SparseGrid.new([
-        [nil, :green, :green],
-        [:green, :green, nil]
+        [:blue, :blue],
       ]),
-    z:
+    commerce:
       SparseGrid.new([
         [:red, :red, nil],
         [nil, :red, :red]
       ]),
-    j:
-      SparseGrid.new([
-        [:blue],
-        [:blue, :blue, :blue]
-      ]),
-    l:
-      SparseGrid.new([
-        [nil, nil, :orange],
-        [:orange, :orange, :orange]
-      ])
+    # j:
+    #   SparseGrid.new([
+    #     [:blue],
+    #     [:blue, :blue, :blue]
+    #   ]),
+    # l:
+    #   SparseGrid.new([
+    #     [nil, nil, :orange],
+    #     [:orange, :orange, :orange]
+    #   ])
   }
 
   @doc """

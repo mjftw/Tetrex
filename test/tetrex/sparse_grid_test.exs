@@ -959,7 +959,7 @@ defmodule SparseGrid.Test do
         [:a, "f", 2],
         [nil, :x, "1"],
         [],
-        [:z]
+        [:commerce]
       ])
 
     expected =
