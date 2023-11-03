@@ -6,7 +6,7 @@
   <%= case {@game.status, user_status} do %>
     <% {:players_joining, _} -> %>
         <.modal_simple id="players_joining_not_ready_modal" show>
-            <b class="text-md"> Desktop Instructions: </b>
+            <b class="text-md invisible md:visible"> Desktop Instructions: </b>
               <p class="text-sm">  - Use the left/right/down arrow keys to move your tetromino.  </p>
               <p class="text-sm">  - Use the up arrow key to rotate your tetromino.  </p>
               <p class="text-sm">  - The space bar drops tetrominos to the bottom of the screen.  </p>
