@@ -1,5 +1,6 @@
 defmodule TetrexWeb.Router do
   use TetrexWeb, :router
+  import OrionWeb.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -47,6 +48,8 @@ defmodule TetrexWeb.Router do
     scope "/dev" do
       pipe_through :browser
       live_dashboard "/dashboard", metrics: TetrexWeb.Telemetry
+
+      live_orion("/orion")
     end
   end
 end
