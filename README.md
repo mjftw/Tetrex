@@ -2,6 +2,9 @@
 
 Yet another Tetris game, because everyone loves Tetris!
 
+I did a talk on the game at CodeBeam Europe, you can watch it here:
+https://www.youtube.com/watch?v=87iFws4c78s&pp=ygUQdGV0cmV4IGNvZGUgYmVhbQ%3D%3D
+
 ## How to play
 
 The easiest way to play is to head on over to https://tetrex.fly.dev/
