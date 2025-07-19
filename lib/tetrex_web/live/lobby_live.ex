@@ -136,8 +136,7 @@ defmodule TetrexWeb.LobbyLive do
        socket
        |> assign(:current_user, updated_user)
        |> assign(:editing_username, false)
-       |> assign(:temp_username, "")
-       |> put_flash(:info, "Username updated successfully!")}
+       |> assign(:temp_username, "")}
     else
       {:noreply,
        socket
