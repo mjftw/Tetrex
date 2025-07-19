@@ -9,6 +9,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
   alias TetrexWeb.Components.Controls
   alias Phoenix.LiveView.JS
   alias Patchwork.Patch
+  alias Tetrex.Users.UserStore
 
   require Logger
 
@@ -40,6 +41,19 @@ defmodule TetrexWeb.MultiplayerGameLive do
           Multiplayer.Game.player_in_game?(game, user_id) ->
             if connected?(socket) do
               GameServer.subscribe_updates(game_server_pid)
+
+              # Track user as in game (rejoining)
+              user = UserStore.get_user!(user_id)
+              TetrexWeb.Presence.track(
+                self(),
+                "users:global",
+                user_id,
+                %{
+                  user: user,
+                  joined_at: inspect(System.system_time(:second)),
+                  status: :in_game
+                }
+              )
 
               ProcessMonitor.monitor(fn _reason ->
                 case GameServer.leave_game(game_server_pid, user_id) do
@@ -80,6 +94,19 @@ defmodule TetrexWeb.MultiplayerGameLive do
             if connected?(socket) do
               GameServer.subscribe_updates(game_server_pid)
               GameServer.join_game(game_server_pid, user_id)
+
+              # Track user as in game
+              user = UserStore.get_user!(user_id)
+              TetrexWeb.Presence.track(
+                self(),
+                "users:global",
+                user_id,
+                %{
+                  user: user,
+                  joined_at: inspect(System.system_time(:second)),
+                  status: :in_game
+                }
+              )
 
               ProcessMonitor.monitor(fn _reason ->
                 case GameServer.leave_game(game_server_pid, user_id) do
