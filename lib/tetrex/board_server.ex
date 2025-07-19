@@ -159,7 +159,6 @@ defmodule Tetrex.BoardServer do
     new_board = Board.remove_blocking_row(board)
     preview = Board.preview(new_board)
 
-    IO.inspect("REMOVE BLOCKIMG")
     {:reply, preview, new_board}
   end
 
