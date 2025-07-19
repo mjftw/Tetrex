@@ -1,6 +1,8 @@
 # Tetrex
 
-Yet another Tetris game, because everyone loves Tetris! For the accompanying talk to this project see [**Building Multiplayer Tetris from Scratch with OTP, Elixir and Phoenix**](https://www.youtube.com/watch?v=87iFws4c78s).
+Yet another Tetris game, because everyone loves Tetris!
+
+For the accompanying talk to this project see [**Building Multiplayer Tetris from Scratch with OTP, Elixir and Phoenix**](https://www.youtube.com/watch?v=87iFws4c78s).
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/87iFws4c78s/0.jpg)](https://www.youtube.com/watch?v=87iFws4c78s)
 
