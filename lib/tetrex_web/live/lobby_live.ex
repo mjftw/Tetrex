@@ -36,6 +36,8 @@ defmodule TetrexWeb.LobbyLive do
      )
      |> assign(:users, %{})
      |> assign(:multiplayer_games, multiplayer_games)
+     |> assign(:editing_username, false)
+     |> assign(:temp_username, "")
      |> mount_presence_init()}
   end
 
@@ -97,6 +99,75 @@ defmodule TetrexWeb.LobbyLive do
      |> push_redirect(to: ~p"/multiplayer-game/#{game_id}")}
   end
 
+  @impl true
+  def handle_event("edit-username", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:editing_username, true)
+     |> assign(:temp_username, socket.assigns.current_user.username)}
+  end
+
+  @impl true
+  def handle_event("cancel-edit-username", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:editing_username, false)
+     |> assign(:temp_username, "")}
+  end
+
+  @impl true
+  def handle_event("update-username", params, socket) do
+    username = case params do
+      %{"username" => username} -> username  # From button click
+      %{"value" => username} -> username     # From keyboard event
+      _ -> socket.assigns.temp_username      # Fallback to current temp
+    end
+    
+    trimmed_username = String.trim(username)
+    
+    if valid_username?(trimmed_username) do
+      UserStore.put_user(socket.assigns.current_user.id, trimmed_username)
+      updated_user = %{socket.assigns.current_user | username: trimmed_username}
+
+      # Update presence with new username
+      update_presence_username(socket, updated_user)
+
+      {:noreply,
+       socket
+       |> assign(:current_user, updated_user)
+       |> assign(:editing_username, false)
+       |> assign(:temp_username, "")
+       |> put_flash(:info, "Username updated successfully!")}
+    else
+      {:noreply,
+       socket
+       |> put_flash(:error, "Please enter a valid username")}
+    end
+  end
+
+  @impl true
+  def handle_event("temp-username-change", %{"value" => username}, socket) do
+    {:noreply,
+     socket
+     |> assign(:temp_username, username)}
+  end
+
+  @impl true
+  def handle_event("handle-keyboard", %{"key" => "Enter", "value" => username}, socket) do
+    handle_event("update-username", %{"value" => username}, socket)
+  end
+
+  @impl true
+  def handle_event("handle-keyboard", %{"key" => "Escape"}, socket) do
+    handle_event("cancel-edit-username", %{}, socket)
+  end
+
+  @impl true
+  def handle_event("handle-keyboard", _params, socket) do
+    # Ignore other keys
+    {:noreply, socket}
+  end
+
   # PubSub handlers
   @impl true
   def handle_info({:created_multiplayer_game, game_server_pid}, socket) do
@@ -147,5 +218,24 @@ defmodule TetrexWeb.LobbyLive do
     updated_games = Enum.filter(socket.assigns.multiplayer_games, &(&1.game_id != game_id))
 
     assign(socket, multiplayer_games: updated_games)
+  end
+
+  defp valid_username?(username) do
+    String.length(username) > 0 && String.length(username) <= 50
+  end
+
+  defp update_presence_username(socket, updated_user) do
+    if connected?(socket) do
+      # Update presence in lobby only
+      TetrexWeb.Presence.update(
+        self(),
+        "room:lobby",
+        updated_user.id,
+        %{
+          user: updated_user,
+          joined_at: inspect(System.system_time(:second))
+        }
+      )
+    end
   end
 end

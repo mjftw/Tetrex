@@ -18,8 +18,51 @@
                         <div class="w-4 h-4 bg-cyan-400 rounded-sm shadow-sm"></div>
                     </div>
                 </div>
-                <div class="text-lg font-semibold text-white bg-white/20 px-4 py-2 rounded-xl border border-white/30 shadow-lg">
-                    Player: <span class="text-cyan-200"><%= @current_user.username %></span>
+                <div class="text-lg font-semibold text-white bg-white/20 px-4 py-2 rounded-xl border border-white/30 shadow-lg flex items-center space-x-3">
+                    <%= if @editing_username do %>
+                        <div class="flex items-center space-x-2">
+                            <span>Player:</span>
+                            <input 
+                                type="text" 
+                                value={@temp_username}
+                                phx-change="temp-username-change"
+                                phx-keydown="handle-keyboard"
+                                class="bg-white/20 border border-white/40 rounded-lg px-2 py-1 text-cyan-200 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300"
+                                placeholder="Enter username"
+                                maxlength="50"
+                            />
+                            <button 
+                                phx-click="update-username" 
+                                phx-value-username={@temp_username}
+                                class="text-green-300 hover:text-green-200 transition-colors"
+                                title="Save username"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </button>
+                            <button 
+                                phx-click="cancel-edit-username"
+                                class="text-red-300 hover:text-red-200 transition-colors"
+                                title="Cancel editing"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    <% else %>
+                        <span>Player: <span class="text-cyan-200"><%= @current_user.username %></span></span>
+                        <button 
+                            phx-click="edit-username"
+                            class="text-gray-300 hover:text-white transition-colors"
+                            title="Edit username"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                            </svg>
+                        </button>
+                    <% end %>
                 </div>
             </div>
         </div>
