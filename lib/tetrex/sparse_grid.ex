@@ -156,13 +156,12 @@ defmodule Tetrex.SparseGrid do
   @spec rotate(sparse_grid(), angle(), coordinate()) :: sparse_grid()
   def rotate(grid, angle, {rotate_at_y, rotate_at_x}) do
     # Rotating around a point is the same as moving to the origin, rotating, and moving back
-    new_grid =
-      grid.values
-      |> move_grid({-rotate_at_y, -rotate_at_x})
-      |> rotate_grid(angle)
-      |> move_grid({rotate_at_y, rotate_at_x})
-      |> Map.new()
-      |> new()
+    grid.values
+    |> move_grid({-rotate_at_y, -rotate_at_x})
+    |> rotate_grid(angle)
+    |> move_grid({rotate_at_y, rotate_at_x})
+    |> Map.new()
+    |> new()
   end
 
   @doc """
@@ -535,7 +534,7 @@ defimpl Inspect, for: Tetrex.SparseGrid do
       |> List.duplicate(br_x - tl_x + 1)
       |> Enum.join("┼")
 
-    row_top_capped = String.slice(row_left_padding, 1..-1) <> "y" <> " ┼" <> row_top <> "┤"
+    row_top_capped = String.slice(row_left_padding, 1..-1//1) <> "y" <> " ┼" <> row_top <> "┤"
 
     row_bottom =
       String.duplicate("─", cell_width + 2)
