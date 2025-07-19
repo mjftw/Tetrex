@@ -1,5 +1,5 @@
 defmodule TetrexWeb.Components.Soundtrack do
-  use TetrexWeb, :live_component
+  use Phoenix.Component
 
   attr :id, :string, required: true
   attr :src, :string, required: true
