@@ -12,7 +12,13 @@ defmodule TetrexWeb.Plugs.RequireUsername do
 
     signup_path = ~p"/signup"
 
-    if conn.request_path == signup_path do
+    # Skip redirect for iframe contexts to prevent redirect loops
+    is_iframe = case get_req_header(conn, "sec-fetch-dest") do
+      ["iframe"] -> true
+      _ -> false
+    end
+
+    if conn.request_path == signup_path or is_iframe do
       conn
     else
       case UserStore.get_user(user_id) do
