@@ -1,5 +1,5 @@
 defmodule TetrexWeb.SignupLive do
-  alias Tetrex.Users.UserStore
+  alias Tetrex.Users.{UserStore, NameGenerator}
   use TetrexWeb, :live_view
 
   require Logger
@@ -9,7 +9,15 @@ defmodule TetrexWeb.SignupLive do
 
   @impl true
   def mount(_params, %{"user_id" => current_user_id} = _session, socket) do
-    {:ok, assign(socket, :current_user_id, current_user_id)}
+    # Automatically generate a random username and redirect
+    username = NameGenerator.generate()
+    UserStore.put_user(current_user_id, username)
+
+    {:ok, 
+     socket
+     |> assign(:current_user_id, current_user_id)
+     |> assign(:generated_username, username)
+     |> push_redirect(to: ~p"/")}
   end
 
   @impl true
