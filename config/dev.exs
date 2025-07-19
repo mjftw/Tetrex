@@ -3,7 +3,7 @@ import Config
 config :tetrex, :settings,
   multiplayer: [
     # Use this to simulate lots of additional players in a game
-    num_fake_players_to_add_on_start: 500,
+    num_fake_players_to_add_on_start: 0,
     # If true, the Patchwork library will be used to send state diffs
     # rather than the entire state.
     # Thought this would be a good idea... it was a terrible idea, it makes
