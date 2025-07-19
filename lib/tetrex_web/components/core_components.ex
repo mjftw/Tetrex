@@ -317,6 +317,34 @@ defmodule TetrexWeb.CoreComponents do
   end
 
   @doc """
+  Renders a Tetris-themed button with various styles
+  """
+  attr(:type, :string, default: "primary", values: ["primary", "secondary"])
+  attr(:class, :string, default: nil)
+  attr(:rest, :global, include: ~w(disabled form name value))
+  slot(:inner_block, required: true)
+
+  def tetris_button(assigns) do
+    ~H"""
+    <.button
+      class={
+        [
+          case @type do
+            "primary" -> "bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/30 rounded-xl"
+            "secondary" -> "bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-300 hover:to-pink-300 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/30 rounded-xl"
+          end,
+          @class
+        ]
+        |> Enum.join(" ")
+      }
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </.button>
+    """
+  end
+
+  @doc """
   Renders an input with label and error messages.
 
   A `Phoenix.HTML.FormField` may be passed as argument,

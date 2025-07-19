@@ -1,5 +1,5 @@
-<div class="flex justify-center">
-  <div class="relative flex flex-col items-center bg-teal-500 pt-3 pb-5 px-6 rounded-md w-fit" phx-window-keydown="keypress">
+<div class="flex justify-center items-center p-6 min-h-screen">
+    <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-6 pb-8 px-8 rounded-2xl w-fit shadow-2xl" phx-window-keydown="keypress">
     <.live_component module={Audio} id="single-player-game-audio" class="absolute inset-x-4 w-8 md:w-10"/>
 
       <%= case @status do %>
@@ -53,5 +53,4 @@
       />
     </div>
   </div>
-
 </div>
