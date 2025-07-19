@@ -1,4 +1,5 @@
 
+<div class="flex justify-center items-center p-6 min-h-screen">
 <div class="relative" phx-window-keydown="keypress">
   <% user_player_data = user_player_data!(@game, @user_id)%>
   <% user_status = Map.fetch!(user_player_data, :status) %>
@@ -50,10 +51,10 @@
         <!-- Display current user's boards -->
         <div class="col-span-full md:col-span-9 md:col-start-2 lg:col-span-5">
             <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
-                <div class="relative flex flex-col items-center bg-teal-500 pt-3 pb-5 px-6 rounded-md w-fit">
+                <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-6 pb-8 px-8 rounded-2xl w-fit shadow-2xl">
                   <.live_component module={Audio} id="multiplayer-game-audio" class="absolute inset-x-4 w-8 md:w-10"/>
 
-                  <div class="bg-green-300 opacity-70 p-2 rounded-lg ring-1 ring-slate-800 text-sm">
+                  <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
                     <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
                   </div>
 
@@ -82,5 +83,6 @@
       on_drop={JS.push("drop")}
     />
   </div>
+</div>
 </div>
 

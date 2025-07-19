@@ -1,58 +1,139 @@
-<div>
-    <div class="flex flex-row justify-between">
-        <span class="text-lg">Lobby</span>
-        <span class="text-lg">Current user: <%= @current_user.username %></span>
+<div class="p-6">
+    <!-- Tetris-themed header -->
+    <div class="max-w-6xl mx-auto">
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 mb-8 shadow-2xl">
+            <div class="flex flex-row justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="text-4xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">
+                        TETREX LOBBY
+                    </div>
+                    <div class="flex space-x-1">
+                        <!-- Tetris block decorations -->
+                        <div class="w-4 h-4 bg-red-400 rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-yellow-400 rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-green-400 rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-blue-400 rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-purple-400 rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-orange-400 rounded-sm shadow-sm"></div>
+                        <div class="w-4 h-4 bg-cyan-400 rounded-sm shadow-sm"></div>
+                    </div>
+                </div>
+                <div class="text-lg font-semibold text-white bg-white/20 px-4 py-2 rounded-xl border border-white/30 shadow-lg">
+                    Player: <span class="text-cyan-200"><%= @current_user.username %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users section -->
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 mb-8 shadow-2xl">
+            <% num_users = Enum.count(@users) %>
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-6 h-6 bg-emerald-400 rounded-sm animate-pulse shadow-sm"></div>
+                <h2 class="text-2xl font-bold text-white">Online Players: <%= num_users %></h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <%= for {_user_id, %{user: %User{id: user_id, username: username}}} <- Enum.take(@users, 8), user_id != @current_user.id  do %>
+                    <div class="bg-emerald-400/20 border border-emerald-300/40 rounded-xl px-3 py-2 text-white font-medium shadow-lg">
+                        <%= username %>
+                    </div>
+                <% end %>
+                <%= if num_users > 8 do %>
+                    <div class="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-gray-200 italic shadow-lg">
+                        +<%= num_users - 8 %> more...
+                    </div>
+                <% end %>
+            </div>
+        </div>
+
+        <!-- Game modes grid -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Single Player Card -->
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-2xl flex flex-col">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-orange-400 rounded-lg flex items-center justify-center shadow-lg">
+                            <div class="w-4 h-4 bg-orange-200 rounded-sm"></div>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Single Player</h2>
+                    </div>
+                    <%= if @user_has_single_player_game do %>
+                        <.tetris_button type="primary" phx-click="resume-single-player-game">
+                            🎮 Resume Game
+                        </.tetris_button>
+                    <% else %>
+                        <.tetris_button type="primary" phx-click="new-single-player-game">
+                            🚀 Start New Game
+                        </.tetris_button>
+                    <% end %>
+                </div>
+                
+                <div class="flex-1 flex flex-col">
+                    <p class="text-gray-200 mb-6">Challenge yourself in solo mode</p>
+                </div>
+            </div>
+
+            <!-- Multiplayer Card -->
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-2xl flex flex-col">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-pink-400 rounded-lg flex items-center justify-center shadow-lg">
+                            <div class="w-4 h-4 bg-pink-200 rounded-sm"></div>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">Multiplayer</h2>
+                    </div>
+                    <.tetris_button type="primary" phx-click="new-multiplayer-game">
+                        ➕ Create Game
+                    </.tetris_button>
+                </div>
+                
+                <div class="flex-1 flex flex-col">
+                    <p class="text-gray-200 mb-6">Compete with friends</p>
+                    
+                    <!-- Games list -->
+                    <div class="flex-1">
+                        <%= if Enum.empty?(@multiplayer_games) do %>
+                            <div class="text-center py-8 text-gray-300">
+                                <div class="text-4xl mb-2">🎯</div>
+                                <p>No active games</p>
+                                <p class="text-sm">Create one to get started!</p>
+                            </div>
+                        <% else %>
+                            <div class="space-y-3 max-h-64 overflow-y-auto">
+                                <%= for game <- @multiplayer_games do %>
+                                    <div class="bg-white/10 border border-white/20 rounded-xl p-4 flex items-center justify-between shadow-lg">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="text-lg font-bold text-white">
+                                                #<%= String.slice(game.game_id, 0, 6) %>
+                                            </div>
+                                            <div class="text-gray-200">
+                                                👥 <%= Multiplayer.Game.num_players(game) %> player<%= if Multiplayer.Game.num_players(game) != 1, do: "s" %>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <%= cond  do %>
+                                            <%  Multiplayer.Game.has_started?(game) -> %>
+                                                <div class="bg-yellow-400/20 border border-yellow-300/40 text-yellow-200 px-3 py-1 rounded-full text-sm font-medium shadow-sm">
+                                                    🔥 In Progress
+                                                </div>
+                                            <%  Multiplayer.Game.is_full?(game) -> %>
+                                                <div class="bg-red-400/20 border border-red-300/40 text-red-200 px-3 py-1 rounded-full text-sm font-medium shadow-sm">
+                                                    🚫 Full
+                                                </div>
+                                            <%  true -> %>
+                                                <.tetris_button type="secondary" phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>
+                                                    ⚡ Join
+                                                </.tetris_button>
+                                            <% end %>
+                                        </div>
+                                    </div>
+                                <% end %>
+                            </div>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <.horizontal_divider />
-
-    <.horizontal_divider />
-
-    <div class="pt-3">
-        <% num_users = Enum.count(@users) %>
-        <h2>Users in lobby: <%= num_users %></h2>
-        <ul role="list" class="marker:text-sky-400 list-disc pl-5 space-y-3 text-slate-500">
-            <%= for {_user_id, %{user: %User{id: user_id, username: username}}} <- Enum.take(@users, 9), user_id != @current_user.id  do %>
-                <li> <%= username %> </li>
-            <% end %>
-            <%= if num_users > 9 do %>
-                <li> ... </li>
-            <% end %>
-        </ul>
-    </div>
-
-    <.horizontal_divider />
-
-    <div class="flex flex-row justify-between">
-        <h2 class="text-xl">Single Player</h2>
-
-        <%= if @user_has_single_player_game do %>
-            <.button_primary phx-click="resume-single-player-game">Resume game</.button_primary>
-        <% else %>
-            <.button_primary phx-click="new-single-player-game">New game</.button_primary>
-        <% end %>
-    </div>
-
-    <.horizontal_divider />
-
-
-    <div class="flex flex-row justify-between">
-        <h2 class="text-xl">Multiplayer</h2>
-        <.button_primary phx-click="new-multiplayer-game">New game</.button_primary>
-    </div>
-
-    <%!-- <.table id="multiplayer_games" rows={Enum.sort_by(joinable_multiplayer_games(@multiplayer_games), &(if Multiplayer.Game.has_started?(&1), do: 1, else: 0))}> --%>
-    <.table id="multiplayer_games" rows={@multiplayer_games}>
-        <:col :let={game} label="Game ID"><%= game.game_id %></:col>
-        <:col :let={game} label="Number of Players"><%= Multiplayer.Game.num_players(game) %></:col>
-        <:col :let={game} label="Joinable">
-            <%= cond  do %>
-            <%  Multiplayer.Game.has_started?(game) -> %>
-                Game in progress
-            <%  Multiplayer.Game.is_full?(game) -> %>
-                Game full
-            <%  true -> %>
-                <.button_secondary phx-click="join-multiplayer-game" phx-value-game-id={game.game_id}>Join</.button_secondary>
-            <% end %>
-        </:col>
-    </.table>
 </div>
