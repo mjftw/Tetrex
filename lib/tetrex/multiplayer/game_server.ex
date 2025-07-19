@@ -165,7 +165,7 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
 
     if Game.exiting?(game) do
-      {:noreply, game}
+      {:noreply, game, {:continue, :request_termination}}
     else
       Process.send_after(self(), :publish_state_loop, div(1000, @rate_limit_max_updates_per_sec))
       {:noreply, game}

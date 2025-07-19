@@ -38,13 +38,25 @@ defmodule TetrexWeb.MultiplayerGameLive do
       {:ok, game_server_pid, game} ->
         cond do
           Multiplayer.Game.player_in_game?(game, user_id) ->
-            {:noreply,
-             socket
-             |> put_flash(
-               :error,
-               "Cannot join as you're already in the game. Is it open in another tab?"
-             )
-             |> redirect_to_lobby()}
+            if connected?(socket) do
+              GameServer.subscribe_updates(game_server_pid)
+
+              ProcessMonitor.monitor(fn _reason ->
+                case GameServer.leave_game(game_server_pid, user_id) do
+                  :ok ->
+                    nil
+
+                  {:error, :cannot_leave_game_in_progress} ->
+                    :ok = GameServer.kill_player(game_server_pid, user_id)
+
+                  {:error, error} ->
+                    Logger.error(inspect(error))
+                end
+              end)
+            end
+
+            initial_game_state = GameServer.get_game_message(game_server_pid)
+            {:noreply, assign(socket, game: initial_game_state, game_server_pid: game_server_pid)}
 
           Multiplayer.Game.has_started?(game) ->
             {:noreply,
@@ -295,6 +307,12 @@ defmodule TetrexWeb.MultiplayerGameLive do
   def num_players_in_game(%GameMessage{players: players}), do: Enum.count(players)
 
   def num_alive_opponents(%GameMessage{players: players}) do
+    players
+    |> Stream.filter(fn {_user_id, %{status: status}} -> status != :dead end)
+    |> Enum.count()
+  end
+
+  def num_alive_opponents(%Tetrex.Multiplayer.Game{players: players}) do
     players
     |> Stream.filter(fn {_user_id, %{status: status}} -> status != :dead end)
     |> Enum.count()
