@@ -295,10 +295,9 @@ defmodule TetrexWeb.MultiplayerGameLive do
   def num_players_in_game(%GameMessage{players: players}), do: Enum.count(players)
 
   def num_alive_opponents(%GameMessage{players: players}) do
-    num_alive_players =
-      players
-      |> Stream.filter(fn {_user_id, %{status: status}} -> status != :dead end)
-      |> Enum.count()
+    players
+    |> Stream.filter(fn {_user_id, %{status: status}} -> status != :dead end)
+    |> Enum.count()
   end
 
   defp handle_status_changes(
