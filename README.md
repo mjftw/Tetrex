@@ -4,11 +4,6 @@ Yet another Tetris game, because everyone loves Tetris! For the accompanying tal
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/87iFws4c78s/0.jpg)](https://www.youtube.com/watch?v=87iFws4c78s)
 
-I did a talk on the game at CodeBeam Europe, you can watch it here:
-
-[![Building Multiplayer Tetris from scratch with OTP, Elixir, and Phoenix by Merlin Webster | Code BEAM
-](https://img.youtube.com/vi/87iFws4c78s/0.jpg)](https://www.youtube.com/watch?v=87iFws4c78s)
-
 ## How to play
 
 The easiest way to play is to head on over to https://tetrex.fly.dev/
