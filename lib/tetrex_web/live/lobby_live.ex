@@ -10,7 +10,7 @@ defmodule TetrexWeb.LobbyLive do
 
   use LiveViewUserTracking,
     presence: TetrexWeb.Presence,
-    topic: "room:lobby",
+    topic: "users:global",
     socket_current_user_assign_key: :current_user,
     socket_users_assign_key: :users
 
@@ -38,7 +38,7 @@ defmodule TetrexWeb.LobbyLive do
      |> assign(:multiplayer_games, multiplayer_games)
      |> assign(:editing_username, false)
      |> assign(:temp_username, "")
-     |> mount_presence_init()}
+     |> mount_presence_init_with_status(:in_lobby)}
   end
 
   @impl true
@@ -225,16 +225,39 @@ defmodule TetrexWeb.LobbyLive do
 
   defp update_presence_username(socket, updated_user) do
     if connected?(socket) do
-      # Update presence in lobby only
+      # Update presence in global user topic
       TetrexWeb.Presence.update(
         self(),
-        "room:lobby",
+        "users:global",
         updated_user.id,
         %{
           user: updated_user,
-          joined_at: inspect(System.system_time(:second))
+          joined_at: inspect(System.system_time(:second)),
+          status: :in_lobby
         }
       )
     end
+  end
+
+  defp mount_presence_init_with_status(socket, status) do
+    if connected?(socket) do
+      %User{id: current_user_id} = user = socket.assigns.current_user
+
+      {:ok, _} =
+        TetrexWeb.Presence.track(
+          self(),
+          "users:global",
+          current_user_id,
+          %{
+            user: user,
+            joined_at: inspect(System.system_time(:second)),
+            status: status
+          }
+        )
+
+      Phoenix.PubSub.subscribe(Tetrex.PubSub, "users:global")
+    end
+
+    handle_presence_joins(socket, TetrexWeb.Presence.list("users:global"))
   end
 end
