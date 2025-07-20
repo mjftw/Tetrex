@@ -58,10 +58,10 @@
                     <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
                   </div>
 
-                    <div class="grid grid-cols-10 gap-3 content-center">
-                        <BoardComponents.hold_tile_box board={board_preview} class="col-span-2"/>
-                        <BoardComponents.playfield board={board_preview} class="col-span-6" is_dead={status == :dead}/>
-                        <BoardComponents.next_tile_box board={board_preview} class="col-span-2"/>
+                    <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 lg:gap-4 content-center">
+                        <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                        <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                        <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
                     </div>
                 </div>
             <% end %>

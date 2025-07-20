@@ -35,10 +35,12 @@
       <% end %>
 
         <BoardComponents.score_box score={@lines_cleared}/>
-        <div class="grid grid-cols-10 gap-3 content-center max-w-xl">
-          <BoardComponents.hold_tile_box board={@board} class="col-span-2" phx-click="hold"/>
-          <BoardComponents.playfield board={@board} class="col-span-6" is_dead={@status == :game_over}/>
-          <BoardComponents.next_tile_box board={@board} class="col-span-2"/>
+        <div class="w-full max-w-xl mx-auto">
+          <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 lg:gap-4 content-center">
+            <BoardComponents.hold_tile_box board={@board} class="justify-self-center" phx-click="hold"/>
+            <BoardComponents.playfield board={@board} class="justify-self-center" is_dead={@status == :game_over}/>
+            <BoardComponents.next_tile_box board={@board} class="justify-self-center"/>
+          </div>
         </div>
 
 

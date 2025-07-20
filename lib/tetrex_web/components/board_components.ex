@@ -129,8 +129,7 @@ defmodule TetrexWeb.Components.BoardComponents do
   defp centre_single_tile(tile), do: SparseGrid.align(tile, :centre, {0, 0}, {3, 3})
 
   defp box_default_styles,
-    do:
-      "m-1 h-fit w-fit rounded-md border-2 border-solid border-slate-700 bg-orange-100 text-center"
+    do: "h-fit w-fit rounded-md border-2 border-solid border-slate-700 bg-orange-100 text-center"
 
   attr(:type, :atom, required: true)
   attr(:x, :integer, required: true)
