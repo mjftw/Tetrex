@@ -44,6 +44,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
               # Track user as in game (rejoining)
               user = UserStore.get_user!(user_id)
+
               TetrexWeb.Presence.track(
                 self(),
                 "users:global",
@@ -97,6 +98,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
 
               # Track user as in game
               user = UserStore.get_user!(user_id)
+
               TetrexWeb.Presence.track(
                 self(),
                 "users:global",
@@ -312,7 +314,7 @@ defmodule TetrexWeb.MultiplayerGameLive do
     data
   end
 
-  defp opponent_data_to_display(players, current_user_id) do
+  def opponent_data_to_display(players, current_user_id) do
     players
     |> Stream.filter(fn {user_id, _} -> user_id != current_user_id end)
     |> Stream.take(@num_opponent_boards_to_show)

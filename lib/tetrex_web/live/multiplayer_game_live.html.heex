@@ -42,36 +42,223 @@
     <% _ -> %>
   <% end %>
 
-    <div class="grid grid-cols-11 gap-1 aspect-video">
-        <!-- Display other users's boards -->
-        <div class="col-span-3 hidden lg:block">
-            <BoardComponents.multiplayer_tiled_playfields player_states={even_opponents_player_data(@game.players, @user_id)}/>
-        </div>
-
-        <!-- Display current user's boards -->
-        <div class="col-span-full md:col-span-9 md:col-start-2 lg:col-span-5">
-            <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
-                <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-4 pb-6 px-3 sm:px-6 md:px-8 sm:pt-6 sm:pb-8 rounded-xl sm:rounded-2xl w-full max-w-lg sm:w-fit lg:max-w-2xl xl:max-w-3xl shadow-2xl">
-                  <.live_component module={Audio} id="multiplayer-game-audio" class="absolute inset-x-4 w-8 md:w-10"/>
-
+        <% opponent_count = Enum.count(opponent_data_to_display(@game.players, @user_id)) %>
+    <%= cond do %>
+      <% opponent_count == 1 -> %>
+        <!-- 1 opponent: Mobile shows only your game, desktop shows side-by-side -->
+        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
+          <div class="relative">
+            <div class="block md:hidden">
+              <!-- Mobile: Only show your game -->
+              <div class="flex flex-col items-center">
+                <div class="text-center mb-2">
+                    <span class="bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                        🎮 Your Game
+                    </span>
+                </div>
+                <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-4 pb-6 px-3 sm:px-6 sm:pt-6 sm:pb-8 rounded-xl sm:rounded-2xl w-full max-w-lg mx-auto shadow-2xl">
+                  <.live_component module={Audio} id="multiplayer-game-audio" class="absolute top-4 left-4 w-8 md:w-10 z-10"/>
                   <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
                     <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
-                                      </div>
+                  </div>
+                  <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 content-center">
+                       <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                       <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                       <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+                   </div>
+                 </div>
+              </div>
+            </div>
+            
+            <div class="hidden md:grid md:grid-cols-2 gap-4 lg:gap-6">
+              <!-- Desktop: Side-by-side layout -->
+              <!-- Your game -->
+              <div class="flex flex-col">
+                <div class="text-center mb-2">
+                    <span class="bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                        🎮 Your Game
+                    </span>
+                </div>
+                <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-2 pb-4 px-2 sm:px-4 md:px-6 sm:pt-4 sm:pb-6 rounded-lg sm:rounded-xl w-full mx-auto shadow-2xl">
+                  <.live_component module={Audio} id="multiplayer-game-audio-desktop" class="absolute top-4 left-4 w-8 md:w-10 z-10"/>
+                  <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
+                    <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
+                  </div>
+                  <div class="grid grid-cols-[1fr_2fr_1fr] gap-1 sm:gap-2 md:gap-3 content-center">
+                       <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                       <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                       <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+                   </div>
+                 </div>
+               </div>
+               
+               <!-- Single opponent -->
+               <div class="flex flex-col">
+                 <div class="text-center mb-2">
+                     <span class="bg-purple-400/20 border border-purple-300/40 text-purple-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                         👥 Opponent
+                     </span>
+                 </div>
+                 <div class="flex-1 flex items-center justify-center">
+                     <BoardComponents.multiplayer_single_opponent_board player_states={opponent_data_to_display(@game.players, @user_id)}/>
+                 </div>
+               </div>
+            </div>
+          </div>
+        <% end %>
 
-                    <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 lg:gap-4 xl:gap-5 content-center">
-                        <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
-                        <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
-                        <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+            <% opponent_count == 2 -> %>
+        <!-- 2 opponents: Mobile shows only your game, desktop shows 3-column layout -->
+        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
+          <div class="relative">
+            <div class="block md:hidden">
+              <!-- Mobile: Only show your game -->
+              <div class="flex flex-col items-center">
+                <div class="text-center mb-2">
+                    <span class="bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                        🎮 Your Game
+                    </span>
+                </div>
+                <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-4 pb-6 px-3 sm:px-6 sm:pt-6 sm:pb-8 rounded-xl sm:rounded-2xl w-full max-w-lg mx-auto shadow-2xl">
+                  <.live_component module={Audio} id="multiplayer-game-audio" class="absolute top-4 left-4 w-8 md:w-10 z-10"/>
+                  <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
+                    <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
+                  </div>
+                  <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 content-center">
+                       <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                       <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                       <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+                   </div>
+                 </div>
+              </div>
+            </div>
+            
+            <div class="hidden md:grid md:grid-cols-3 gap-1 sm:gap-2 lg:gap-4 xl:gap-6">
+              <!-- Desktop: 3-column layout -->
+              <!-- Your game -->
+              <div class="flex flex-col lg:order-2">
+                <div class="text-center mb-2">
+                    <span class="bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                        🎮 Your Game
+                    </span>
+                </div>
+                <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-2 pb-4 px-2 sm:px-4 md:px-6 sm:pt-4 sm:pb-6 rounded-lg sm:rounded-xl w-full mx-auto shadow-2xl">
+                  <.live_component module={Audio} id="multiplayer-game-audio-desktop-2p" class="absolute top-4 left-4 w-8 md:w-10 z-10"/>
+                  <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
+                    <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
+                  </div>
+                  <div class="grid grid-cols-[1fr_2fr_1fr] gap-1 sm:gap-2 md:gap-3 content-center">
+                       <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                       <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                       <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+                   </div>
+                 </div>
+               </div>
+               
+               <!-- First opponent -->
+               <div class="flex flex-col lg:order-1">
+                 <div class="text-center mb-2">
+                     <span class="bg-purple-400/20 border border-purple-300/40 text-purple-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                         👥 Opponent
+                     </span>
+                 </div>
+                 <div class="flex-1 flex items-center justify-center">
+                     <BoardComponents.multiplayer_single_opponent_board player_states={even_opponents_player_data(@game.players, @user_id)}/>
+                 </div>
+               </div>
+               
+               <!-- Second opponent -->
+               <div class="flex flex-col lg:order-3">
+                 <div class="text-center mb-2">
+                     <span class="bg-purple-400/20 border border-purple-300/40 text-purple-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                         👥 Opponent
+                     </span>
+                 </div>
+                 <div class="flex-1 flex items-center justify-center">
+                     <BoardComponents.multiplayer_single_opponent_board player_states={odd_opponents_player_data(@game.players, @user_id)}/>
+                 </div>
+               </div>
+            </div>
+          </div>
+        <% end %>
+
+      <% true -> %>
+        <!-- 3+ opponents: Show only active player on small screens, full layout on large screens -->
+        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
+                     <div class="relative">
+             <div class="block md:hidden">
+               <!-- Small screens: Only show your game -->
+               <div class="flex flex-col items-center">
+                 <div class="text-center mb-2">
+                     <span class="bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                         🎮 Your Game
+                     </span>
+                 </div>
+                 <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-4 pb-6 px-3 sm:px-6 md:px-8 sm:pt-6 sm:pb-8 rounded-xl sm:rounded-2xl w-full max-w-lg md:max-w-2xl mx-auto shadow-2xl">
+                   <.live_component module={Audio} id="multiplayer-game-audio" class="absolute top-4 left-4 w-8 md:w-10 z-10"/>
+                  <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
+                    <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
+                  </div>
+                  <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 md:gap-4 content-center">
+                      <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                      <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                      <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="hidden md:block">
+              <!-- Large screens: Full layout with opponent boards -->
+              <div class="grid grid-cols-11 gap-2 aspect-video">
+                <!-- Left opponents section -->
+                <div class="col-span-3 flex flex-col">
+                    <div class="text-center mb-2">
+                        <span class="bg-purple-400/20 border border-purple-300/40 text-purple-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                            👥 Opponents
+                        </span>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center">
+                        <BoardComponents.multiplayer_tiled_playfields player_states={even_opponents_player_data(@game.players, @user_id)}/>
                     </div>
                 </div>
-            <% end %>
-        </div>
 
-        <!-- Display other users's boards -->
-        <div class="col-span-3 hidden lg:block">
-            <BoardComponents.multiplayer_tiled_playfields player_states={odd_opponents_player_data(@game.players, @user_id)}/>
-        </div>
-    </div>
+                <!-- Your game section -->
+                <div class="col-span-5 flex flex-col">
+                    <div class="text-center mb-2">
+                        <span class="bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                            🎮 Your Game
+                        </span>
+                    </div>
+                                         <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-4 pb-6 px-3 sm:px-6 md:px-8 sm:pt-6 sm:pb-8 rounded-xl sm:rounded-2xl w-full max-w-lg sm:w-fit lg:max-w-2xl xl:max-w-3xl shadow-2xl">
+                       <.live_component module={Audio} id="multiplayer-game-audio-desktop-3p" class="absolute top-4 left-4 w-8 md:w-10 z-10"/>
+                      <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
+                        <b>Opponents remaining: <%= num_alive_opponents(@game) - 1 %></b>
+                      </div>
+                      <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 lg:gap-4 xl:gap-5 content-center">
+                          <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                          <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                          <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+                      </div>
+                    </div>
+                </div>
+
+                <!-- Right opponents section -->
+                <div class="col-span-3 flex flex-col">
+                    <div class="text-center mb-2">
+                        <span class="bg-purple-400/20 border border-purple-300/40 text-purple-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                            👥 Opponents
+                        </span>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center">
+                        <BoardComponents.multiplayer_tiled_playfields player_states={odd_opponents_player_data(@game.players, @user_id)}/>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+    <% end %>
 
   <div class="absolute inset-x-0 bottom-2 sm:bottom-0 opacity-20 md:hidden">
     <Controls.mobile_controls
