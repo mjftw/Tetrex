@@ -5,7 +5,7 @@ defmodule Tetrex.MixProject do
     [
       app: :tetrex,
       version: "0.22.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -49,7 +49,8 @@ defmodule Tetrex.MixProject do
       {:versioce, "~> 2.0.0"},
       {:credo, "~> 1.7"},
       {:tailwind_formatter, "~> 0.3.6", only: [:dev, :test], runtime: false},
-      {:patchwork, git: "https://github.com/mjftw/patchwork.git", ref: "3e25990"}
+      {:patchwork, git: "https://github.com/mjftw/patchwork.git", ref: "3e25990"},
+      {:tidewave, "~> 0.2", only: :dev}
     ]
   end
 
