@@ -99,6 +99,22 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   attr(:player_states, :list, required: true)
 
+  def multiplayer_single_opponent_board(assigns) do
+    ~H"""
+    <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
+      <div class="bg-white/25 border-white/30 relative mx-auto flex w-full flex-col items-center rounded-lg border px-2 pt-2 pb-4 shadow-2xl backdrop-blur-md sm:rounded-xl sm:px-4 sm:pt-4 sm:pb-6 md:px-6">
+        <div class="grid-cols-[1fr_2fr_1fr] grid content-center gap-2 sm:gap-3 lg:gap-4">
+          <.hold_tile_box board={board_preview} class="justify-self-center" />
+          <.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead} />
+          <.next_tile_box board={board_preview} class="justify-self-center" />
+        </div>
+      </div>
+    <% end %>
+    """
+  end
+
+  attr(:player_states, :list, required: true)
+
   def multiplayer_tiled_playfields(assigns) do
     ~H"""
     <% grid_props = fn ->
@@ -116,10 +132,12 @@ defmodule TetrexWeb.Components.BoardComponents do
       end
     end %>
 
-    <div class="flex h-full items-center justify-end rounded-md bg-neutral-200 px-2">
-      <div class={["grid grid-flow-dense", grid_props.()]}>
+    <div class="bg-white/10 border-white/20 flex h-full items-center justify-center rounded-lg border p-2">
+      <div class={["grid grid-flow-dense gap-2", grid_props.()]}>
         <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
-          <.playfield board={board_preview} is_dead={status == :dead} />
+          <div class="flex flex-col items-center">
+            <.playfield board={board_preview} is_dead={status == :dead} class="scale-75" />
+          </div>
         <% end %>
       </div>
     </div>
