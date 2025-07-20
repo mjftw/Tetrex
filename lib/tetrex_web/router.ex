@@ -12,7 +12,7 @@ defmodule TetrexWeb.Router do
       "content-security-policy" => "frame-ancestors 'self' https://mjftw.dev"
     }
     plug TetrexWeb.Plugs.UserSession
-    plug TetrexWeb.Plugs.RequireUsername
+
   end
 
   pipeline :api do
@@ -24,7 +24,7 @@ defmodule TetrexWeb.Router do
       pipe_through :browser
 
       live "/admin", AdminLive
-      live "/signup", SignupLive
+
       live "/single-player-game", SinglePlayerGameLive
       live "/multiplayer-game/:game_id", MultiplayerGameLive
       live "/", LobbyLive
