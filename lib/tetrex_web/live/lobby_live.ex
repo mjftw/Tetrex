@@ -4,6 +4,7 @@ defmodule TetrexWeb.LobbyLive do
   alias Tetrex.Users.NameGenerator
   alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
+  alias TetrexWeb.Components.BoardComponents
 
   use TetrexWeb, :live_view
 
@@ -26,15 +27,17 @@ defmodule TetrexWeb.LobbyLive do
       Enum.each(multiplayer_game_pids, &Multiplayer.GameServer.subscribe_updates(&1))
     end
 
-    current_user = case UserStore.get_user(current_user_id) do
-      nil ->
-        # Generate a random username if user doesn't exist
-        username = NameGenerator.generate()
-        UserStore.put_user(current_user_id, username)
-        UserStore.get_user!(current_user_id)
-      user ->
-        user
-    end
+    current_user =
+      case UserStore.get_user(current_user_id) do
+        nil ->
+          # Generate a random username if user doesn't exist
+          username = NameGenerator.generate()
+          UserStore.put_user(current_user_id, username)
+          UserStore.get_user!(current_user_id)
+
+        user ->
+          user
+      end
 
     {:ok,
      socket
@@ -42,6 +45,10 @@ defmodule TetrexWeb.LobbyLive do
      |> assign(
        :user_has_single_player_game,
        GameDynamicSupervisor.user_has_single_player_game?(current_user.id)
+     )
+     |> assign(
+       :single_player_game_preview,
+       get_single_player_game_preview(current_user.id)
      )
      |> assign(:users, %{})
      |> assign(:multiplayer_games, multiplayer_games)
@@ -55,11 +62,17 @@ defmodule TetrexWeb.LobbyLive do
     user_id = socket.assigns.current_user.id
 
     if !GameDynamicSupervisor.user_has_single_player_game?(user_id) do
-      GameDynamicSupervisor.start_single_player_game(user_id)
+      case GameDynamicSupervisor.start_single_player_game(user_id) do
+        {:ok, _game_server_pid} ->
+          {:noreply,
+           socket
+           |> assign(:user_has_single_player_game, true)
+           |> assign(:single_player_game_preview, get_single_player_game_preview(user_id))
+           |> push_redirect(to: ~p"/single-player-game")}
 
-      {:noreply,
-       socket
-       |> push_redirect(to: ~p"/single-player-game")}
+        {:error, _error} ->
+          {:noreply, put_flash(socket, :error, "Failed to start single player game")}
+      end
     else
       {:noreply,
        socket
@@ -76,9 +89,12 @@ defmodule TetrexWeb.LobbyLive do
        socket
        |> push_redirect(to: ~p"/single-player-game")}
     else
+      # Game no longer exists, update the preview state
       {:noreply,
        socket
-       |> put_flash(:error, "Cannot find single player game #{1}")}
+       |> assign(:user_has_single_player_game, false)
+       |> assign(:single_player_game_preview, nil)
+       |> put_flash(:error, "Cannot find single player game")}
     end
   end
 
@@ -126,14 +142,18 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def handle_event("update-username", params, socket) do
-    username = case params do
-      %{"username" => username} -> username  # From button click
-      %{"value" => username} -> username     # From keyboard event
-      _ -> socket.assigns.temp_username      # Fallback to current temp
-    end
-    
+    username =
+      case params do
+        # From button click
+        %{"username" => username} -> username
+        # From keyboard event
+        %{"value" => username} -> username
+        # Fallback to current temp
+        _ -> socket.assigns.temp_username
+      end
+
     trimmed_username = String.trim(username)
-    
+
     if valid_username?(trimmed_username) do
       UserStore.put_user(socket.assigns.current_user.id, trimmed_username)
       updated_user = %{socket.assigns.current_user | username: trimmed_username}
@@ -217,10 +237,38 @@ defmodule TetrexWeb.LobbyLive do
   end
 
   def joinable_multiplayer_games(multiplayer_games),
-    do: Enum.filter(multiplayer_games, &(!Multiplayer.Game.has_started?(&1) && Multiplayer.Game.num_alive_players(&1) > 0))
+    do:
+      Enum.filter(
+        multiplayer_games,
+        &(!Multiplayer.Game.has_started?(&1) && Multiplayer.Game.num_alive_players(&1) > 0)
+      )
 
   def in_progress_multiplayer_games(multiplayer_games),
-    do: Enum.filter(multiplayer_games, &(&1.status == :playing && Multiplayer.Game.num_alive_players(&1) > 0))
+    do:
+      Enum.filter(
+        multiplayer_games,
+        &(&1.status == :playing && Multiplayer.Game.num_alive_players(&1) > 0)
+      )
+
+  defp get_single_player_game_preview(user_id) do
+    case GameDynamicSupervisor.user_single_player_game(user_id) do
+      nil ->
+        nil
+
+      {_pid,
+       %Tetrex.SinglePlayer.Game{
+         board_pid: board_pid,
+         status: status,
+         lines_cleared: lines_cleared
+       }} ->
+        try do
+          board_data = Tetrex.BoardServer.preview(board_pid)
+          %{board: board_data, status: status, lines_cleared: lines_cleared}
+        rescue
+          _ -> nil
+        end
+    end
+  end
 
   defp forget_multiplayer_game(socket, game_id) do
     updated_games = Enum.filter(socket.assigns.multiplayer_games, &(&1.game_id != game_id))

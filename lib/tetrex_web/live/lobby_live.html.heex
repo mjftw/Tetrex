@@ -105,21 +105,48 @@
                         <div class="w-8 h-8 bg-orange-400 rounded-lg flex items-center justify-center shadow-lg">
                             <div class="w-4 h-4 bg-orange-200 rounded-sm"></div>
                         </div>
-                        <h2 class="text-2xl font-bold text-white">Single Player</h2>
+                        <h2 class="text-2xl font-bold text-white">Single Player Game</h2>
                     </div>
-                    <%= if @user_has_single_player_game do %>
+                    <%= if @user_has_single_player_game and is_nil(@single_player_game_preview) do %>
                         <.tetris_button type="primary" phx-click="resume-single-player-game">
                             🎮 Resume Game
                         </.tetris_button>
                     <% else %>
-                        <.tetris_button type="primary" phx-click="new-single-player-game">
-                            🚀 Start New Game
-                        </.tetris_button>
+                        <%= if not @user_has_single_player_game do %>
+                            <.tetris_button type="primary" phx-click="new-single-player-game">
+                                🚀 Start New Game
+                            </.tetris_button>
+                        <% end %>
                     <% end %>
                 </div>
                 
                 <div class="flex-1 flex flex-col">
-                    <p class="text-gray-200 mb-6">Challenge yourself in solo mode</p>
+                    <%= if @single_player_game_preview do %>
+                        <div class="flex flex-col items-center">
+                            <div class="relative">
+                                <!-- Board preview with light blur and bigger scale -->
+                                <div class="blur-sm opacity-80 scale-75 transform origin-center">
+                                    <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 content-center">
+                                        <BoardComponents.hold_tile_box board={@single_player_game_preview.board} class="justify-self-center" />
+                                        <BoardComponents.playfield 
+                                            board={@single_player_game_preview.board} 
+                                            class="pointer-events-none justify-self-center" 
+                                            is_dead={@single_player_game_preview.status == :game_over}
+                                        />
+                                        <BoardComponents.next_tile_box board={@single_player_game_preview.board} class="justify-self-center" />
+                                    </div>
+                                </div>
+                                <!-- Resume Game button overlay -->
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <.tetris_button type="primary" phx-click="resume-single-player-game" class="shadow-2xl">
+                                        🎮 Resume Game
+                                    </.tetris_button>
+                                </div>
+                            </div>
+                        </div>
+                    <% else %>
+                        <p class="text-gray-200 mb-6">Challenge yourself in solo mode</p>
+                    <% end %>
                 </div>
             </div>
 
