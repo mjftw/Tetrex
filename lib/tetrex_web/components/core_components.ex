@@ -292,7 +292,7 @@ defmodule TetrexWeb.CoreComponents do
     <.button
       class={
         [
-          "bg-orange-300 text-slate-800 hover:bg-orange-200 transition-colors",
+          "bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/30 rounded-xl",
           @class
         ]
         |> Enum.join(" ")
@@ -314,7 +314,7 @@ defmodule TetrexWeb.CoreComponents do
     <.button
       class={
         [
-          "bg-slate-300 transition-colors hover:bg-slate-200 text-slate-800",
+          "bg-purple-500/30 hover:bg-purple-400/40 text-white font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 border border-purple-300/40 rounded-xl backdrop-blur-sm",
           @class
         ]
         |> Enum.join(" ")

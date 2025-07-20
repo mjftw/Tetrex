@@ -62,6 +62,14 @@ defmodule TetrexWeb.SinglePlayerGameLive do
   end
 
   @impl true
+  def handle_event("save_and_exit_game", _value, socket) do
+    # Save the game by keeping it running and just exit to lobby
+    socket
+    |> push_redirect(to: ~p"/")
+    |> noreply()
+  end
+
+  @impl true
   def handle_event("new_game", _value, socket),
     do:
       socket

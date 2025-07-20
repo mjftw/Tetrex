@@ -7,15 +7,19 @@
           <.modal id="game_intro_modal" on_cancel={JS.push("start_game")} backdrop_class="bg-transparent backdrop-blur-sm" show>
             <div class="flex flex-col items-center gap-5">
               <b>Ready Player 1</b>
-              <.button_primary phx-click="start_game">Start</.button_primary>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <.button_secondary phx-click="quit_game">Quit</.button_secondary>
+                <.button_primary phx-click="start_game">Start</.button_primary>
+              </div>
             </div>
           </.modal>
         <% :paused -> %>
           <.modal id="game_paused_modal" on_cancel={JS.push("start_game")} backdrop_class="bg-transparent backdrop-blur-sm" show>
             <div class="flex flex-col items-center gap-5">
               <b>Paused</b>
-                <div class="flex flex-row gap-3">
-                  <.button_secondary phx-click="quit_game">Quit game</.button_secondary>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <.button_secondary phx-click="save_and_exit_game">Save and Exit</.button_secondary>
+                  <.button_secondary phx-click="quit_game">Quit</.button_secondary>
                   <.button_primary phx-click="start_game">Resume</.button_primary>
                 </div>
             </div>
@@ -25,9 +29,10 @@
             <div class="flex flex-col items-center gap-5">
               <div>Game Over</div>
               <div>Score: <%= @lines_cleared%></div>
-              <div class="flex flex-row gap-3">
-                <.button_secondary phx-click="quit_game">Quit game</.button_secondary>
-                <.button_primary phx-click="new_game">Play again</.button_primary>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <.button_secondary phx-click="save_and_exit_game">Save and Exit</.button_secondary>
+                <.button_secondary phx-click="quit_game">Quit</.button_secondary>
+                <.button_primary phx-click="new_game">Play Again</.button_primary>
               </div>
             </div>
         </.modal>

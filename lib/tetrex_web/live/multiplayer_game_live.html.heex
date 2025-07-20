@@ -12,13 +12,19 @@
                 <% user_status == :not_ready -> %>
                     <div class="flex flex-col items-center gap-5">
                         <b>Waiting for all players to be ready...</b>
-                        <.button_primary phx-click="player-ready" phx-value-user-id={@user_id}>I'm ready!</.button_primary>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <.button_secondary phx-click="exit-game">Quit</.button_secondary>
+                            <.button_primary phx-click="player-ready" phx-value-user-id={@user_id}>I'm ready!</.button_primary>
+                        </div>
                     </div>
 
                 <% true -> %>
                     <div class="flex flex-col items-center gap-5">
                         <b>Waiting for all players to be ready...</b>
-                        <.button_secondary phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</.button_secondary>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <.button_secondary phx-click="exit-game">Quit</.button_secondary>
+                            <.button_secondary phx-click="player-not-ready" phx-value-user-id={@user_id}>I changed my mind, I'm not ready</.button_secondary>
+                        </div>
                     </div>
             <% end %>
         </.modal_simple>
