@@ -91,7 +91,7 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   def score_box(assigns) do
     ~H"""
-    <div class={[box_default_styles(), "p-2 text-xl", @class]}>
+    <div class={[box_default_styles(), "p-2 text-lg sm:text-xl mb-2 sm:mb-4", @class]}>
       Score: <%= @score %>
     </div>
     """
