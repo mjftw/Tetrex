@@ -8,7 +8,8 @@ defmodule TetrexWeb.Endpoint do
     store: :cookie,
     key: "_tetrex_key",
     signing_salt: "BRy6Zu+s",
-    same_site: "Lax"
+    same_site: "None",
+    secure: true
   ]
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
