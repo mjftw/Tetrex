@@ -53,6 +53,28 @@
 
         <% opponent_count = Enum.count(opponent_data_to_display(@game.players, @user_id)) %>
     <%= cond do %>
+      <% opponent_count == 0 -> %>
+        <!-- Only 1 player (user): Show only your game, no opponent boxes -->
+        <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
+          <div class="flex flex-col items-center">
+            <div class="text-center mb-2">
+                <span class="bg-cyan-400/20 border border-cyan-300/40 text-cyan-200 px-2 py-1 rounded-lg text-xs font-medium shadow-sm">
+                    🎮 Your Game: <%= get_user_name(@user_id) %>
+                </span>
+            </div>
+            <div class="relative flex flex-col items-center bg-white/25 backdrop-blur-md border border-white/30 pt-4 pb-6 px-3 sm:px-6 sm:pt-6 sm:pb-8 rounded-xl sm:rounded-2xl w-full max-w-lg mx-auto shadow-2xl">
+              <.live_component module={Audio} id="multiplayer-game-audio-single" class="absolute top-4 left-4 w-8 md:w-10 z-10"/>
+              <div class="bg-emerald-400/20 border border-emerald-300/40 p-3 rounded-xl text-white text-sm font-semibold shadow-lg mb-4">
+                <b>Waiting for opponents to join...</b>
+              </div>
+              <div class="grid grid-cols-[1fr_2fr_1fr] gap-2 sm:gap-3 content-center">
+                   <BoardComponents.hold_tile_box board={board_preview} class="justify-self-center"/>
+                   <BoardComponents.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead}/>
+                   <BoardComponents.next_tile_box board={board_preview} class="justify-self-center"/>
+               </div>
+             </div>
+          </div>
+        <% end %>
       <% opponent_count == 1 -> %>
         <!-- 1 opponent: Mobile shows only your game, desktop shows side-by-side -->
         <%= with %{board_preview: board_preview, lines_cleared: lines_cleared, status: status} <- user_player_data do %>
