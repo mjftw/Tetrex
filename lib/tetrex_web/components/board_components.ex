@@ -101,8 +101,13 @@ defmodule TetrexWeb.Components.BoardComponents do
 
   def multiplayer_single_opponent_board(assigns) do
     ~H"""
-    <%= for {_user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
+    <%= for {user_id, %{board_preview: board_preview, status: status}} <- @player_states do %>
       <div class="bg-white/25 border-white/30 relative mx-auto flex w-full flex-col items-center rounded-lg border px-2 pt-2 pb-4 shadow-2xl backdrop-blur-md sm:rounded-xl sm:px-4 sm:pt-4 sm:pb-6 md:px-6">
+        <div class="mb-2 text-center">
+          <span class="bg-purple-400/20 border-purple-300/40 rounded-lg border px-2 py-1 text-xs font-medium text-purple-200 shadow-sm">
+            👥 Opponent: <%= TetrexWeb.MultiplayerGameLive.get_user_name(user_id) %>
+          </span>
+        </div>
         <div class="grid-cols-[1fr_2fr_1fr] grid content-center gap-2 sm:gap-3 lg:gap-4">
           <.hold_tile_box board={board_preview} class="justify-self-center" />
           <.playfield board={board_preview} class="justify-self-center" is_dead={status == :dead} />

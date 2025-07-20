@@ -347,6 +347,13 @@ defmodule TetrexWeb.MultiplayerGameLive do
     |> Enum.count()
   end
 
+  def get_user_name(user_id) do
+    case Tetrex.Users.UserStore.get_user(user_id) do
+      %Tetrex.Users.User{username: username} -> username
+      nil -> "Unknown"
+    end
+  end
+
   defp handle_status_changes(
          %{assigns: %{game: old_game, user_id: user_id}} = socket,
          %GameMessage{} = new_game
