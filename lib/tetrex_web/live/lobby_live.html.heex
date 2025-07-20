@@ -3,11 +3,11 @@
     <div class="max-w-6xl mx-auto">
         <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 mb-8 shadow-2xl">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
-                <div class="flex items-center space-x-4">
+                <div class="flex flex-col items-center md:flex-row gap-2 md:gap-4">
                     <div class="text-4xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">
                         TETREX
                     </div>
-                    <div class="flex space-x-1">
+                    <div class="flex space-x-1 justify-start">
                         <!-- Tetris block decorations -->
                         <div class="w-4 h-4 bg-red-400 rounded-sm shadow-sm"></div>
                         <div class="w-4 h-4 bg-yellow-400 rounded-sm shadow-sm"></div>
@@ -18,50 +18,54 @@
                         <div class="w-4 h-4 bg-cyan-400 rounded-sm shadow-sm"></div>
                     </div>
                 </div>
-                <div class="text-lg font-semibold text-white bg-white/20 px-4 py-2 rounded-xl border border-white/30 shadow-lg flex items-center space-x-3">
+                <div class="text-lg font-semibold text-white bg-white/20 px-4 py-2 rounded-xl border border-white/30 shadow-lg">
                     <%= if @editing_username do %>
-                        <div class="flex items-center space-x-2">
-                            <span>Player:</span>
-                            <input 
-                                type="text" 
-                                value={@temp_username}
-                                phx-change="temp-username-change"
-                                phx-keydown="handle-keyboard"
-                                class="bg-white/20 border border-white/40 rounded-lg px-2 py-1 text-cyan-200 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300"
-                                placeholder="Enter username"
-                                maxlength="50"
-                            />
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                            <span class="flex-shrink-0">Player:</span>
+                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                <input 
+                                    type="text" 
+                                    value={@temp_username}
+                                    phx-change="temp-username-change"
+                                    phx-keydown="handle-keyboard"
+                                    class="bg-white/20 border border-white/40 rounded-lg px-2 py-1 text-cyan-200 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 flex-1 min-w-0"
+                                    placeholder="Enter username"
+                                    maxlength="50"
+                                />
+                                <button 
+                                    phx-click="update-username" 
+                                    phx-value-username={@temp_username}
+                                    class="text-green-300 hover:text-green-200 transition-colors flex-shrink-0 p-1"
+                                    title="Save username"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </button>
+                                <button 
+                                    phx-click="cancel-edit-username"
+                                    class="text-red-300 hover:text-red-200 transition-colors flex-shrink-0 p-1"
+                                    title="Cancel editing"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    <% else %>
+                        <div class="flex items-center justify-between gap-3">
+                            <span>Player: <span class="text-cyan-200"><%= @current_user.username %></span></span>
                             <button 
-                                phx-click="update-username" 
-                                phx-value-username={@temp_username}
-                                class="text-green-300 hover:text-green-200 transition-colors"
-                                title="Save username"
+                                phx-click="edit-username"
+                                class="text-gray-300 hover:text-white transition-colors flex-shrink-0 p-1"
+                                title="Edit username"
                             >
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </button>
-                            <button 
-                                phx-click="cancel-edit-username"
-                                class="text-red-300 hover:text-red-200 transition-colors"
-                                title="Cancel editing"
-                            >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                 </svg>
                             </button>
                         </div>
-                    <% else %>
-                        <span>Player: <span class="text-cyan-200"><%= @current_user.username %></span></span>
-                        <button 
-                            phx-click="edit-username"
-                            class="text-gray-300 hover:text-white transition-colors"
-                            title="Edit username"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                            </svg>
-                        </button>
                     <% end %>
                 </div>
             </div>
