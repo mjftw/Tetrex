@@ -61,22 +61,22 @@ defmodule TetrexWeb.LobbyLive do
   def handle_event("new-single-player-game", _value, socket) do
     user_id = socket.assigns.current_user.id
 
-    if !GameDynamicSupervisor.user_has_single_player_game?(user_id) do
-      case GameDynamicSupervisor.start_single_player_game(user_id) do
-        {:ok, _game_server_pid} ->
-          {:noreply,
-           socket
-           |> assign(:user_has_single_player_game, true)
-           |> assign(:single_player_game_preview, get_single_player_game_preview(user_id))
-           |> push_redirect(to: ~p"/single-player-game")}
+    # If user has an existing game, terminate it first
+    if GameDynamicSupervisor.user_has_single_player_game?(user_id) do
+      GameDynamicSupervisor.remove_single_player_game(user_id)
+    end
 
-        {:error, _error} ->
-          {:noreply, put_flash(socket, :error, "Failed to start single player game")}
-      end
-    else
-      {:noreply,
-       socket
-       |> put_flash(:error, "Single player game already in progress")}
+    # Start new game
+    case GameDynamicSupervisor.start_single_player_game(user_id) do
+      {:ok, _game_server_pid} ->
+        {:noreply,
+         socket
+         |> assign(:user_has_single_player_game, true)
+         |> assign(:single_player_game_preview, get_single_player_game_preview(user_id))
+         |> push_redirect(to: ~p"/single-player-game")}
+
+      {:error, _error} ->
+        {:noreply, put_flash(socket, :error, "Failed to start single player game")}
     end
   end
 

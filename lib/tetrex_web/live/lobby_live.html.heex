@@ -107,16 +107,17 @@
                         </div>
                         <h2 class="text-2xl font-bold text-white">Single Player Game</h2>
                     </div>
-                    <%= if @user_has_single_player_game and is_nil(@single_player_game_preview) do %>
-                        <.tetris_button type="primary" phx-click="resume-single-player-game">
-                            🎮 Resume Game
-                        </.tetris_button>
-                    <% else %>
-                        <%= if not @user_has_single_player_game do %>
+                    <%= cond do %>
+                        <% @user_has_single_player_game and is_nil(@single_player_game_preview) -> %>
+                            <.tetris_button type="primary" phx-click="resume-single-player-game">
+                                🎮 Resume Game
+                            </.tetris_button>
+                        <% not @user_has_single_player_game -> %>
                             <.tetris_button type="primary" phx-click="new-single-player-game">
                                 🚀 Start New Game
                             </.tetris_button>
-                        <% end %>
+                        <% true -> %>
+                            <!-- No button in header when preview with overlay button is shown -->
                     <% end %>
                 </div>
                 
@@ -136,11 +137,17 @@
                                         <BoardComponents.next_tile_box board={@single_player_game_preview.board} class="justify-self-center" />
                                     </div>
                                 </div>
-                                <!-- Resume Game button overlay -->
+                                <!-- Resume/Start Game button overlay -->
                                 <div class="absolute inset-0 flex items-center justify-center">
-                                    <.tetris_button type="primary" phx-click="resume-single-player-game" class="shadow-2xl">
-                                        🎮 Resume Game
-                                    </.tetris_button>
+                                    <%= if @single_player_game_preview.status == :game_over do %>
+                                        <.tetris_button type="primary" phx-click="new-single-player-game" class="shadow-2xl">
+                                            🚀 Start New Game
+                                        </.tetris_button>
+                                    <% else %>
+                                        <.tetris_button type="primary" phx-click="resume-single-player-game" class="shadow-2xl">
+                                            🎮 Resume Game
+                                        </.tetris_button>
+                                    <% end %>
                                 </div>
                             </div>
                         </div>
