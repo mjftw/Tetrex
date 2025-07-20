@@ -5,7 +5,7 @@
   <% user_status = Map.fetch!(user_player_data, :status) %>
   <%= case {@game.status, user_status} do %>
     <% {:players_joining, _} -> %>
-        <.modal_simple id="players_joining_not_ready_modal" show>
+        <.modal_simple id="players_joining_not_ready_modal" backdrop_class="bg-transparent backdrop-blur-sm" show>
             <%= cond do %>
                 <% num_players_in_game(@game) < 2 -> %>
                     <b>Waiting for more players to join...</b>
@@ -23,7 +23,7 @@
             <% end %>
         </.modal_simple>
     <% {_, :dead} -> %>
-        <.modal_simple  id="finished_dead_modal" show>
+        <.modal_simple id="finished_dead_modal" backdrop_class="bg-transparent backdrop-blur-sm" show>
             <div class="flex flex-col gap-2 items-center text-center">
                 <b>You did not win - better luck next time</b><br/>
                 Press back button to retreat to the lobby.
@@ -31,7 +31,7 @@
             </div>
         </.modal_simple>
     <% {:finished, :ready} -> %>
-        <.modal_simple id="finished_ready_modal" show>
+        <.modal_simple id="finished_ready_modal" backdrop_class="bg-transparent backdrop-blur-sm" show>
             <div class="flex flex-col gap-2 items-center text-center">
                 <b>WINNER!!</b><br/>
                 Yes, you are amazing.<br/>

@@ -39,6 +39,7 @@ defmodule TetrexWeb.CoreComponents do
   attr(:id, :string, required: true)
   attr(:show, :boolean, default: false)
   attr(:on_cancel, JS, default: %JS{})
+  attr(:backdrop_class, :string, default: "bg-zinc-50/90")
   slot(:inner_block, required: true)
 
   def modal(assigns) do
@@ -50,7 +51,11 @@ defmodule TetrexWeb.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        id={"#{@id}-bg"}
+        class={[@backdrop_class, "fixed inset-0 transition-opacity"]}
+        aria-hidden="true"
+      />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -94,12 +99,17 @@ defmodule TetrexWeb.CoreComponents do
   """
   attr(:id, :string, required: true)
   attr(:show, :boolean, default: false)
+  attr(:backdrop_class, :string, default: "bg-zinc-50/90")
   slot(:inner_block, required: true)
 
   def modal_simple(assigns) do
     ~H"""
     <div id={@id} phx-mounted={@show && show_modal(@id)} class="relative z-50 hidden">
-      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        id={"#{@id}-bg"}
+        class={[@backdrop_class, "fixed inset-0 transition-opacity"]}
+        aria-hidden="true"
+      />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -330,8 +340,11 @@ defmodule TetrexWeb.CoreComponents do
       class={
         [
           case @type do
-            "primary" -> "bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/30 rounded-xl"
-            "secondary" -> "bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-300 hover:to-pink-300 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/30 rounded-xl"
+            "primary" ->
+              "bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/30 rounded-xl"
+
+            "secondary" ->
+              "bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-300 hover:to-pink-300 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border border-white/30 rounded-xl"
           end,
           @class
         ]
