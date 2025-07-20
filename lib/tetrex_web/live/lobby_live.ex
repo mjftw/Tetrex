@@ -1,6 +1,7 @@
 defmodule TetrexWeb.LobbyLive do
   alias Tetrex.Users.UserStore
   alias Tetrex.Users.User
+  alias Tetrex.Users.NameGenerator
   alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
 
@@ -25,7 +26,15 @@ defmodule TetrexWeb.LobbyLive do
       Enum.each(multiplayer_game_pids, &Multiplayer.GameServer.subscribe_updates(&1))
     end
 
-    current_user = UserStore.get_user!(current_user_id)
+    current_user = case UserStore.get_user(current_user_id) do
+      nil ->
+        # Generate a random username if user doesn't exist
+        username = NameGenerator.generate()
+        UserStore.put_user(current_user_id, username)
+        UserStore.get_user!(current_user_id)
+      user ->
+        user
+    end
 
     {:ok,
      socket
