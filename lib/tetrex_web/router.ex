@@ -7,12 +7,13 @@ defmodule TetrexWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, html: {TetrexWeb.Layouts, :root}
     plug :protect_from_forgery
+
     plug :put_secure_browser_headers, %{
       "x-frame-options" => "ALLOW-FROM https://mjftw.dev",
       "content-security-policy" => "frame-ancestors 'self' https://mjftw.dev"
     }
-    plug TetrexWeb.Plugs.UserSession
 
+    plug TetrexWeb.Plugs.UserSession
   end
 
   pipeline :api do

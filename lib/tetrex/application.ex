@@ -14,6 +14,7 @@ defmodule Tetrex.Application do
       Tetrex.GameDynamicSupervisor,
       # Start the UserStore store
       Tetrex.Users.UserStore,
+      Tetrex.ChatServer,
       # Start the Telemetry supervisor
       TetrexWeb.Telemetry,
       # Start the PubSub system
