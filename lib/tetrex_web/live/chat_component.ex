@@ -56,7 +56,8 @@ defmodule TetrexWeb.ChatComponent do
              socket
              |> assign(:chat_with_username, target_user.username)
              |> assign(:messages, conversation.messages)
-             |> push_event("scroll-to-bottom", %{})}
+             |> push_event("scroll-to-bottom", %{})
+             |> push_event("focus-input", %{})}
 
           true ->
             {:ok, socket}
