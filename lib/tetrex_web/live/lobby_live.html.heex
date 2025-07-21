@@ -79,14 +79,40 @@
                 <h2 class="text-2xl font-bold text-white">Online Players: <%= num_users %></h2>
             </div>
             
+            <!-- Chat notice -->
+            <%= if num_users > 1 do %>
+                <div class="mb-4 p-3 bg-cyan-500/20 border border-cyan-400/30 rounded-lg">
+                    <div class="flex items-center space-x-2 text-cyan-200">
+                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 21l1.98-5.126A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                        </svg>
+                        <span class="text-sm font-medium">💬 Click below to chat with other players!</span>
+                    </div>
+                </div>
+            <% end %>
+            
             <div class="flex flex-wrap gap-3">
                 <%= for {_user_id, %{user: %User{id: user_id, username: username}, status: status}} <- Enum.take(@users, 8), user_id != @current_user.id  do %>
-                    <div class={"bg-emerald-400/20 border border-emerald-300/40 rounded-xl px-3 py-2 text-white font-medium shadow-lg #{if status == :in_game, do: "flex items-center space-x-2", else: ""}"}>
+                    <% unread_count = Map.get(@unread_counts, user_id, 0) %>
+                    <button 
+                        phx-click="open_chat"
+                        phx-value-user_id={user_id}
+                        class={["relative bg-emerald-400/20 border border-emerald-300/40 rounded-xl px-3 py-2 text-white font-medium shadow-lg hover:bg-emerald-400/30 transition-colors cursor-pointer", (if status == :in_game, do: "flex items-center space-x-2", else: "")]} 
+                        title={"Chat with #{username}"}
+                    >
                         <span><%= username %></span>
                         <%= if status == :in_game do %>
                             <span class="text-orange-400" title="In Game">🔥</span>
                         <% end %>
-                    </div>
+                        <span class="ml-2 text-xs opacity-60">💬</span>
+                        
+                        <!-- Unread messages badge -->
+                        <%= if unread_count > 0 do %>
+                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-lg animate-pulse">
+                                <%= if unread_count > 9, do: "9+", else: unread_count %>
+                            </span>
+                        <% end %>
+                    </button>
                 <% end %>
                 <%= if num_users > 8 do %>
                     <div class="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-gray-200 italic shadow-lg">
@@ -221,3 +247,12 @@
         </div>
     </div>
 </div>
+
+<!-- Chat Component -->
+<.live_component 
+  module={TetrexWeb.ChatComponent} 
+  id="chat_component"
+  current_user={@current_user}
+  chat_open={@chat_open}
+  chat_with_user_id={@chat_with_user_id}
+/>

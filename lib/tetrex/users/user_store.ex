@@ -23,4 +23,12 @@ defmodule Tetrex.Users.UserStore do
       &Map.put(&1, user_id, %User{id: user_id, username: username})
     )
   end
+
+  def clear do
+    Agent.update(__MODULE__, fn _ -> %{} end)
+  end
+
+  def all_users do
+    Agent.get(__MODULE__, & &1)
+  end
 end

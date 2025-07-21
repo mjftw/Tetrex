@@ -4,6 +4,7 @@ defmodule TetrexWeb.LobbyLive do
   alias Tetrex.Users.NameGenerator
   alias Tetrex.Multiplayer
   alias Tetrex.GameDynamicSupervisor
+  alias Tetrex.ChatServer
   alias TetrexWeb.Components.BoardComponents
 
   use TetrexWeb, :live_view
@@ -25,6 +26,7 @@ defmodule TetrexWeb.LobbyLive do
       GameDynamicSupervisor.subscribe_multiplayer_game_updates()
 
       Enum.each(multiplayer_game_pids, &Multiplayer.GameServer.subscribe_updates(&1))
+      ChatServer.subscribe_user_chats(current_user_id)
     end
 
     current_user =
@@ -37,6 +39,13 @@ defmodule TetrexWeb.LobbyLive do
 
         user ->
           user
+      end
+
+    unread_counts =
+      if connected?(socket) do
+        ChatServer.get_unread_counts(current_user.id)
+      else
+        %{}
       end
 
     {:ok,
@@ -54,6 +63,9 @@ defmodule TetrexWeb.LobbyLive do
      |> assign(:multiplayer_games, multiplayer_games)
      |> assign(:editing_username, false)
      |> assign(:temp_username, "")
+     |> assign(:chat_open, false)
+     |> assign(:chat_with_user_id, nil)
+     |> assign(:unread_counts, unread_counts)
      |> mount_presence_init_with_status(:in_lobby)}
   end
 
@@ -196,6 +208,20 @@ defmodule TetrexWeb.LobbyLive do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_event("open_chat", %{"user_id" => user_id}, socket) do
+    ChatServer.mark_as_read(socket.assigns.current_user.id, user_id)
+
+    # Update unread counts
+    updated_unread_counts = Map.delete(socket.assigns.unread_counts, user_id)
+
+    {:noreply,
+     socket
+     |> assign(:chat_open, true)
+     |> assign(:chat_with_user_id, user_id)
+     |> assign(:unread_counts, updated_unread_counts)}
+  end
+
   # PubSub handlers
   @impl true
   def handle_info({:created_multiplayer_game, game_server_pid}, socket) do
@@ -234,6 +260,49 @@ defmodule TetrexWeb.LobbyLive do
 
         {:noreply, assign(socket, multiplayer_games: updated_games)}
     end
+  end
+
+  @impl true
+  def handle_info(:close_chat, socket) do
+    {:noreply,
+     socket
+     |> assign(:chat_open, false)
+     |> assign(:chat_with_user_id, nil)}
+  end
+
+  @impl true
+  def handle_info({:chat_sent, _user_id}, socket) do
+    {:noreply, push_event(socket, "phx:chat-sent", %{})}
+  end
+
+  @impl true
+  def handle_info({:new_chat_message, message}, socket) do
+    current_user_id = socket.assigns.current_user.id
+
+    if socket.assigns.chat_open == true and not is_nil(socket.assigns.chat_with_user_id) and
+         ((message.from_user_id == socket.assigns.chat_with_user_id and
+             message.to_user_id == current_user_id) or
+            (message.from_user_id == current_user_id and
+               message.to_user_id == socket.assigns.chat_with_user_id)) do
+      send_update(TetrexWeb.ChatComponent, id: "chat_component", new_message: message)
+    end
+
+    # Handle unread counts if this is a message TO the current user and not from them
+    updated_socket =
+      if message.to_user_id == current_user_id and message.from_user_id != current_user_id do
+        if socket.assigns.chat_open == true and
+             socket.assigns.chat_with_user_id == message.from_user_id do
+          ChatServer.mark_as_read(current_user_id, message.from_user_id)
+          socket
+        else
+          unread_counts = ChatServer.get_unread_counts(current_user_id)
+          assign(socket, :unread_counts, unread_counts)
+        end
+      else
+        socket
+      end
+
+    {:noreply, updated_socket}
   end
 
   def joinable_multiplayer_games(multiplayer_games),
