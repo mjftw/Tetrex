@@ -340,6 +340,47 @@ defmodule Tetrex.Board do
   end
 
   @doc """
+  Clear completed lines and generate garbage rows based on Tetris rules
+  - Single (1 line): 0 garbage rows
+  - Double (2 lines): 1 garbage row
+  - Triple (3 lines): 2 garbage rows
+  - Tetris (4 lines): 4 garbage rows
+  """
+  @spec clear_lines_and_generate_garbage(board()) ::
+          {board(), non_neg_integer(), [SparseGrid.sparse_grid()]}
+  def clear_lines_and_generate_garbage(board) do
+    {new_board, lines_cleared} = clear_completed_rows(board)
+
+    garbage_rows =
+      case lines_cleared do
+        # Single: no garbage
+        1 ->
+          []
+
+        # Double: 1 garbage row
+        2 ->
+          [generate_garbage_row(width: board.playfield_width)]
+
+        # Triple: 2 garbage rows
+        3 ->
+          [
+            generate_garbage_row(width: board.playfield_width),
+            generate_garbage_row(width: board.playfield_width)
+          ]
+
+        # Tetris: 4 garbage rows
+        4 ->
+          for _ <- 1..4, do: generate_garbage_row(width: board.playfield_width)
+
+        # No lines or more than 4 lines: no garbage (shouldn't happen in normal Tetris)
+        _ ->
+          []
+      end
+
+    {new_board, lines_cleared, garbage_rows}
+  end
+
+  @doc """
   Apply a transform function to the active tile, checking that doing so would
   cause it to collide with the playfield or be outside the playfield.
   """
