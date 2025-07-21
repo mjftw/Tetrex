@@ -1056,11 +1056,27 @@ defmodule Tetrex.Board.Test do
   end
 
   test "tetris (4 lines) generates 4 garbage rows with gaps" do
-    # Test that clearing 4 lines produces 4 garbage rows for opponent
-    # board = setup_board_with_tetris_ready()
-    # {new_board, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
-    # assert length(garbage_rows) == 4
-    # assert Enum.all?(garbage_rows, &garbage_row_has_single_gap/1)
+    board = setup_board_with_tetris_ready()
+    {new_board, lines_cleared, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
+    assert lines_cleared == 4
+    assert length(garbage_rows) == 4
+    assert Enum.all?(garbage_rows, &garbage_row_has_single_gap/1)
+  end
+
+  defp setup_board_with_tetris_ready do
+    board = Board.new(6, 10, 42)
+
+    # Fill bottom four rows completely (Tetris)
+    tetris_complete_rows =
+      for row <- 2..5, col <- 0..9, into: %{} do
+        {{row, col}, :test_block}
+      end
+
+    playfield_with_tetris =
+      board.playfield
+      |> Tetrex.SparseGrid.merge(Tetrex.SparseGrid.new(tetris_complete_rows))
+
+    %{board | playfield: playfield_with_tetris}
   end
 
   test "generate_garbage_row/1 creates row with exactly 9 filled blocks and 1 gap" do
