@@ -1243,13 +1243,49 @@ defmodule Tetrex.Board.Test do
   end
 
   test "clear_completed_rows/1 clears lines containing garbage blocks" do
-    # board = setup_board_with_garbage_and_gap()
-    # # Fill the gap to complete the line
-    # board = place_block_in_garbage_gap(board)
-    # {new_board, lines_cleared} = Board.clear_completed_rows(board)
-    #
-    # assert lines_cleared == 1
-    # assert garbage_line_is_cleared(new_board)
+    board = setup_board_with_garbage_and_gap()
+    # Fill the gap to complete the line
+    board = place_block_in_garbage_gap(board)
+    {new_board, lines_cleared} = Board.clear_completed_rows(board)
+
+    assert lines_cleared == 1
+    assert garbage_line_is_cleared(new_board)
+  end
+
+  defp setup_board_with_garbage_and_gap do
+    board = Board.new(5, 10, 42)
+
+    # Create a garbage row with gap at column 5
+    garbage_row = Board.generate_garbage_row(gap_column: 5, width: 10)
+    # Place it at the bottom row
+    moved_garbage = Tetrex.SparseGrid.move(garbage_row, {4, 0})
+
+    playfield_with_garbage =
+      board.playfield
+      |> Tetrex.SparseGrid.merge(moved_garbage)
+
+    %{board | playfield: playfield_with_garbage}
+  end
+
+  defp place_block_in_garbage_gap(board) do
+    # Add a block at the gap position (row 4, column 5)
+    gap_filled = Tetrex.SparseGrid.new(%{{4, 5} => :regular_block})
+
+    playfield_complete =
+      board.playfield
+      |> Tetrex.SparseGrid.merge(gap_filled)
+
+    %{board | playfield: playfield_complete}
+  end
+
+  defp garbage_line_is_cleared(board) do
+    # Check that bottom row (4) has no garbage blocks
+    bottom_row_empty =
+      Enum.all?(0..9, fn col ->
+        Tetrex.SparseGrid.get(board.playfield, 4, col) == nil
+      end)
+
+    bottom_row_empty
   end
 
   test "clear_completed_rows/1 handles mixed garbage and regular block lines" do
