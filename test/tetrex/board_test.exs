@@ -1050,10 +1050,28 @@ defmodule Tetrex.Board.Test do
   end
 
   test "generate_garbage_row/1 places gap at specified column" do
-    # for gap_col <- 0..9 do
-    #   garbage_row = Board.generate_garbage_row(gap_column: gap_col)
-    #   assert get_gap_position(garbage_row) == gap_col
-    # end
+    for gap_col <- 0..9 do
+      garbage_row = Board.generate_garbage_row(gap_column: gap_col, width: 10)
+      assert get_gap_position(garbage_row) == gap_col
+    end
+  end
+
+  defp get_gap_position(sparse_grid) do
+    # Find which column (0-9) doesn't have a value in row 0
+    filled_columns =
+      sparse_grid.values
+      |> Map.keys()
+      |> Enum.map(fn {_row, col} -> col end)
+      |> MapSet.new()
+
+    all_columns = MapSet.new(0..9)
+    gap_columns = MapSet.difference(all_columns, filled_columns)
+
+    case MapSet.to_list(gap_columns) do
+      [gap_col] -> gap_col
+      [] -> :no_gap
+      multiple -> {:multiple_gaps, multiple}
+    end
   end
 
   test "generate_garbage_row/1 uses random gap position when not specified" do
