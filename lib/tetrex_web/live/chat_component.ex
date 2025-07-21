@@ -20,6 +20,12 @@ defmodule TetrexWeb.ChatComponent do
 
     # Handle partial updates (like when only new_message is sent)
     cond do
+      # If this is a username update for the user we're chatting with
+      Map.has_key?(assigns, :updated_username) and
+        Map.has_key?(assigns, :chat_with_user_id) and
+          socket.assigns.chat_with_user_id == assigns.chat_with_user_id ->
+        {:ok, assign(socket, :chat_with_username, assigns.updated_username)}
+
       # If this is just a new message update
       Map.has_key?(assigns, :new_message) and not is_nil(assigns.new_message) and
           not Map.has_key?(assigns, :current_user) ->
