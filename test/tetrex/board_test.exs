@@ -1018,11 +1018,33 @@ defmodule Tetrex.Board.Test do
   end
 
   test "double line clear generates 1 garbage row with gap" do
-    # Test that clearing 2 lines produces 1 garbage row for opponent
-    # board = setup_board_with_double_lines_ready()
-    # {new_board, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
-    # assert length(garbage_rows) == 1
-    # assert garbage_row_has_single_gap(hd(garbage_rows))
+    board = setup_board_with_double_lines_ready()
+    {new_board, lines_cleared, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
+    assert lines_cleared == 2
+    assert length(garbage_rows) == 1
+    assert garbage_row_has_single_gap(hd(garbage_rows))
+  end
+
+  defp setup_board_with_double_lines_ready do
+    board = Board.new(5, 10, 42)
+
+    # Fill bottom two rows completely
+    double_complete_rows =
+      for row <- 3..4, col <- 0..9, into: %{} do
+        {{row, col}, :test_block}
+      end
+
+    playfield_with_lines =
+      board.playfield
+      |> Tetrex.SparseGrid.merge(Tetrex.SparseGrid.new(double_complete_rows))
+
+    %{board | playfield: playfield_with_lines}
+  end
+
+  defp garbage_row_has_single_gap(garbage_row) do
+    gap_count = count_gaps(garbage_row)
+    filled_count = count_filled_blocks(garbage_row)
+    gap_count == 1 and filled_count == 9
   end
 
   test "triple line clear generates 2 garbage rows with gaps" do
