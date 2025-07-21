@@ -167,11 +167,15 @@ defmodule TetrexWeb.LobbyLive do
     trimmed_username = String.trim(username)
 
     if valid_username?(trimmed_username) do
+      old_username = socket.assigns.current_user.username
       UserStore.put_user(socket.assigns.current_user.id, trimmed_username)
       updated_user = %{socket.assigns.current_user | username: trimmed_username}
 
       # Update presence with new username
       update_presence_username(socket, updated_user)
+
+      # Broadcast username change via PubSub
+      ChatServer.broadcast_username_change(updated_user.id, old_username, trimmed_username)
 
       {:noreply,
        socket
@@ -214,6 +218,9 @@ defmodule TetrexWeb.LobbyLive do
 
     # Update unread counts
     updated_unread_counts = Map.delete(socket.assigns.unread_counts, user_id)
+
+    # Subscribe to username changes only when chat is open
+    ChatServer.subscribe_username_changes()
 
     {:noreply,
      socket
@@ -264,6 +271,9 @@ defmodule TetrexWeb.LobbyLive do
 
   @impl true
   def handle_info(:close_chat, socket) do
+    # Unsubscribe from username changes when chat closes
+    ChatServer.unsubscribe_username_changes()
+
     {:noreply,
      socket
      |> assign(:chat_open, false)
@@ -303,6 +313,20 @@ defmodule TetrexWeb.LobbyLive do
       end
 
     {:noreply, updated_socket}
+  end
+
+  @impl true
+  def handle_info({:username_changed, %{user_id: user_id, new_username: new_username}}, socket) do
+    # If we have a chat open with the user whose name changed, update the chat header
+    if socket.assigns.chat_open and socket.assigns.chat_with_user_id == user_id do
+      send_update(TetrexWeb.ChatComponent,
+        id: "chat_component",
+        chat_with_user_id: user_id,
+        updated_username: new_username
+      )
+    end
+
+    {:noreply, socket}
   end
 
   def joinable_multiplayer_games(multiplayer_games),

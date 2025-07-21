@@ -55,6 +55,32 @@ defmodule Tetrex.ChatServer do
   end
 
   @doc """
+  Subscribe to username change notifications globally
+  """
+  def subscribe_username_changes() do
+    PubSub.subscribe(Tetrex.PubSub, "username_changes")
+  end
+
+  @doc """
+  Unsubscribe from username change notifications
+  """
+  def unsubscribe_username_changes() do
+    PubSub.unsubscribe(Tetrex.PubSub, "username_changes")
+  end
+
+  @doc """
+  Broadcast a username change to all subscribers
+  """
+  def broadcast_username_change(user_id, old_username, new_username) do
+    PubSub.broadcast!(
+      Tetrex.PubSub,
+      "username_changes",
+      {:username_changed,
+       %{user_id: user_id, old_username: old_username, new_username: new_username}}
+    )
+  end
+
+  @doc """
   Get unread message counts for a user
   """
   def get_unread_counts(user_id) do
