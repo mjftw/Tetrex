@@ -1355,11 +1355,38 @@ defmodule Tetrex.Board.Test do
   end
 
   test "clear_completed_rows/1 leaves incomplete garbage lines uncleared" do
-    # board = setup_board_with_incomplete_garbage_line()
-    # {new_board, lines_cleared} = Board.clear_completed_rows(board)
-    #
-    # assert lines_cleared == 0
-    # assert garbage_line_still_present(new_board)
+    board = setup_board_with_incomplete_garbage_line()
+    {new_board, lines_cleared} = Board.clear_completed_rows(board)
+
+    assert lines_cleared == 0
+    assert garbage_line_still_present(new_board)
+  end
+
+  defp setup_board_with_incomplete_garbage_line do
+    board = Board.new(5, 10, 42)
+
+    # Create a garbage row with gap at column 5 (incomplete)
+    garbage_row = Board.generate_garbage_row(gap_column: 5, width: 10)
+    moved_garbage = Tetrex.SparseGrid.move(garbage_row, {4, 0})
+
+    playfield_with_incomplete_garbage =
+      board.playfield
+      |> Tetrex.SparseGrid.merge(moved_garbage)
+
+    %{board | playfield: playfield_with_incomplete_garbage}
+  end
+
+  defp garbage_line_still_present(board) do
+    # Check that garbage blocks are still at row 4
+    garbage_blocks_present =
+      Enum.any?(0..9, fn col ->
+        Tetrex.SparseGrid.get(board.playfield, 4, col) == :garbage
+      end)
+
+    # Check that gap is still empty at column 5
+    gap_still_empty = Tetrex.SparseGrid.get(board.playfield, 4, 5) == nil
+
+    garbage_blocks_present and gap_still_empty
   end
 
   test "clear_completed_rows/1 makes garbage fall when lines above are cleared" do
