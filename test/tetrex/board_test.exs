@@ -1149,12 +1149,27 @@ defmodule Tetrex.Board.Test do
   end
 
   test "add_garbage_rows/2 stacks multiple garbage rows from bottom up" do
-    # board = setup_empty_board()
-    # garbage_rows = [generate_test_garbage_row(), generate_test_garbage_row()]
-    # new_board = Board.add_garbage_rows(board, garbage_rows)
-    #
-    # assert get_bottom_row(new_board) == hd(garbage_rows)
-    # assert get_row(new_board, board.playfield_height - 2) == List.last(garbage_rows)
+    board = setup_simple_board()
+    garbage_row1 = Board.generate_garbage_row(gap_column: 3, width: 10)
+    garbage_row2 = Board.generate_garbage_row(gap_column: 7, width: 10)
+
+    new_board = Board.add_garbage_rows(board, [garbage_row1, garbage_row2])
+
+    # Second garbage row should be at bottom (last in list)
+    bottom_row = extract_row(new_board, board.playfield_height - 1)
+    assert has_garbage_pattern(bottom_row, gap_column: 7)
+
+    # First garbage row should be one row up
+    second_row = extract_row(new_board, board.playfield_height - 2)
+    assert has_garbage_pattern(second_row, gap_column: 3)
+  end
+
+  defp extract_row(board, row_index) do
+    for col <- 0..(board.playfield_width - 1), into: %{} do
+      value = Tetrex.SparseGrid.get(board.playfield, row_index, col)
+      {{0, col}, value}
+    end
+    |> Tetrex.SparseGrid.new()
   end
 
   test "clear_completed_rows/1 clears lines containing garbage blocks" do
