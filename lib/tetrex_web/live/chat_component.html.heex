@@ -69,11 +69,14 @@
 
     <!-- Message Input -->
     <div class="p-4 bg-white/90 backdrop-blur-sm border-t border-gray-200 flex-shrink-0">
-      <.form for={%{}} as={:message} phx-submit="send_message" phx-target={@myself} class="flex space-x-2">
+      <.form for={%{}} as={:message} phx-submit="send_message" phx-target={@myself} class="flex space-x-2" id="chat-form">
         <input 
           type="text"
           name="message[content]"
           placeholder="Type a message..."
+          value={@message_content}
+          phx-keyup="update_message"
+          phx-target={@myself}
           class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-white/70 backdrop-blur-sm"
           autocomplete="off"
           maxlength="500"
