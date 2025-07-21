@@ -1081,11 +1081,41 @@ defmodule Tetrex.Board.Test do
   end
 
   test "add_garbage_rows/2 adds garbage rows to bottom of playfield" do
-    # board = setup_empty_board()
-    # garbage_rows = [generate_test_garbage_row()]
-    # new_board = Board.add_garbage_rows(board, garbage_rows)
-    # bottom_row = get_bottom_row(new_board)
-    # assert bottom_row == hd(garbage_rows)
+    board = setup_simple_board()
+    garbage_rows = [Board.generate_garbage_row(gap_column: 5, width: 10)]
+    new_board = Board.add_garbage_rows(board, garbage_rows)
+    bottom_row = extract_bottom_row(new_board)
+    assert has_garbage_pattern(bottom_row, gap_column: 5)
+  end
+
+  defp setup_simple_board do
+    Board.new(5, 10, 42)
+  end
+
+  defp extract_bottom_row(board) do
+    bottom_row_idx = board.playfield_height - 1
+
+    for col <- 0..(board.playfield_width - 1), into: %{} do
+      value = Tetrex.SparseGrid.get(board.playfield, bottom_row_idx, col)
+      {{0, col}, value}
+    end
+    |> Tetrex.SparseGrid.new()
+  end
+
+  defp has_garbage_pattern(sparse_grid, opts) do
+    gap_column = Keyword.fetch!(opts, :gap_column)
+
+    # Check that all columns except gap_column have :garbage
+    for col <- 0..9 do
+      value = Tetrex.SparseGrid.get(sparse_grid, 0, col)
+
+      if col == gap_column do
+        value == nil
+      else
+        value == :garbage
+      end
+    end
+    |> Enum.all?()
   end
 
   test "add_garbage_rows/2 pushes existing blocks up when adding garbage" do
