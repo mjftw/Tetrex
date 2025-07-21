@@ -69,6 +69,17 @@ defmodule Tetrex.BoardServer do
     GenServer.call(board_pid, :hold)
   end
 
+  @spec add_garbage_rows(pid(), [Tetrex.SparseGrid.sparse_grid()]) :: Board.board_preview()
+  def add_garbage_rows(board_pid, garbage_rows) do
+    GenServer.call(board_pid, {:add_garbage_rows, garbage_rows})
+  end
+
+  @spec clear_lines_and_generate_garbage(pid()) ::
+          {Board.board_preview(), non_neg_integer(), [Tetrex.SparseGrid.sparse_grid()]}
+  def clear_lines_and_generate_garbage(board_pid) do
+    GenServer.call(board_pid, :clear_lines_and_generate_garbage)
+  end
+
   # Server callbacks
 
   @impl true
@@ -160,6 +171,23 @@ defmodule Tetrex.BoardServer do
     preview = Board.preview(new_board)
 
     {:reply, preview, new_board}
+  end
+
+  # New garbage system handlers
+  @impl true
+  def handle_call({:add_garbage_rows, garbage_rows}, _from, board) do
+    new_board = Board.add_garbage_rows(board, garbage_rows)
+    preview = Board.preview(new_board)
+
+    {:reply, preview, new_board}
+  end
+
+  @impl true
+  def handle_call(:clear_lines_and_generate_garbage, _from, board) do
+    {new_board, lines_cleared, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
+    preview = Board.preview(new_board)
+
+    {:reply, {preview, lines_cleared, garbage_rows}, new_board}
   end
 
   @impl true
