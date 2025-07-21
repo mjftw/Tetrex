@@ -1424,12 +1424,38 @@ defmodule Tetrex.Board.Test do
   end
 
   test "adding garbage that pushes blocks above playfield should trigger game over" do
-    # board = setup_board_with_blocks_near_top()
-    # tall_garbage = generate_multiple_garbage_rows(5)
-    # new_board = Board.add_garbage_rows(board, tall_garbage)
-    # preview = Board.preview(new_board)
-    #
-    # assert preview.active_tile_fits == false
+    board = setup_board_with_blocks_near_top()
+    tall_garbage = generate_multiple_garbage_rows(5)
+    new_board = Board.add_garbage_rows(board, tall_garbage)
+    preview = Board.preview(new_board)
+
+    assert preview.active_tile_fits == false
+  end
+
+  defp setup_board_with_blocks_near_top do
+    board = Board.new(5, 10, 42)
+
+    # Place blocks in rows 1 and 2 (near top, leaving only row 0 free)
+    near_top_blocks = %{
+      {1, 4} => :test_block,
+      {1, 5} => :test_block,
+      {2, 3} => :test_block,
+      {2, 4} => :test_block,
+      {2, 5} => :test_block,
+      {2, 6} => :test_block
+    }
+
+    playfield_with_blocks =
+      board.playfield
+      |> Tetrex.SparseGrid.merge(Tetrex.SparseGrid.new(near_top_blocks))
+
+    %{board | playfield: playfield_with_blocks}
+  end
+
+  defp generate_multiple_garbage_rows(count) when count > 0 do
+    for _ <- 1..count do
+      Board.generate_garbage_row(width: 10)
+    end
   end
 
   test "player survives when active piece still fits after garbage addition" do
