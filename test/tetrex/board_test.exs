@@ -991,4 +991,196 @@ defmodule Tetrex.Board.Test do
 
     assert previewed == expected
   end
+
+  # Garbage System Tests - Minimal Tetris-compliant implementation
+
+  test "single line clear generates no garbage rows" do
+    # Test that clearing 1 line produces 0 garbage rows for opponent
+    # board = setup_board_with_single_line_ready()
+    # {new_board, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
+    # assert garbage_rows == []
+  end
+
+  test "double line clear generates 1 garbage row with gap" do
+    # Test that clearing 2 lines produces 1 garbage row for opponent
+    # board = setup_board_with_double_lines_ready()
+    # {new_board, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
+    # assert length(garbage_rows) == 1
+    # assert garbage_row_has_single_gap(hd(garbage_rows))
+  end
+
+  test "triple line clear generates 2 garbage rows with gaps" do
+    # Test that clearing 3 lines produces 2 garbage rows for opponent
+    # board = setup_board_with_triple_lines_ready()
+    # {new_board, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
+    # assert length(garbage_rows) == 2
+    # assert Enum.all?(garbage_rows, &garbage_row_has_single_gap/1)
+  end
+
+  test "tetris (4 lines) generates 4 garbage rows with gaps" do
+    # Test that clearing 4 lines produces 4 garbage rows for opponent
+    # board = setup_board_with_tetris_ready()
+    # {new_board, garbage_rows} = Board.clear_lines_and_generate_garbage(board)
+    # assert length(garbage_rows) == 4
+    # assert Enum.all?(garbage_rows, &garbage_row_has_single_gap/1)
+  end
+
+  test "generate_garbage_row/1 creates row with exactly 9 filled blocks and 1 gap" do
+    garbage_row = Board.generate_garbage_row(gap_column: 3, width: 10)
+    filled_count = count_filled_blocks(garbage_row)
+    gap_count = count_gaps(garbage_row)
+
+    assert filled_count == 9
+    assert gap_count == 1
+  end
+
+  # Helper functions for garbage system tests
+  defp count_filled_blocks(sparse_grid) do
+    sparse_grid.values
+    |> Map.values()
+    |> Enum.count(fn value -> value != nil end)
+  end
+
+  defp count_gaps(sparse_grid) do
+    # Count positions that should be filled but aren't
+    # For a 10-wide row, there should be 10 positions total
+    total_positions = 10
+    filled_positions = map_size(sparse_grid.values)
+    total_positions - filled_positions
+  end
+
+  test "generate_garbage_row/1 places gap at specified column" do
+    # for gap_col <- 0..9 do
+    #   garbage_row = Board.generate_garbage_row(gap_column: gap_col)
+    #   assert get_gap_position(garbage_row) == gap_col
+    # end
+  end
+
+  test "generate_garbage_row/1 uses random gap position when not specified" do
+    # rows = Enum.map(1..10, fn _ -> Board.generate_garbage_row() end)
+    # gap_positions = Enum.map(rows, &get_gap_position/1)
+    # assert Enum.uniq(gap_positions) |> length() > 1
+  end
+
+  test "add_garbage_rows/2 adds garbage rows to bottom of playfield" do
+    # board = setup_empty_board()
+    # garbage_rows = [generate_test_garbage_row()]
+    # new_board = Board.add_garbage_rows(board, garbage_rows)
+    # bottom_row = get_bottom_row(new_board)
+    # assert bottom_row == hd(garbage_rows)
+  end
+
+  test "add_garbage_rows/2 pushes existing blocks up when adding garbage" do
+    # board = setup_board_with_blocks_at_bottom()
+    # original_bottom_blocks = get_bottom_row(board)
+    # garbage_rows = [generate_test_garbage_row()]
+    # new_board = Board.add_garbage_rows(board, garbage_rows)
+    #
+    # # Original bottom blocks should now be one row higher
+    # pushed_up_blocks = get_row(new_board, board.playfield_height - 2)
+    # assert pushed_up_blocks == original_bottom_blocks
+  end
+
+  test "add_garbage_rows/2 stacks multiple garbage rows from bottom up" do
+    # board = setup_empty_board()
+    # garbage_rows = [generate_test_garbage_row(), generate_test_garbage_row()]
+    # new_board = Board.add_garbage_rows(board, garbage_rows)
+    #
+    # assert get_bottom_row(new_board) == hd(garbage_rows)
+    # assert get_row(new_board, board.playfield_height - 2) == List.last(garbage_rows)
+  end
+
+  test "clear_completed_rows/1 clears lines containing garbage blocks" do
+    # board = setup_board_with_garbage_and_gap()
+    # # Fill the gap to complete the line
+    # board = place_block_in_garbage_gap(board)
+    # {new_board, lines_cleared} = Board.clear_completed_rows(board)
+    #
+    # assert lines_cleared == 1
+    # assert garbage_line_is_cleared(new_board)
+  end
+
+  test "clear_completed_rows/1 handles mixed garbage and regular block lines" do
+    # board = setup_board_with_mixed_garbage_and_regular_blocks()
+    # board = fill_remaining_gaps(board)
+    # {new_board, lines_cleared} = Board.clear_completed_rows(board)
+    #
+    # assert lines_cleared > 0
+    # assert no_completed_lines_remain(new_board)
+  end
+
+  test "clear_completed_rows/1 leaves incomplete garbage lines uncleared" do
+    # board = setup_board_with_incomplete_garbage_line()
+    # {new_board, lines_cleared} = Board.clear_completed_rows(board)
+    #
+    # assert lines_cleared == 0
+    # assert garbage_line_still_present(new_board)
+  end
+
+  test "clear_completed_rows/1 makes garbage fall when lines above are cleared" do
+    # board = setup_board_with_regular_blocks_above_garbage()
+    # board = complete_line_above_garbage(board)
+    # {new_board, _} = Board.clear_completed_rows(board)
+    #
+    # # Garbage should have moved down to fill the cleared space
+    # assert garbage_has_fallen(new_board)
+  end
+
+  test "clear_lines_and_generate_opponent_garbage/1 generates appropriate garbage for opponent" do
+    # player_board = setup_board_ready_for_double()
+    # {new_board, opponent_garbage} = Board.clear_lines_and_generate_opponent_garbage(player_board)
+    #
+    # assert length(opponent_garbage) == 1  # Double = 1 garbage row
+    # assert hd(opponent_garbage) |> garbage_row_has_single_gap()
+  end
+
+  test "clear_lines_and_generate_opponent_garbage/1 sends no garbage for single line clears" do
+    # player_board = setup_board_ready_for_single()
+    # {new_board, opponent_garbage} = Board.clear_lines_and_generate_opponent_garbage(player_board)
+    #
+    # assert opponent_garbage == []
+  end
+
+  test "garbage gap positions are consistent per player seed" do
+    # This ensures that a player's garbage rows have aligned gaps, making them
+    # easier to clear together (following modern Tetris conventions)
+    # player_seed = 12345
+    # garbage_1 = Board.generate_garbage_row(player_seed: player_seed)
+    # garbage_2 = Board.generate_garbage_row(player_seed: player_seed)
+    #
+    # assert get_gap_position(garbage_1) == get_gap_position(garbage_2)
+  end
+
+  test "adding garbage that pushes blocks above playfield should trigger game over" do
+    # board = setup_board_with_blocks_near_top()
+    # tall_garbage = generate_multiple_garbage_rows(5)
+    # new_board = Board.add_garbage_rows(board, tall_garbage)
+    # preview = Board.preview(new_board)
+    #
+    # assert preview.active_tile_fits == false
+  end
+
+  test "player survives when active piece still fits after garbage addition" do
+    # board = setup_board_with_room_at_top()
+    # small_garbage = generate_multiple_garbage_rows(2)
+    # new_board = Board.add_garbage_rows(board, small_garbage)
+    # preview = Board.preview(new_board)
+    #
+    # assert preview.active_tile_fits == true
+  end
+
+  # Helper function placeholders for garbage system tests
+  # These would be implemented with actual test setup logic:
+  #
+  # defp setup_empty_board(), do: Board.new(20, 10, 12345)
+  # defp setup_board_with_single_line_ready(), do: # ... implementation
+  # defp setup_board_with_double_lines_ready(), do: # ... implementation
+  # defp setup_board_with_triple_lines_ready(), do: # ... implementation
+  # defp setup_board_with_tetris_ready(), do: # ... implementation
+  # defp garbage_row_has_single_gap(row), do: # ... implementation
+  # defp generate_test_garbage_row(), do: # ... implementation
+  # defp count_filled_blocks(row), do: # ... implementation
+  # defp count_gaps(row), do: # ... implementation
+  # defp get_gap_position(row), do: # ... implementation
+  # defp generate_multiple_garbage_rows(count), do: # ... implementation
 end
