@@ -32,7 +32,11 @@ defmodule TetrexWeb.ChatComponent do
                 (message.from_user_id == current_user.id and
                    message.to_user_id == chat_with_user_id)) do
           updated_messages = socket.assigns.messages ++ [message]
-          {:ok, assign(socket, :messages, updated_messages)}
+
+          {:ok,
+           socket
+           |> assign(:messages, updated_messages)
+           |> push_event("scroll-to-bottom", %{})}
         else
           {:ok, socket}
         end
@@ -51,7 +55,8 @@ defmodule TetrexWeb.ChatComponent do
             {:ok,
              socket
              |> assign(:chat_with_username, target_user.username)
-             |> assign(:messages, conversation.messages)}
+             |> assign(:messages, conversation.messages)
+             |> push_event("scroll-to-bottom", %{})}
 
           true ->
             {:ok, socket}
@@ -75,7 +80,10 @@ defmodule TetrexWeb.ChatComponent do
 
       send(self(), {:chat_sent, socket.assigns.chat_with_user_id})
 
-      {:noreply, assign(socket, :message_content, "")}
+      {:noreply,
+       socket
+       |> assign(:message_content, "")
+       |> push_event("scroll-to-bottom", %{})}
     else
       {:noreply, socket}
     end
