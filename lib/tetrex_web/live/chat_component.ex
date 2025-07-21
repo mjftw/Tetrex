@@ -10,7 +10,8 @@ defmodule TetrexWeb.ChatComponent do
      socket
      |> assign(:messages, [])
      |> assign(:chat_with_user_id, nil)
-     |> assign(:chat_with_username, nil)}
+     |> assign(:chat_with_username, nil)
+     |> assign(:message_content, "")}
   end
 
   @impl true
@@ -62,8 +63,8 @@ defmodule TetrexWeb.ChatComponent do
   end
 
   @impl true
-  def handle_event("send_message", %{"message" => %{"content" => content}}, socket) do
-    content = String.trim(content)
+  def handle_event("send_message", _params, socket) do
+    content = String.trim(socket.assigns.message_content)
 
     if String.length(content) > 0 and socket.assigns.chat_with_user_id do
       ChatServer.send_message(
@@ -74,10 +75,15 @@ defmodule TetrexWeb.ChatComponent do
 
       send(self(), {:chat_sent, socket.assigns.chat_with_user_id})
 
-      {:noreply, socket}
+      {:noreply, assign(socket, :message_content, "")}
     else
       {:noreply, socket}
     end
+  end
+
+  @impl true
+  def handle_event("update_message", %{"value" => content}, socket) do
+    {:noreply, assign(socket, :message_content, content)}
   end
 
   @impl true
