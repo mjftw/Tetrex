@@ -7,8 +7,6 @@ defmodule Tetrex.Board do
 
   @tile_bag_size 9999
 
-  @blocking_tile :blocking
-
   @enforce_keys [
     :playfield,
     :playfield_height,
@@ -84,12 +82,7 @@ defmodule Tetrex.Board do
 
           row_filled = SparseGrid.filled?(playfield, row_start, row_end)
 
-          blocking_row =
-            playfield
-            |> SparseGrid.mask(row_start, row_end)
-            |> SparseGrid.all?(&(&1 == @blocking_tile))
-
-          should_clear_row = row_filled && !blocking_row
+          should_clear_row = row_filled
 
           case {should_clear_row, row_num} do
             {false, _} ->
@@ -246,59 +239,7 @@ defmodule Tetrex.Board do
     end
   end
 
-  @doc """
-  Push the playfield up by adding a row to the bottom
-  """
-  @spec add_blocking_row(board()) :: board()
-  def add_blocking_row(board) do
-    blocking_row =
-      SparseGrid.fill(
-        @blocking_tile,
-        {board.playfield_height - 1, 0},
-        {board.playfield_height - 1, board.playfield_width - 1}
-      )
 
-    playfield =
-      board.playfield
-      |> SparseGrid.move({-1, 0})
-      |> SparseGrid.merge(blocking_row)
-
-    %__MODULE__{
-      board
-      | playfield: playfield
-    }
-  end
-
-  @doc """
-  Remove one blocking line from the bottom of the playfield, if there is one
-  """
-  @spec remove_blocking_row(board()) :: board()
-  def remove_blocking_row(board) do
-    has_blocking_row =
-      board.playfield
-      |> SparseGrid.mask(
-        {board.playfield_height - 1, 0},
-        {board.playfield_height - 1, board.playfield_width - 1}
-      )
-      |> SparseGrid.all?(&(&1 == @blocking_tile))
-
-    if has_blocking_row do
-      playfield =
-        board.playfield
-        |> SparseGrid.mask(
-          {0, 0},
-          {board.playfield_height - 2, board.playfield_width - 1}
-        )
-        |> SparseGrid.move({1, 0})
-
-      %__MODULE__{
-        board
-        | playfield: playfield
-      }
-    else
-      board
-    end
-  end
 
   @doc """
   Generate a single garbage row with exactly one gap

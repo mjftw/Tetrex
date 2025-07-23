@@ -394,7 +394,7 @@ defmodule Tetrex.Board.Test do
     assert num_rows_cleared == 2
   end
 
-  test "try_move_active_down/1 should not clear blocking tiles" do
+  test "try_move_active_down/1 clears filled rows normally" do
     board = %{
       Board.new(6, 3, 0)
       | active_tile:
@@ -410,7 +410,7 @@ defmodule Tetrex.Board.Test do
             [nil, nil, :b],
             [nil, :b, :b],
             [:b, :b, nil],
-            [:blocking, :blocking, :blocking]
+            [:red, :green, :blue]
           ])
     }
 
@@ -420,8 +420,7 @@ defmodule Tetrex.Board.Test do
         [nil, nil, :b],
         [:a, :a, :b],
         [nil, :b, :b],
-        [:b, :b, nil],
-        [:blocking, :blocking, :blocking]
+        [:b, :b, nil]
       ])
 
     {_, moved, _} = Board.try_move_active_down(board)
@@ -774,93 +773,7 @@ defmodule Tetrex.Board.Test do
     assert not_rotated == board
   end
 
-  test "add_blocking_row/2 should push playfield up and add a row to the bottom" do
-    board = %{
-      Board.new(6, 3, 0)
-      | active_tile:
-          Tetrex.SparseGrid.new([
-            [:a]
-          ]),
-        playfield:
-          Tetrex.SparseGrid.new([
-            [],
-            [],
-            [],
-            [nil, :a, nil],
-            [:a, nil, nil],
-            [nil, :a, nil]
-          ])
-    }
 
-    expected =
-      Tetrex.SparseGrid.new([
-        [],
-        [],
-        [nil, :a, nil],
-        [:a, nil, nil],
-        [nil, :a, nil],
-        [:blocking, :blocking, :blocking]
-      ])
-
-    %{playfield: moved} = Board.add_blocking_row(board)
-
-    assert moved == expected
-  end
-
-  test "remove_blocking_row/2 remove a blocking row from bottom of playfield when there is one" do
-    board = %{
-      Board.new(6, 3, 0)
-      | active_tile:
-          Tetrex.SparseGrid.new([
-            [:a]
-          ]),
-        playfield:
-          Tetrex.SparseGrid.new([
-            [],
-            [],
-            [nil, :a, nil],
-            [:a, nil, nil],
-            [nil, :a, nil],
-            [:blocking, :blocking, :blocking]
-          ])
-    }
-
-    expected =
-      Tetrex.SparseGrid.new([
-        [],
-        [],
-        [],
-        [nil, :a, nil],
-        [:a, nil, nil],
-        [nil, :a, nil]
-      ])
-
-    %{playfield: moved} = Board.remove_blocking_row(board)
-
-    assert moved == expected
-  end
-
-  test "remove_blocking_row/2 not modify playfield when no blocking row" do
-    board = %{
-      Board.new(5, 3, 0)
-      | active_tile:
-          Tetrex.SparseGrid.new([
-            [:a]
-          ]),
-        playfield:
-          Tetrex.SparseGrid.new([
-            [],
-            [],
-            [nil, :a, nil],
-            [:a, nil, nil],
-            [nil, :a, nil]
-          ])
-    }
-
-    %{playfield: not_moved} = Board.remove_blocking_row(board)
-
-    assert not_moved == board.playfield
-  end
 
   test "preview/1 should return flattened view of board when active tile fits" do
     board = %{
