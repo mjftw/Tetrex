@@ -25,6 +25,15 @@ defmodule Tetrex.Multiplayer.GameServer do
                                 false
                               )
 
+  @send_blocking_row_probability Application.compile_env(
+                                   :tetrex,
+                                   [
+                                     :settings,
+                                     :multiplayer,
+                                     :send_blocking_row_probability
+                                   ],
+                                   0.5
+                                 )
   @rate_limit_max_updates_per_sec Application.compile_env(
                                     :tetrex,
                                     [
@@ -475,41 +484,25 @@ defmodule Tetrex.Multiplayer.GameServer do
         {:ok, game}
       end
 
-    # Generate and send garbage rows based on Tetris rules when lines are cleared
+    # Send a blocking row to a random alive player per line cleared
+    # Probability of sending a row is == @send_blocking_row_probability
     game =
-      if num_lines_cleared > 0 do
-        # Generate garbage using Tetris rules based on lines cleared
-        opponent_garbage_rows = generate_garbage_for_opponents(board_pid, num_lines_cleared)
+      game
+      |> Game.alive_players()
+      |> Stream.map(fn {player_user_id, _} -> player_user_id end)
+      |> Stream.filter(fn player_user_id -> player_user_id != user_id end)
+      |> Enum.take_random(num_lines_cleared)
+      |> Enum.filter(fn _ -> random_bool(@send_blocking_row_probability) end)
+      |> Enum.reduce(game, fn user_id, game ->
+        case send_blocking_row_to_player(game, user_id) do
+          {:ok, new_game} ->
+            new_game
 
-        # Send garbage to opponent players (not the player who cleared lines)
-        opponent_players =
-          game
-          |> Game.alive_players()
-          |> Stream.map(fn {player_user_id, _} -> player_user_id end)
-          |> Stream.filter(fn player_user_id -> player_user_id != user_id end)
-          |> Enum.to_list()
-
-        # Send the generated garbage to one random opponent
-        if length(opponent_garbage_rows) > 0 and length(opponent_players) > 0 do
-          random_opponent = Enum.random(opponent_players)
-
-          case send_garbage_to_player(game, random_opponent, opponent_garbage_rows) do
-            {:ok, new_game} ->
-              new_game
-
-            {:error, error} ->
-              Logger.error(
-                "Failed to send garbage to player #{random_opponent}: #{inspect(error)}"
-              )
-
-              game
-          end
-        else
-          game
+          {:error, error} ->
+            Logger.error(error)
+            game
         end
-      else
-        game
-      end
+      end)
 
     game
   end
@@ -536,18 +529,12 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
-  # New function for sending garbage rows using the Tetris-compliant system
-  defp send_garbage_to_player(game, user_id, garbage_rows) do
+  defp send_blocking_row_to_player(game, user_id) do
     case Game.get_player_state(game, user_id) do
       {:ok, %{board_pid: board_pid}} ->
-        case BoardServer.add_garbage_rows(board_pid, garbage_rows) do
-          %{active_tile_fits: false} ->
-            # Player dies due to garbage overflow
-            kill_player_stop_timer(game, user_id)
-
-          _ ->
-            # Player survives the garbage addition
-            {:ok, game}
+        case BoardServer.add_blocking_row(board_pid) do
+          %{active_tile_fits: false} -> kill_player_stop_timer(game, user_id)
+          _ -> {:ok, game}
         end
 
       {:error, error} ->
@@ -555,35 +542,8 @@ defmodule Tetrex.Multiplayer.GameServer do
     end
   end
 
-  # Generate garbage rows for opponents based on Tetris rules
-  defp generate_garbage_for_opponents(board_pid, num_lines_cleared) do
-    # Get board dimensions for garbage generation
-    %{playfield_width: width} = BoardServer.preview(board_pid)
-
-    case num_lines_cleared do
-      # Single: no garbage
-      1 ->
-        []
-
-      # Double: 1 garbage row
-      2 ->
-        [Tetrex.Board.generate_garbage_row(width: width)]
-
-      # Triple: 2 garbage rows
-      3 ->
-        [
-          Tetrex.Board.generate_garbage_row(width: width),
-          Tetrex.Board.generate_garbage_row(width: width)
-        ]
-
-      # Tetris: 4 garbage rows
-      4 ->
-        for _ <- 1..4, do: Tetrex.Board.generate_garbage_row(width: width)
-
-      # No lines or more than 4 lines: no garbage
-      _ ->
-        []
-    end
+  defp random_bool(true_probability) do
+    :rand.uniform(100) <= true_probability * 100
   end
 
   # Note this function is only for debug use
