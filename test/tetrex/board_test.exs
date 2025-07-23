@@ -417,8 +417,8 @@ defmodule Tetrex.Board.Test do
     expected =
       Tetrex.SparseGrid.new([
         [],
-        [nil, nil, :b],
-        [:a, :a, :b],
+        [],
+        [:a, nil, :b],
         [nil, :b, :b],
         [:b, :b, nil],
         [:blocking, :blocking, :blocking]
@@ -882,9 +882,32 @@ defmodule Tetrex.Board.Test do
     }
 
     board_with_blocking_row = Board.add_blocking_row(board)
-    %{active_tile_fits: active_tile_fits} = Board.preview(board_with_blocking_row)
+    %{tiles_fit_on_board: tiles_fit_on_board} = Board.preview(board_with_blocking_row)
 
-    assert active_tile_fits == true
+    assert tiles_fit_on_board == true
+  end
+
+  test "add_blocking_row/2 should detect when tiles are pushed off board even if active tile fits" do
+    board = %{
+      Board.new(3, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [:a]
+          ])
+          |> Tetrex.SparseGrid.move({2, 1}),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [nil, :b, nil],
+            [nil, :b, nil],
+            [:b, :b, :b]
+          ])
+    }
+
+    board_with_blocking_row = Board.add_blocking_row(board)
+    %{tiles_fit_on_board: tiles_fit_on_board} = Board.preview(board_with_blocking_row)
+
+    # Even though the active tile might fit, some playfield tiles were pushed off the top
+    assert tiles_fit_on_board == false
   end
 
   test "preview/1 should return flattened view of board when active tile fits" do
@@ -925,7 +948,7 @@ defmodule Tetrex.Board.Test do
           [:p, :a, :p],
           [:p, :p, :p]
         ]),
-      active_tile_fits: true
+      tiles_fit_on_board: true
     }
 
     assert previewed == expected
@@ -1011,7 +1034,7 @@ defmodule Tetrex.Board.Test do
           [:p, :d, :p],
           [:p, :p, :p]
         ]),
-      active_tile_fits: false
+      tiles_fit_on_board: false
     }
 
     assert previewed == expected
