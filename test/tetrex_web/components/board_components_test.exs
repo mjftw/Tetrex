@@ -9,7 +9,7 @@ defmodule TetrexWeb.Components.BoardComponentsTest do
     test "renders all tile types including garbage without crashing" do
       # Test that all tile types render without function clause errors
       # This is the main test that would have caught the original bug
-      tile_types = [:red, :green, :blue, :cyan, :yellow, :purple, :orange, :drop_preview, :blocking, :garbage, nil]
+      tile_types = [:red, :green, :blue, :cyan, :yellow, :purple, :orange, :drop_preview, :garbage, nil]
       
       for tile_type <- tile_types do
         # Create a single-tile sparse grid
@@ -35,7 +35,6 @@ defmodule TetrexWeb.Components.BoardComponentsTest do
           :purple -> assert html =~ "fill-purple-400"
           :orange -> assert html =~ "fill-orange-400"
           :drop_preview -> assert html =~ "fill-slate-500"
-          :blocking -> assert html =~ "fill-slate-700"
           :garbage -> assert html =~ "fill-gray-500"  # This is the key test for our fix
           nil -> assert html # Just verify it doesn't crash
         end
@@ -95,7 +94,7 @@ defmodule TetrexWeb.Components.BoardComponentsTest do
       grid_data = [
         [:red, :green, :blue],
         [:cyan, :yellow, :purple], 
-        [:orange, :garbage, :blocking],
+        [:orange, :garbage, :drop_preview],
         [nil, :drop_preview, :garbage]
       ]
       
@@ -113,7 +112,7 @@ defmodule TetrexWeb.Components.BoardComponentsTest do
       assert html =~ "fill-purple-400"
       assert html =~ "fill-orange-400"
       assert html =~ "fill-gray-500"  # garbage tiles
-      assert html =~ "fill-slate-700" # blocking tiles
+
       assert html =~ "fill-slate-500" # drop_preview tiles
     end
 

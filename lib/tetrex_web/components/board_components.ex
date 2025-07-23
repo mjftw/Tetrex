@@ -208,11 +208,7 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
-  defp tile(%{type: :blocking} = assigns) do
-    ~H"""
-    <.tile_edged x={@x} y={@y} size={@size} class="fill-slate-700 stroke-slate-800" />
-    """
-  end
+
 
   defp tile(%{type: :garbage} = assigns) do
     ~H"""
