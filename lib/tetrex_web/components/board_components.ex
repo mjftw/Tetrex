@@ -214,12 +214,6 @@ defmodule TetrexWeb.Components.BoardComponents do
     """
   end
 
-  defp tile(%{type: :garbage} = assigns) do
-    ~H"""
-    <.tile_filled x={@x} y={@y} size={@size} class="fill-gray-500" />
-    """
-  end
-
   defp tile(%{type: nil} = assigns) do
     ~H"""
 
