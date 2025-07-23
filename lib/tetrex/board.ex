@@ -305,8 +305,8 @@ defmodule Tetrex.Board do
   """
   @spec generate_garbage_row(keyword()) :: SparseGrid.sparse_grid()
   def generate_garbage_row(opts) do
+    gap_column = Keyword.fetch!(opts, :gap_column)
     width = Keyword.fetch!(opts, :width)
-    gap_column = Keyword.get(opts, :gap_column, Enum.random(0..(width - 1)))
 
     garbage_values =
       for col <- 0..(width - 1), col != gap_column, into: %{} do
