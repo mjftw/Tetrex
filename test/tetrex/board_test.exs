@@ -862,6 +862,31 @@ defmodule Tetrex.Board.Test do
     assert not_moved == board.playfield
   end
 
+  test "add_blocking_row/2 should not kill player when active tile can be moved up to fit" do
+    board = %{
+      Board.new(6, 3, 0)
+      | active_tile:
+          Tetrex.SparseGrid.new([
+            [:a]
+          ])
+          |> Tetrex.SparseGrid.move({4, 1}),
+        playfield:
+          Tetrex.SparseGrid.new([
+            [],
+            [],
+            [],
+            [nil, nil, :b],
+            [nil, nil, :b],
+            [:b, :b, :b]
+          ])
+    }
+
+    board_with_blocking_row = Board.add_blocking_row(board)
+    %{active_tile_fits: active_tile_fits} = Board.preview(board_with_blocking_row)
+
+    assert active_tile_fits == true
+  end
+
   test "preview/1 should return flattened view of board when active tile fits" do
     board = %{
       Board.new(3, 3, 0)
