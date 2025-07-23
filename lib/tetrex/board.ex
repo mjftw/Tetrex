@@ -44,7 +44,7 @@ defmodule Tetrex.Board do
           playfield_width: non_neg_integer(),
           next_tile: SparseGrid.t(),
           hold_tile: SparseGrid.t(),
-          tiles_fit_on_board: boolean()
+          active_tile_fits: boolean()
         }
 
   @doc """
@@ -333,10 +333,13 @@ defmodule Tetrex.Board do
   """
   @spec preview(board()) :: board_preview()
   def preview(board) do
-    tiles_fit = tiles_fit_on_board(board)
-    
-    case tiles_fit do
-      true ->
+    # FIXME: This check is not sufficient!
+    # If a blocking row is added there may be an overlap where the tiles are pushed off the board,
+    #  but active tile still fits.
+    # Need additional check to see if this has happened, and put this info in preview.
+    # Maybe change "active_tile_fits" to "tiles_fit_on_board" instead
+    case SparseGrid.overlaps?(board.active_tile, board.playfield) do
+      false ->
         %{active_tile: dropped} = drop_active_no_merge(board)
 
         playfield =
@@ -351,10 +354,10 @@ defmodule Tetrex.Board do
           hold_tile: board.hold_tile,
           playfield_height: board.playfield_height,
           playfield_width: board.playfield_width,
-          tiles_fit_on_board: true
+          active_tile_fits: true
         }
 
-      false ->
+      true ->
         new_board = try_move_active_up_until_fits(board)
 
         %{
@@ -363,7 +366,7 @@ defmodule Tetrex.Board do
           hold_tile: new_board.hold_tile,
           playfield_height: board.playfield_height,
           playfield_width: board.playfield_width,
-          tiles_fit_on_board: false
+          active_tile_fits: false
         }
     end
   end
@@ -417,21 +420,6 @@ defmodule Tetrex.Board do
         }
         |> try_move_active_up_until_fits()
     end
-  end
-
-  defp tiles_fit_on_board(board) do
-    # Check if active tile fits on the board (no overlap with playfield)
-    active_tile_fits = not SparseGrid.overlaps?(board.active_tile, board.playfield)
-    
-    # Check if any playfield tiles are pushed off the top of the board
-    playfield_corners = SparseGrid.corners(board.playfield)
-    playfield_fits_vertically = 
-      case playfield_corners do
-        nil -> true  # Empty playfield fits
-        %{topleft: {min_row, _}} -> min_row >= 0
-      end
-    
-    active_tile_fits and playfield_fits_vertically
   end
 
   defp try_move_active_sideways(board, x_translation) do
