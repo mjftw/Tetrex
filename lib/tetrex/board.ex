@@ -317,29 +317,6 @@ defmodule Tetrex.Board do
   end
 
   @doc """
-  Add garbage rows to the bottom of the playfield
-  """
-  @spec add_garbage_rows(board(), [SparseGrid.sparse_grid()]) :: board()
-  def add_garbage_rows(board, garbage_rows) do
-    garbage_count = length(garbage_rows)
-
-    # Move existing playfield up by the number of garbage rows
-    shifted_playfield = SparseGrid.move(board.playfield, {-garbage_count, 0})
-
-    # Add each garbage row to the bottom
-    final_playfield =
-      garbage_rows
-      |> Enum.with_index()
-      |> Enum.reduce(shifted_playfield, fn {garbage_row, index}, acc ->
-        row_offset = board.playfield_height - garbage_count + index
-        moved_garbage = SparseGrid.move(garbage_row, {row_offset, 0})
-        SparseGrid.merge(acc, moved_garbage)
-      end)
-
-    %__MODULE__{board | playfield: final_playfield}
-  end
-
-  @doc """
   Apply a transform function to the active tile, checking that doing so would
   cause it to collide with the playfield or be outside the playfield.
   """
