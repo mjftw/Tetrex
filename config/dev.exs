@@ -11,6 +11,7 @@ config :tetrex, :settings,
     # so I'll just put it behind a feature flag and advise you not to use it.
     # I never claimed this game was production ready ;-)
     use_multiplayer_state_diff: false,
+    send_blocking_row_probability: 1,
     rate_limit_max_updates_per_sec: 30
   ]
 

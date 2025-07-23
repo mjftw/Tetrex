@@ -15,7 +15,9 @@ config :tetrex, :settings,
     # and puts more load on the client browser.
     # Cannot be greater than :max_players_in_game
     num_opponent_boards_to_show: 98,
-
+    # The probability of sending a blocking row to another player when a
+    # line is cleared
+    send_blocking_row_probability: 1,
     # How many times per second to update the browser game views
     rate_limit_max_updates_per_sec: 20
   ]
