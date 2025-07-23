@@ -301,22 +301,6 @@ defmodule Tetrex.Board do
   end
 
   @doc """
-  Generate a single garbage row with exactly one gap
-  """
-  @spec generate_garbage_row(keyword()) :: SparseGrid.sparse_grid()
-  def generate_garbage_row(opts) do
-    gap_column = Keyword.fetch!(opts, :gap_column)
-    width = Keyword.fetch!(opts, :width)
-
-    garbage_values =
-      for col <- 0..(width - 1), col != gap_column, into: %{} do
-        {{0, col}, :garbage}
-      end
-
-    SparseGrid.new(garbage_values)
-  end
-
-  @doc """
   Apply a transform function to the active tile, checking that doing so would
   cause it to collide with the playfield or be outside the playfield.
   """
